@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+               "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", ui-monospace, monospace;
+}
+
+/* ─── Apple design tokens ───────────────────────────────────── */
+:root {
+  --c-black:      #000000;
+  --c-dark:       #1d1d1f;
+  --c-bg:         #f5f5f7;
+  --c-white:      #ffffff;
+  --c-blue:       #0071e3;
+  --c-blue-h:     #0077ed;
+  --c-text-1:     #1d1d1f;   /* primary on light */
+  --c-text-2:     #6e6e73;   /* secondary on light */
+  --c-text-3:     #86868b;   /* tertiary / captions */
+  --c-text-inv:   #f5f5f7;   /* primary on dark */
+  --c-text-inv2:  #a1a1a6;   /* secondary on dark */
+  --c-text-inv3:  #6e6e73;   /* tertiary on dark */
+  --c-border-l:   rgba(0,0,0,0.08);
+  --c-border-d:   rgba(255,255,255,0.1);
+  --c-card-l:     rgba(255,255,255,0.9);
+  --c-card-d:     rgba(255,255,255,0.05);
+}
+
+/* ─── Base ──────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--c-black);
+  color: var(--c-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ─── Apple-style selection ─────────────────────────────────── */
+::selection {
+  background: rgba(0, 113, 227, 0.2);
+  color: inherit;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #48484a; }
+
+/* ─── Scroll indicator ──────────────────────────────────────── */
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50%       { opacity: 1;   transform: scaleY(1.3); }
+}
+.scroll-indicator { animation: scroll-pulse 2.2s ease-in-out infinite; }
+
+/* ─── Apple-style page transition ──────────────────────────── */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: page-in 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; }
+
+/* ─── Section label (blue small-caps) ───────────────────────── */
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-blue);
+}
+.section-label-dark {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-blue);
+  opacity: 0.85;
+}
