@@ -30,6 +30,92 @@ export interface ExperienceDetail {
 
 export const EXPERIENCE_DATA: ExperienceDetail[] = [
   {
+    slug:     "alibaba-international",
+    company:  "Alibaba International",
+    logo:     "/photos/logo-alibaba.png",
+    role:     { en: "AI Business Analytics Intern", zh: "AI 商业分析实习生" },
+    period:   { en: "Summer 2026", zh: "2026年暑期" },
+    location: { en: "China", zh: "中国" },
+    category: { en: "AI & Business Analytics", zh: "AI 与商业分析" },
+    tagline:  {
+      en: "AI-enabled logistics analytics for global e-commerce growth",
+      zh: "以 AI 与物流履约分析驱动国际电商增长",
+    },
+    accent: "#ff6a00",
+    overview: {
+      en: "Joined Alibaba International's BI team supporting AliExpress logistics and supply chain. I combined causal analysis, semantic data infrastructure, and AI agents to quantify the business value of delivery improvements, standardise metric definitions, and accelerate the diagnosis of global logistics exceptions.",
+      zh: "加入阿里国际 BI-AE 物流与供应链团队，将因果分析、语义化数据基础设施与 AI Agent 应用于国际电商业务，量化履约改善的商业价值、统一指标口径，并提升全球物流异常诊断效率。",
+    },
+    metrics: [
+      { value: "$1.27M", label: { en: "Monthly GMV opportunity quantified", zh: "月度 GMV 增益空间" } },
+      { value: "1.4M",   label: { en: "Users in delivery analysis", zh: "履约分析用户样本" } },
+      { value: "6",      label: { en: "Delivery stages monitored", zh: "履约分段监测" } },
+      { value: "30 sec", label: { en: "Root-cause drill-down", zh: "异常定位下钻" } },
+    ],
+    sections: [
+      {
+        title: { en: "Fulfilment & GMV Analysis", zh: "履约时效与 GMV 分析" },
+        points: {
+          en: [
+            "Designed a three-window cohort study for US cross-border users and applied Generalized Propensity Score (GPS) with Difference-in-Differences (DID) to estimate the causal relationship between delivery time and subsequent GMV.",
+            "Identified an approximately 10-day tolerance threshold: delivery delays beyond it were associated with accelerating GMV loss, with the steepest impact among high- and ultra-high-value users.",
+            "Estimated that shortening delivery for users above 12 days to 10 days could unlock approximately $40.8K in daily GMV and $1.265M monthly, with 83% of the gain contributed by high-value segments.",
+          ],
+          zh: [
+            "面向美国跨境用户设计三窗口队列实验，结合广义倾向得分（GPS）与双重差分（DID），估计妥投时效对用户后续 GMV 的因果影响。",
+            "识别约 10 天的用户容忍阈值：超过该节点后，GMV 损失加速扩大，且高价值与超高价值用户受到的影响最为显著。",
+            "测算将 12 天以上用户的妥投时长缩短至 10 天，可带来约 4.08 万美元日均、126.5 万美元月均 GMV 增益，其中 83% 来自高价值用户群体。",
+          ],
+        },
+      },
+      {
+        title: { en: "AI-native Metrics Library", zh: "AI 原生指标库" },
+        points: {
+          en: [
+            "Built an AI-readable logistics and supply-chain metrics layer using Markdown and YAML, combining a searchable index, standardised metric definitions, calculation logic, data lineage, and a business glossary.",
+            "Created reusable Skills that extract metric definitions from reports and trace SQL from result tables through intermediate layers to ADS source tables, producing field-level lineage reports.",
+            "Designed an agent workflow for metric lookup, document-definition audits, and change requests, connected through Devix and DingTalk for cloud-hosted, version-controlled access.",
+          ],
+          zh: [
+            "使用 Markdown 与 YAML 搭建 AI 可直接解析的物流供应链指标语义层，整合总索引、标准定义、计算口径、数据血缘与业务术语词典。",
+            "制作可复用的指标抓取与 SQL 溯源 Skills：从业务文档中提取标准化指标信息，并从结果表穿透中间层追踪至 ADS 源表，输出字段级血缘报告。",
+            "设计指标查询、文档口径审查与指标增改申请三类 Agent 能力，并通过 Devix 与钉钉实现云端托管和版本管理。",
+          ],
+        },
+      },
+      {
+        title: { en: "Logistics Sentinel Agent", zh: "物流异常监测 Agent" },
+        points: {
+          en: [
+            "Developed a daily monitoring workflow that scans six fulfilment stages across countries and compares performance with SLA targets, seven-day trends, and thirty-day baselines before pushing exception summaries to DingTalk.",
+            "Designed a three-level diagnostic path from country and fulfilment stage to the ten weakest routes and their lowest-performing carriers, reducing root-cause drill-down to about 30 seconds.",
+            "Extended diagnosis with bilingual web attribution, matching geography and event timing to assess external causes such as port closures, strikes, and aviation controls.",
+          ],
+          zh: [
+            "搭建每日物流监测流程，扫描全球各国六段履约达成率，并与 SLA 目标、7 天趋势和 30 天基线交叉对比，通过钉钉推送异常摘要。",
+            "设计从国家与履约分段，到最差 TOP10 线路，再到低表现承运商的三层下钻路径，将异常根因定位时间缩短至约 30 秒。",
+            "扩展中英双语联网归因能力，以地理位置和事件时间双重匹配外部原因，辅助识别港口关闭、罢工与航空管制等影响。",
+          ],
+        },
+      },
+      {
+        title: { en: "AI & GPU Capability Building", zh: "AI 与 GPU 能力建设" },
+        points: {
+          en: [
+            "Authored an AI Workbench operations guide covering repository setup, ODPS connectivity, dependency installation, debugging, and grey-release deployment to help the team operationalise reusable analyses.",
+            "Deployed and tested NVIDIA cuOpt with Qwen2.5-7B for vehicle-routing optimisation, translating business constraints into solver-ready models and converting GPU results back into decision-oriented explanations.",
+          ],
+          zh: [
+            "编写《AI 应用台操作指南》，覆盖代码建仓、ODPS 数据源连接、依赖安装、Debug 与灰度上线，帮助团队将可复用分析部署为持续运行的能力。",
+            "使用 Qwen2.5-7B 配合 NVIDIA cuOpt 开展车辆路径规划实验，将业务约束转化为求解模型，并把 GPU 计算结果还原为可执行的业务解释。",
+          ],
+        },
+      },
+    ],
+    tools: ["Python", "SQL", "ODPS", "GPS", "DID", "YAML", "Devix", "DingTalk", "Qwen2.5-7B", "NVIDIA cuOpt"],
+  },
+
+  {
     slug:     "roland-berger",
     company:  "Roland Berger",
     logo:     "/photos/logo-roland-berger.jpeg",

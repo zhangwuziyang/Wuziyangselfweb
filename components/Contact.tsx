@@ -10,8 +10,10 @@ export default function Contact() {
   const { lang } = useLang();
   const c = i18n.contact;
 
+  const email = lang === "zh" ? "3168661545@qq.com" : "zhangwuziyang@gmail.com";
+
   const infoValues: Record<string, string> = {
-    Email:      "wuziyang@wisc.edu",
+    Email:      email,
     Location:   tx(c.infoValues.Location, lang),
     University: tx(c.infoValues.University, lang),
     Status:     tx(c.infoValues.Status, lang),
@@ -49,14 +51,14 @@ export default function Contact() {
           <ScrollReveal delay={0.22}>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-20">
               <a
-                href="mailto:wuziyang@wisc.edu"
+                href={`mailto:${email}`}
                 className="group inline-flex items-center gap-2 text-sm font-medium rounded-full transition-colors duration-300 px-7 py-3 bg-[#f5f5f7] text-[#1d1d1f] hover:bg-white"
               >
                 {tx(c.sendEmail, lang)}
                 <span className="group-hover:translate-x-0.5 transition-transform duration-200 inline-block">↗</span>
               </a>
               <a
-                href="https://www.linkedin.com/in/wuziyang-zhang"
+                href="https://www.linkedin.com/in/wuziyang-zhang-7b547229b"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm font-medium rounded-full transition-[background,border-color] duration-300 px-7 py-3 text-[#f5f5f7] border border-white/[0.18] hover:bg-white/[0.08] hover:border-white/[0.35]"
@@ -64,7 +66,8 @@ export default function Contact() {
                 {tx(c.linkedin, lang)}
               </a>
               <a
-                href="/resume.pdf"
+                href="/resume-wuziyang-zhang.pdf"
+                download="Wuziyang-Zhang-Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm font-medium rounded-full transition-[background,border-color] duration-300 px-7 py-3 text-[#f5f5f7] border border-white/[0.18] hover:bg-white/[0.08] hover:border-white/[0.35]"

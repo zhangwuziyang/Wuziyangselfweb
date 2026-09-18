@@ -4,9 +4,9 @@ import { useLang } from "@/context/LangContext";
 import { i18n, tx } from "@/lib/i18n";
 
 const FOOTER_LINKS = [
-  { href: "https://www.linkedin.com/in/wuziyang-zhang", key: "linkedin" as const, label: { en: "LinkedIn", zh: "LinkedIn" }, external: true },
-  { href: "mailto:wuziyang@wisc.edu",                   key: "email"    as const, label: i18n.footer.email,                    external: false },
-  { href: "/resume.pdf",                                 key: "resume"   as const, label: i18n.footer.resume,                   external: true  },
+  { href: "https://www.linkedin.com/in/wuziyang-zhang-7b547229b", key: "linkedin" as const, label: { en: "LinkedIn", zh: "LinkedIn" }, external: true },
+  { href: "mailto:zhangwuziyang@gmail.com",              key: "email"    as const, label: i18n.footer.email,                    external: false },
+  { href: "/resume-wuziyang-zhang.pdf",                  key: "resume"   as const, label: i18n.footer.resume,                   external: true  },
 ];
 
 export default function Footer() {

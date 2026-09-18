@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LangProvider } from "@/context/LangContext";
+import ProfileChat from "@/components/ProfileChat";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wuziyang.com";
 const OG_IMAGE = "/images/background.jpg";
@@ -58,7 +59,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-black antialiased">
-        <LangProvider>{children}</LangProvider>
+        <LangProvider>
+          {children}
+          <ProfileChat />
+        </LangProvider>
       </body>
     </html>
   );

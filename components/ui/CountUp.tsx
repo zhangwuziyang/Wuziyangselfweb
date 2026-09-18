@@ -19,7 +19,13 @@ export function CountUp({
   className = "",
 }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-15%" });
+  // Delay the animation until the number is comfortably inside the viewport,
+  // but never shrink the horizontal observer area. A four-sided negative
+  // margin can exclude counters close to the left or right edge permanently.
+  const isInView = useInView(ref, {
+    once: true,
+    margin: "0px 0px -15% 0px",
+  });
   const [count, setCount] = useState(0);
 
   useEffect(() => {

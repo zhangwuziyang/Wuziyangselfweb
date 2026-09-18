@@ -149,10 +149,10 @@ export default function Navbar() {
                 {tx(i18n.nav.lang, lang)}
               </button>
               <a
-                href="mailto:wuziyang@wisc.edu"
+                href={lang === "zh" ? "mailto:3168661545@qq.com" : "mailto:zhangwuziyang@gmail.com"}
                 className="text-white/50 text-sm font-mono"
               >
-                wuziyang@wisc.edu
+                {lang === "zh" ? "3168661545@qq.com" : "zhangwuziyang@gmail.com"}
               </a>
             </motion.div>
           </motion.div>
