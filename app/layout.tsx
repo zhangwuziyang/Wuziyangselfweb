@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LangProvider } from "@/context/LangContext";
 import ProfileChat from "@/components/ProfileChat";
+import { SITE_URL } from "@/lib/site";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wuziyang.com";
 const OG_IMAGE = "/images/background.jpg";
 
 export const metadata: Metadata = {
