@@ -211,7 +211,7 @@ export default function CodeAndPowerClient() {
             style={{ borderLeft: `2px solid ${ACCENT}` }}
           >
             <p className="font-light leading-[1.8] italic mb-2" style={{ fontSize: "clamp(1rem, 1.5vw, 1.1rem)", color: "#86868b" }}>
-              "{content.tagline[lang]}"
+              &ldquo;{content.tagline[lang]}&rdquo;
             </p>
             <p className="text-sm" style={{ color: "#48484a" }}>{content.taglineAuthor}</p>
           </motion.blockquote>
