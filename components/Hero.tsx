@@ -30,7 +30,7 @@ export default function Hero() {
         className="absolute inset-0"
       >
         <Image
-          src="/images/background.jpg"
+          src="/images/background.webp"
           alt="Wuziyang Zhang"
           fill
           className="object-cover"
