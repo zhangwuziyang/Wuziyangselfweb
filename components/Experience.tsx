@@ -39,9 +39,9 @@ export default function Experience() {
 
         <ol ref={railRef} className="relative">
           {/* Rail: faint track + scroll-driven fill. x = centre of the node column */}
-          <div className="absolute top-2 bottom-2 left-[11px] md:left-[171px] w-px bg-white/[0.08]" aria-hidden />
+          <div className="absolute top-2 bottom-2 left-[11px] md:left-[211px] w-px bg-white/[0.08]" aria-hidden />
           <motion.div
-            className="absolute top-2 bottom-2 left-[11px] md:left-[171px] w-px origin-top"
+            className="absolute top-2 bottom-2 left-[11px] md:left-[211px] w-px origin-top"
             style={{ scaleY: railFill, background: "linear-gradient(to bottom, #f5f5f7, rgba(245,245,247,0.25))" }}
             aria-hidden
           />
@@ -51,7 +51,7 @@ export default function Experience() {
             const newYear = i === 0 || TIMELINE[i - 1].start.slice(0, 4) !== year;
 
             return (
-              <li key={exp.slug} className="relative grid grid-cols-[24px_1fr] md:grid-cols-[140px_64px_1fr] gap-x-4 md:gap-x-0 pb-10 last:pb-0">
+              <li key={exp.slug} className="relative grid grid-cols-[24px_1fr] md:grid-cols-[180px_64px_1fr] gap-x-4 md:gap-x-0 pb-10 last:pb-0">
 
                 {/* Date column (desktop) */}
                 <ScrollReveal delay={0.04} className="hidden md:block pt-7 pr-6 text-right">
@@ -60,7 +60,7 @@ export default function Experience() {
                       {year}
                     </p>
                   )}
-                  <p className="text-sm" style={{ color: "#6e6e73" }}>{t(exp.period, lang)}</p>
+                  <p className="text-sm whitespace-nowrap" style={{ color: "#6e6e73" }}>{t(exp.period, lang)}</p>
                   <p className="text-xs mt-0.5" style={{ color: "#48484a" }}>{t(exp.location, lang)}</p>
                 </ScrollReveal>
 
