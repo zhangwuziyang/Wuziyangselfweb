@@ -7,6 +7,10 @@ export interface ExperienceDetail {
   logo:       string;
   role:       { en: string; zh: string };
   period:     { en: string; zh: string };
+  /** Start month (YYYY-MM), used to order the timeline */
+  start:      string;
+  /** True while the role is ongoing */
+  current?:   boolean;
   location:   { en: string; zh: string };
   category:   { en: string; zh: string };
   /** One-line teaser shown on the card */
@@ -31,6 +35,7 @@ export interface ExperienceDetail {
 export const EXPERIENCE_DATA: ExperienceDetail[] = [
   {
     slug:     "alibaba-international",
+    start:    "2026-06",
     company:  "Alibaba International",
     logo:     "/photos/logo-alibaba.png",
     role:     { en: "AI Business Analytics Intern", zh: "AI 商业分析实习生" },
@@ -117,6 +122,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
 
   {
     slug:     "roland-berger",
+    start:    "2025-05",
     company:  "Roland Berger",
     logo:     "/photos/logo-roland-berger.jpeg",
     role:     { en: "Project Consulting Intern", zh: "项目咨询实习生" },
@@ -201,6 +207,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
 
   {
     slug:     "guoyuan-securities",
+    start:    "2024-06",
     company:  "Guoyuan Securities",
     logo:     "/photos/logo-guoyuan.png",
     role:     { en: "Industry Research Intern", zh: "行业研究实习生" },
@@ -272,6 +279,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
 
   {
     slug:     "bytedance",
+    start:    "2025-12",
     company:  "ByteDance",
     logo:     "/photos/logo-bytedance.png",
     role:     { en: "Strategy Analysis Intern", zh: "战略分析实习生" },
@@ -356,6 +364,8 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
 
   {
     slug:     "chartcreator",
+    start:    "2025-08",
+    current:  true,
     company:  "ChartCreator",
     logo:     "/photos/logo-chartcreator.jpg",
     role:     { en: "AI Product Manager & Builder", zh: "AI 产品经理 & 开发者" },
