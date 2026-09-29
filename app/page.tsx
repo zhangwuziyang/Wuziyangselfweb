@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
+import { localeAlternates } from "@/lib/locale";
 import Navbar    from "@/components/Navbar";
 import Hero       from "@/components/Hero";
 import About      from "@/components/About";
@@ -10,6 +12,10 @@ import Skills     from "@/components/Skills";
 import Philosophy from "@/components/Philosophy";
 import Contact    from "@/components/Contact";
 import Footer     from "@/components/Footer";
+
+export const metadata: Metadata = {
+  alternates: localeAlternates("/", "en"),
+};
 
 export default function Home() {
   return (

@@ -28,6 +28,7 @@ export interface ExperienceDetail {
   tools: string[];
 }
 
+/** Newest first. */
 export const EXPERIENCE_DATA: ExperienceDetail[] = [
   {
     slug:     "alibaba-international",
@@ -113,161 +114,6 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
       },
     ],
     tools: ["Python", "SQL", "ODPS", "GPS", "DID", "YAML", "Devix", "DingTalk", "Qwen2.5-7B", "NVIDIA cuOpt"],
-  },
-
-  {
-    slug:     "roland-berger",
-    company:  "Roland Berger",
-    logo:     "/photos/logo-roland-berger.jpeg",
-    role:     { en: "Project Consulting Intern", zh: "项目咨询实习生" },
-    period:   { en: "May – Aug 2025", zh: "2025年5月 – 8月" },
-    location: { en: "Wuhan, Hubei, China", zh: "中国 · 湖北武汉" },
-    category: { en: "Strategy Consulting", zh: "战略咨询" },
-    tagline:  {
-      en: "Data-driven KOC user-growth strategy for Dongfeng Honda",
-      zh: "东风本田 KOC 数字化用户增长与数据驱动战略",
-    },
-    accent: "#6366f1",
-    overview: {
-      en: "Embedded in Roland Berger's automotive user-growth practice, I led quantitative analysis for a flagship engagement with Dongfeng Honda — helping the client translate three years of KOC ecosystem data into a deployable growth strategy.",
-      zh: "在罗兰贝格汽车用户增长业务线，我主导了东风本田旗舰项目的定量分析工作，帮助客户将三年 KOC 生态数据转化为可落地的增长策略。",
-    },
-    metrics: [
-      { value: "R² = 0.86",   label: { en: "Model accuracy",       zh: "模型拟合度"   } },
-      { value: "500+",        label: { en: "User profiles clustered", zh: "用户画像聚类" } },
-      { value: "27%",         label: { en: "UGC output increase",   zh: "UGC 产出提升" } },
-      { value: "97 pages",    label: { en: "Operation system manual", zh: "运营体系文件" } },
-    ],
-    sections: [
-      {
-        title: { en: "Data Processing", zh: "数据处理" },
-        points: {
-          en: [
-            "Integrated 3 years of sales and user operations data for Dongfeng Honda across 10 dimensions including KOC engagement, content creation, and referral rates.",
-            "Used Python (pandas, NumPy) to clean and validate data, detect anomalies, and identify key growth factors to support the brand's private-domain growth strategy.",
-          ],
-          zh: [
-            "系统整合东风本田三年用户运营与销售数据，覆盖 KOC 互动、内容产出、转介率等 10 个维度。",
-            "使用 Python（pandas、NumPy）进行数据清洗、异常值处理与关键增长因子识别，为品牌私域增长策略提供数据依据。",
-          ],
-        },
-      },
-      {
-        title: { en: "Model Development", zh: "数据建模" },
-        points: {
-          en: [
-            "Built multiple linear regression and random-forest models to forecast new KOC growth and content output trends.",
-            "Achieved R² = 0.86, directly informing quarterly operation targets and resource allocation decisions.",
-            "Produced 10+ slide decks summarising model results — all adopted by the client.",
-          ],
-          zh: [
-            "构建多元回归模型与随机森林模型，预测 KOC 新增人数与内容产出变化趋势。",
-            "模型 R² = 0.86，有效支撑客户季度运营目标制定与资源投入决策。",
-            "产出 10+ 页文档报告，最终被客户全部采纳。",
-          ],
-        },
-      },
-      {
-        title: { en: "Strategy Optimisation", zh: "策略优化" },
-        points: {
-          en: [
-            "Co-authored multiple rounds of executive-level presentation materials and designed KOC growth paths and UGC incentive tiering systems.",
-            "Applied K-Means clustering to 500+ user profiles and content types, identifying three core segments: \"Aesthetic Seeding,\" \"Daily Sharing,\" and \"Usage Insights.\"",
-            "Updated the KOC grading system using the Diamond Model and proposed differentiated strategies by vehicle type and region — raising UGC output by 27% in the following month.",
-          ],
-          zh: [
-            "联合项目组撰写多轮高层汇报材料，协助设计 KOC 成长路径与 UGC 激励分层策略等施策机制。",
-            "对 500+ 用户画像与内容类型进行 K-Means 聚类，识别出「美图种草」「日常分享」「用车心得」三类核心人群。",
-            "结合「钻石模型」与回归结果更新 KOC 分级体系，提出分车型、分地区、分层级的差异化策略，次月 UGC 产出提升 27%。",
-          ],
-        },
-      },
-      {
-        title: { en: "System Building", zh: "体系搭建" },
-        points: {
-          en: [
-            "Led creation of the 97-page Dongfeng Honda KOC Digital Operation System Manual (PowerPoint), converting project insights into a standardised operational framework.",
-            "Produced a 15-page Word standard operation guide for internal training and process standardisation.",
-          ],
-          zh: [
-            "参与搭建《东风本田保客达人 KOC 数字化运营体系文件》（97 页 PPT），将项目洞察沉淀为标准化运营框架。",
-            "将模型结果与洞察系统化转化为 Word 运营体系文件（15 页），用于企业内部培训与流程标准化。",
-          ],
-        },
-      },
-    ],
-    tools: ["Python", "pandas", "NumPy", "K-Means", "Random Forest", "Multiple Regression", "PowerPoint", "Excel"],
-  },
-
-  {
-    slug:     "guoyuan-securities",
-    company:  "Guoyuan Securities",
-    logo:     "/photos/logo-guoyuan.png",
-    role:     { en: "Industry Research Intern", zh: "行业研究实习生" },
-    period:   { en: "Jun – Aug 2024", zh: "2024年6月 – 8月" },
-    location: { en: "Hefei, Anhui, China", zh: "中国 · 安徽合肥" },
-    category: { en: "Financial Research", zh: "金融研究" },
-    tagline:  {
-      en: "Deep-dive baijiu sector research covering Moutai, Wuliangye and Fenjiu",
-      zh: "覆盖茅台、五粮液、汾酒的白酒板块深度行研",
-    },
-    accent: "#14b8a6",
-    overview: {
-      en: "Joined the consumer industry coverage team at Guoyuan Securities, focusing on China's premium baijiu market during a pivotal period of consumption upgrading. Built the financial infrastructure and authored an independent strategy report that was incorporated into the team's quarterly portfolio discussion.",
-      zh: "加入国元证券消费品行业覆盖团队，在消费升级关键时期深入研究中国高端白酒市场。构建了完整的金融基础设施，并独立完成一份被纳入季度组合策略讨论的策略报告。",
-    },
-    metrics: [
-      { value: "15+",   label: { en: "Companies covered",    zh: "覆盖上市公司" } },
-      { value: "3",     label: { en: "Valuation models",     zh: "估值模型"     } },
-      { value: "1",     label: { en: "Independent strategy report", zh: "独立策略报告" } },
-      { value: "2024",  label: { en: "Mid-year report published", zh: "年中报告发布" } },
-    ],
-    sections: [
-      {
-        title: { en: "Research Focus", zh: "研究方向" },
-        points: {
-          en: [
-            "Analysed China's white liquor (baijiu) sector covering leading brands including Kweichow Moutai, Wuliangye, and Fenjiu.",
-            "Focused on premium and sub-premium market structure, consumption upgrading trends, and channel dynamics.",
-          ],
-          zh: [
-            "聚焦白酒板块，覆盖茅台、五粮液、山西汾酒等龙头企业。",
-            "重点研究高端与次高端酒市场格局、消费升级趋势及渠道动态。",
-          ],
-        },
-      },
-      {
-        title: { en: "Data & Modelling", zh: "数据与建模" },
-        points: {
-          en: [
-            "Built a financial indicator database (revenue growth, net margin, inventory turnover ratio, etc.) using Wind, iFind, and quarterly reports across 15+ listed consumer staples companies.",
-            "Performed time-series and YoY/MoM comparisons in Excel to track raw material costs, sales channels, and holiday demand fluctuations.",
-            "Applied DCF and PE models to assess fair-value estimates and investment positioning.",
-          ],
-          zh: [
-            "基于 Wind、iFind 和上市公司季度财报，建立覆盖 15 家以上消费品公司的核心财务指标数据库（营收增速、净利率、渠道库存周转率等）。",
-            "在 Excel 中进行时间序列分析与同比环比对比，追踪原料价格、渠道动销及节假日销售波动。",
-            "运用 DCF 和 PE 估值模型测算核心标的合理区间，形成投资建议。",
-          ],
-        },
-      },
-      {
-        title: { en: "Report Writing & Output", zh: "研报写作与成果" },
-        points: {
-          en: [
-            "Assisted in drafting in-depth industry reports and monthly strategy briefs, summarising channel research and terminal sales data using the PESTEL framework for macro analysis.",
-            "Independently authored the Mid-Year Strategy Report on the Baijiu Sector (2024), advocating a \"steady growth in premium, structural recovery in sub-premium\" investment thesis.",
-            "Selected sections of the report were featured in the team's quarterly portfolio strategy discussion.",
-          ],
-          zh: [
-            "参与撰写行业深度研究报告及月度策略简报，结合 PESTEL 模型分析宏观政策与消费趋势。",
-            "独立完成《白酒板块 2024 年中期策略报告》，提出「高端稳增长、次高端结构性修复」的投资判断。",
-            "报告节选被导师纳入季度组合策略讨论材料。",
-          ],
-        },
-      },
-    ],
-    tools: ["Wind", "iFind", "Excel", "DCF", "PE Valuation", "PESTEL", "Financial Modelling"],
   },
 
   {
@@ -423,6 +269,161 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
       },
     ],
     tools: ["Claude Code", "Codex", "Next.js", "Tailwind CSS", "Figma", "Agile", "CI/CD", "Prompt Engineering"],
+  },
+
+  {
+    slug:     "roland-berger",
+    company:  "Roland Berger",
+    logo:     "/photos/logo-roland-berger.jpeg",
+    role:     { en: "Project Consulting Intern", zh: "项目咨询实习生" },
+    period:   { en: "May – Aug 2025", zh: "2025年5月 – 8月" },
+    location: { en: "Wuhan, Hubei, China", zh: "中国 · 湖北武汉" },
+    category: { en: "Strategy Consulting", zh: "战略咨询" },
+    tagline:  {
+      en: "Data-driven KOC user-growth strategy for Dongfeng Honda",
+      zh: "东风本田 KOC 数字化用户增长与数据驱动战略",
+    },
+    accent: "#6366f1",
+    overview: {
+      en: "Embedded in Roland Berger's automotive user-growth practice, I led quantitative analysis for a flagship engagement with Dongfeng Honda — helping the client translate three years of KOC ecosystem data into a deployable growth strategy.",
+      zh: "在罗兰贝格汽车用户增长业务线，我主导了东风本田旗舰项目的定量分析工作，帮助客户将三年 KOC 生态数据转化为可落地的增长策略。",
+    },
+    metrics: [
+      { value: "R² = 0.86",   label: { en: "Model accuracy",       zh: "模型拟合度"   } },
+      { value: "500+",        label: { en: "User profiles clustered", zh: "用户画像聚类" } },
+      { value: "27%",         label: { en: "UGC output increase",   zh: "UGC 产出提升" } },
+      { value: "97 pages",    label: { en: "Operation system manual", zh: "运营体系文件" } },
+    ],
+    sections: [
+      {
+        title: { en: "Data Processing", zh: "数据处理" },
+        points: {
+          en: [
+            "Integrated 3 years of sales and user operations data for Dongfeng Honda across 10 dimensions including KOC engagement, content creation, and referral rates.",
+            "Used Python (pandas, NumPy) to clean and validate data, detect anomalies, and identify key growth factors to support the brand's private-domain growth strategy.",
+          ],
+          zh: [
+            "系统整合东风本田三年用户运营与销售数据，覆盖 KOC 互动、内容产出、转介率等 10 个维度。",
+            "使用 Python（pandas、NumPy）进行数据清洗、异常值处理与关键增长因子识别，为品牌私域增长策略提供数据依据。",
+          ],
+        },
+      },
+      {
+        title: { en: "Model Development", zh: "数据建模" },
+        points: {
+          en: [
+            "Built multiple linear regression and random-forest models to forecast new KOC growth and content output trends.",
+            "Achieved R² = 0.86, directly informing quarterly operation targets and resource allocation decisions.",
+            "Produced 10+ slide decks summarising model results — all adopted by the client.",
+          ],
+          zh: [
+            "构建多元回归模型与随机森林模型，预测 KOC 新增人数与内容产出变化趋势。",
+            "模型 R² = 0.86，有效支撑客户季度运营目标制定与资源投入决策。",
+            "产出 10+ 页文档报告，最终被客户全部采纳。",
+          ],
+        },
+      },
+      {
+        title: { en: "Strategy Optimisation", zh: "策略优化" },
+        points: {
+          en: [
+            "Co-authored multiple rounds of executive-level presentation materials and designed KOC growth paths and UGC incentive tiering systems.",
+            "Applied K-Means clustering to 500+ user profiles and content types, identifying three core segments: \"Aesthetic Seeding,\" \"Daily Sharing,\" and \"Usage Insights.\"",
+            "Updated the KOC grading system using the Diamond Model and proposed differentiated strategies by vehicle type and region — raising UGC output by 27% in the following month.",
+          ],
+          zh: [
+            "联合项目组撰写多轮高层汇报材料，协助设计 KOC 成长路径与 UGC 激励分层策略等施策机制。",
+            "对 500+ 用户画像与内容类型进行 K-Means 聚类，识别出「美图种草」「日常分享」「用车心得」三类核心人群。",
+            "结合「钻石模型」与回归结果更新 KOC 分级体系，提出分车型、分地区、分层级的差异化策略，次月 UGC 产出提升 27%。",
+          ],
+        },
+      },
+      {
+        title: { en: "System Building", zh: "体系搭建" },
+        points: {
+          en: [
+            "Led creation of the 97-page Dongfeng Honda KOC Digital Operation System Manual (PowerPoint), converting project insights into a standardised operational framework.",
+            "Produced a 15-page Word standard operation guide for internal training and process standardisation.",
+          ],
+          zh: [
+            "参与搭建《东风本田保客达人 KOC 数字化运营体系文件》（97 页 PPT），将项目洞察沉淀为标准化运营框架。",
+            "将模型结果与洞察系统化转化为 Word 运营体系文件（15 页），用于企业内部培训与流程标准化。",
+          ],
+        },
+      },
+    ],
+    tools: ["Python", "pandas", "NumPy", "K-Means", "Random Forest", "Multiple Regression", "PowerPoint", "Excel"],
+  },
+
+  {
+    slug:     "guoyuan-securities",
+    company:  "Guoyuan Securities",
+    logo:     "/photos/logo-guoyuan.png",
+    role:     { en: "Industry Research Intern", zh: "行业研究实习生" },
+    period:   { en: "Jun – Aug 2024", zh: "2024年6月 – 8月" },
+    location: { en: "Hefei, Anhui, China", zh: "中国 · 安徽合肥" },
+    category: { en: "Financial Research", zh: "金融研究" },
+    tagline:  {
+      en: "Deep-dive baijiu sector research covering Moutai, Wuliangye and Fenjiu",
+      zh: "覆盖茅台、五粮液、汾酒的白酒板块深度行研",
+    },
+    accent: "#14b8a6",
+    overview: {
+      en: "Joined the consumer industry coverage team at Guoyuan Securities, focusing on China's premium baijiu market during a pivotal period of consumption upgrading. Built the financial infrastructure and authored an independent strategy report that was incorporated into the team's quarterly portfolio discussion.",
+      zh: "加入国元证券消费品行业覆盖团队，在消费升级关键时期深入研究中国高端白酒市场。构建了完整的金融基础设施，并独立完成一份被纳入季度组合策略讨论的策略报告。",
+    },
+    metrics: [
+      { value: "15+",   label: { en: "Companies covered",    zh: "覆盖上市公司" } },
+      { value: "3",     label: { en: "Valuation models",     zh: "估值模型"     } },
+      { value: "1",     label: { en: "Independent strategy report", zh: "独立策略报告" } },
+      { value: "2024",  label: { en: "Mid-year report published", zh: "年中报告发布" } },
+    ],
+    sections: [
+      {
+        title: { en: "Research Focus", zh: "研究方向" },
+        points: {
+          en: [
+            "Analysed China's white liquor (baijiu) sector covering leading brands including Kweichow Moutai, Wuliangye, and Fenjiu.",
+            "Focused on premium and sub-premium market structure, consumption upgrading trends, and channel dynamics.",
+          ],
+          zh: [
+            "聚焦白酒板块，覆盖茅台、五粮液、山西汾酒等龙头企业。",
+            "重点研究高端与次高端酒市场格局、消费升级趋势及渠道动态。",
+          ],
+        },
+      },
+      {
+        title: { en: "Data & Modelling", zh: "数据与建模" },
+        points: {
+          en: [
+            "Built a financial indicator database (revenue growth, net margin, inventory turnover ratio, etc.) using Wind, iFind, and quarterly reports across 15+ listed consumer staples companies.",
+            "Performed time-series and YoY/MoM comparisons in Excel to track raw material costs, sales channels, and holiday demand fluctuations.",
+            "Applied DCF and PE models to assess fair-value estimates and investment positioning.",
+          ],
+          zh: [
+            "基于 Wind、iFind 和上市公司季度财报，建立覆盖 15 家以上消费品公司的核心财务指标数据库（营收增速、净利率、渠道库存周转率等）。",
+            "在 Excel 中进行时间序列分析与同比环比对比，追踪原料价格、渠道动销及节假日销售波动。",
+            "运用 DCF 和 PE 估值模型测算核心标的合理区间，形成投资建议。",
+          ],
+        },
+      },
+      {
+        title: { en: "Report Writing & Output", zh: "研报写作与成果" },
+        points: {
+          en: [
+            "Assisted in drafting in-depth industry reports and monthly strategy briefs, summarising channel research and terminal sales data using the PESTEL framework for macro analysis.",
+            "Independently authored the Mid-Year Strategy Report on the Baijiu Sector (2024), advocating a \"steady growth in premium, structural recovery in sub-premium\" investment thesis.",
+            "Selected sections of the report were featured in the team's quarterly portfolio strategy discussion.",
+          ],
+          zh: [
+            "参与撰写行业深度研究报告及月度策略简报，结合 PESTEL 模型分析宏观政策与消费趋势。",
+            "独立完成《白酒板块 2024 年中期策略报告》，提出「高端稳增长、次高端结构性修复」的投资判断。",
+            "报告节选被导师纳入季度组合策略讨论材料。",
+          ],
+        },
+      },
+    ],
+    tools: ["Wind", "iFind", "Excel", "DCF", "PE Valuation", "PESTEL", "Financial Modelling"],
   },
 ];
 

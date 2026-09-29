@@ -40,6 +40,15 @@ body {
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ─── Apple-style selection ─────────────────────────────────── */
 ::selection {
   background: rgba(0, 113, 227, 0.2);

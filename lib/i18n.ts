@@ -12,7 +12,7 @@ export const i18n = {
   },
 
   hero: {
-    nameLabel:  { en: "吴梓洋  ·  Wuziyang Zhang", zh: "张吴梓洋" },
+    nameLabel:  { en: "张吴梓洋  ·  Wuziyang Zhang", zh: "张吴梓洋" },
     headline1:  { en: "Think in systems.",          zh: "洞见系统。" },
     headline2:  { en: "Build with taste.",          zh: "以品味筑造。" },
     sub1:       { en: "Economics · Information Science · AI Products —", zh: "经济学 · 信息科学 · AI 产品" },
@@ -106,7 +106,7 @@ export const i18n = {
     cityGrid: [
       { city: { en: "Tokyo",     zh: "东京"   }, note: { en: "Product Design", zh: "产品设计" } },
       { city: { en: "Paris",     zh: "巴黎"   }, note: { en: "Aesthetics",     zh: "美学"     } },
-      { city: { en: "New York",  zh: "纽约"   }, note: { en: "Finance",        zh: "金融"     } },
+      { city: { en: "Madison",   zh: "麦迪逊" }, note: { en: "Home base",      zh: "大本营"   } },
       { city: { en: "Singapore", zh: "新加坡" }, note: { en: "Strategy",       zh: "战略"     } },
       { city: { en: "London",    zh: "伦敦"   }, note: { en: "Market",         zh: "市场"     } },
       { city: { en: "Seoul",     zh: "首尔"   }, note: { en: "Culture",        zh: "文化"     } },
@@ -152,7 +152,7 @@ export const i18n = {
     quote2:    { en: "and impossible to forget.\"",       zh: "且令人难以忘怀的事物。」" },
     p1: { en: "I believe technology is most powerful when it becomes intuitive enough to disappear — when the tool stops being the thing you use and starts being the thing you think with.", zh: "我相信，技术在足够直觉、能消隐于无形时，才最具力量——当工具不再是你使用的对象，而成为你思考本身的一部分。" },
     p2: { en: "The best work lives at the intersection of logic and taste. It has a point of view. It was made by someone who cared about both the inside and the outside.", zh: "最好的作品存在于逻辑与品味的交汇处。它有自己的立场，由一个对内外同样在意的人创造。" },
-    signature: { en: "吴梓洋  ·  Wuziyang Zhang", zh: "张吴梓洋" },
+    signature: { en: "张吴梓洋  ·  Wuziyang Zhang", zh: "张吴梓洋" },
   },
 
   contact: {
@@ -181,7 +181,7 @@ export const i18n = {
     copy:   { en: "Wuziyang Zhang. Designed with intent.", zh: "张吴梓洋 · 以意为形。" },
     email:  { en: "Email",  zh: "邮件" },
     resume: { en: "Résumé", zh: "简历" },
-    mono:   { en: "吴梓洋 · WZ", zh: "张吴梓洋 · WZ" },
+    mono:   { en: "张吴梓洋 · WZ", zh: "张吴梓洋 · WZ" },
   },
 } as const;
 

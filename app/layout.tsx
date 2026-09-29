@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LangProvider } from "@/context/LangContext";
 import ProfileChat from "@/components/ProfileChat";
+import { MotionProvider } from "@/components/MotionProvider";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wuziyang.com";
 const OG_IMAGE = "/images/background.jpg";
@@ -26,7 +27,6 @@ export const metadata: Metadata = {
     "Data Analysis",
   ],
   authors: [{ name: "Wuziyang Zhang" }],
-  alternates: { canonical: "/" },
   openGraph: {
     title: "Wuziyang Zhang — Think in systems. Build with taste.",
     description:
@@ -34,6 +34,8 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: "Wuziyang Zhang",
+    locale: "en_US",
+    alternateLocale: ["zh_CN"],
     images: [{ url: OG_IMAGE, width: 1600, height: 900, alt: "Wuziyang Zhang" }],
   },
   twitter: {
@@ -59,10 +61,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-black antialiased">
-        <LangProvider>
-          {children}
-          <ProfileChat />
-        </LangProvider>
+        <MotionProvider>
+          <LangProvider>
+            {children}
+            <ProfileChat />
+          </LangProvider>
+        </MotionProvider>
       </body>
     </html>
   );

@@ -1,64 +1,74 @@
 "use client";
 
-import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
+import { createContext, useCallback, useContext, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import type { Lang } from "@/lib/i18n";
+import { langFromPath, localizePath, stripLocale } from "@/lib/locale";
 
 const LS_KEY = "wz-lang";
-const EVT    = "wz-lang-change";
 
-function readLang(): Lang {
+function readPreference(): Lang | null {
   try {
     const v = localStorage.getItem(LS_KEY);
-    return v === "zh" ? "zh" : "en";
+    return v === "zh" || v === "en" ? v : null;
   } catch {
-    return "en";
+    return null;
   }
 }
 
-function writeLang(next: Lang) {
+function writePreference(next: Lang) {
   try {
     localStorage.setItem(LS_KEY, next);
   } catch {
     // ignore
   }
-  window.dispatchEvent(new Event(EVT));
 }
-
-function subscribe(cb: () => void) {
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === LS_KEY) cb();
-  };
-  window.addEventListener("storage", onStorage);
-  window.addEventListener(EVT, cb);
-  return () => {
-    window.removeEventListener("storage", onStorage);
-    window.removeEventListener(EVT, cb);
-  };
-}
-
-const getServerSnapshot: () => Lang = () => "en";
 
 interface LangContextValue {
   lang: Lang;
   toggle: () => void;
+  /** Localise an internal English path such as "/university" or "/#about". */
+  href: (path: string) => string;
 }
 
 const LangContext = createContext<LangContextValue>({
   lang: "en",
   toggle: () => {},
+  href: (path) => path,
 });
 
+/**
+ * The language comes from the URL (/zh/... is Chinese), so the server renders
+ * the right language. The visitor's last choice is remembered and applied when
+ * they land on an English page again.
+ */
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const lang = useSyncExternalStore(subscribe, readLang, getServerSnapshot);
+  const pathname = usePathname() ?? "/";
+  const router = useRouter();
+  const lang = langFromPath(pathname);
 
   useEffect(() => {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
   }, [lang]);
 
-  const toggle = () => writeLang(lang === "en" ? "zh" : "en");
+  useEffect(() => {
+    if (lang === "en" && readPreference() === "zh") {
+      router.replace(localizePath(pathname, "zh") + window.location.hash);
+    }
+    // Only on first load: later switches go through toggle().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const toggle = useCallback(() => {
+    const next: Lang = lang === "en" ? "zh" : "en";
+    writePreference(next);
+    router.push(localizePath(stripLocale(pathname), next) + window.location.hash, { scroll: false });
+  }, [lang, pathname, router]);
+
+  const href = useCallback((path: string) => localizePath(path, lang), [lang]);
 
   return (
-    <LangContext.Provider value={{ lang, toggle }}>
+    <LangContext.Provider value={{ lang, toggle, href }}>
       {children}
     </LangContext.Provider>
   );

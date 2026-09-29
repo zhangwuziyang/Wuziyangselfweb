@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useInView } from "framer-motion";
+import { useInView, useReducedMotion } from "framer-motion";
 
 interface CountUpProps {
   end: number;
@@ -27,12 +27,18 @@ export function CountUp({
     margin: "0px 0px -15% 0px",
   });
   const [count, setCount] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!isInView) return;
 
     let startTime: number | null = null;
     let rafId = 0;
+
+    if (reduceMotion) {
+      rafId = requestAnimationFrame(() => setCount(end));
+      return () => cancelAnimationFrame(rafId);
+    }
 
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
@@ -45,7 +51,7 @@ export function CountUp({
 
     rafId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(rafId);
-  }, [isInView, end, duration]);
+  }, [isInView, reduceMotion, end, duration]);
 
   return (
     <span ref={ref} className={className}>

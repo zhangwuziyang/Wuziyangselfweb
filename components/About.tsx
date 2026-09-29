@@ -8,7 +8,7 @@ import { i18n, tx } from "@/lib/i18n";
 
 
 export default function About() {
-  const { lang } = useLang();
+  const { lang, href } = useLang();
   const a = i18n.about;
 
   return (
@@ -105,7 +105,7 @@ export default function About() {
             {/* University card — links to /university */}
             <ScrollReveal delay={0.35} className="mt-6">
               <Link
-                href="/university"
+                href={href("/university")}
                 className="group flex items-center justify-between gap-4 px-5 py-4 rounded-2xl transition-[background,box-shadow] duration-300 hover:shadow-md"
                 style={{ background: "#f5f5f7", border: "1px solid rgba(0,0,0,0.07)" }}
               >

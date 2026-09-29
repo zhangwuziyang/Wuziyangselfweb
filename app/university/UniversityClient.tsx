@@ -131,7 +131,7 @@ const WHY = {
 /* ─── Component ─────────────────────────────────────────────── */
 
 export default function UniversityClient() {
-  const { lang, toggle } = useLang();
+  const { lang, toggle, href } = useLang();
 
   return (
     <div style={{ background: "#fff", minHeight: "100vh" }}>
@@ -147,7 +147,7 @@ export default function UniversityClient() {
         }}
       >
         <Link
-          href="/#about"
+          href={href("/#about")}
           className="flex items-center gap-2 text-sm font-medium transition-colors duration-200 text-[#86868b] hover:text-[#1d1d1f]"
         >
           <span style={{ fontSize: 18, lineHeight: 1 }}>←</span>
@@ -422,7 +422,7 @@ export default function UniversityClient() {
       <div style={{ background: "#1d1d1f", borderTop: "1px solid rgba(255,255,255,0.06)" }} className="px-5 py-12">
         <div className="max-w-[900px] mx-auto">
           <Link
-            href="/#about"
+            href={href("/#about")}
             className="group inline-flex items-center gap-2 text-sm font-medium transition-colors duration-200 text-[#6e6e73] hover:text-[#f5f5f7]"
           >
             <span className="group-hover:-translate-x-0.5 transition-transform duration-200 inline-block">←</span>

@@ -7,8 +7,11 @@ import { useLang } from "@/context/LangContext";
 import { i18n, tx } from "@/lib/i18n";
 import { EXPERIENCE_DATA, t } from "@/lib/experienceData";
 
+// ChartCreator is shown in the Projects section instead.
+const WORK_EXPERIENCE = EXPERIENCE_DATA.filter((exp) => exp.slug !== "chartcreator");
+
 export default function Experience() {
-  const { lang } = useLang();
+  const { lang, href } = useLang();
   const e = i18n.experience;
 
   return (
@@ -28,9 +31,9 @@ export default function Experience() {
         </ScrollReveal>
 
         <div className="space-y-4">
-          {EXPERIENCE_DATA.map((exp, i) => (
+          {WORK_EXPERIENCE.map((exp, i) => (
             <ScrollReveal key={exp.slug} delay={i * 0.06}>
-              <Link href={`/experience/${exp.slug}`}>
+              <Link href={href(`/experience/${exp.slug}`)}>
                 <article
                   className="group relative rounded-2xl p-8 md:p-10 cursor-pointer overflow-hidden transition-[background,border-color,transform] duration-[400ms] bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] hover:border-white/[0.15] hover:-translate-y-0.5"
                 >
@@ -62,7 +65,7 @@ export default function Experience() {
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-sm" style={{ color: "#6e6e73" }}>{t(exp.period, lang)}</p>
-                          <p className="text-xs mt-0.5" style={{ color: "#48484a" }}>{t(exp.location, lang)}</p>
+                          <p className="text-xs mt-0.5" style={{ color: "#86868b" }}>{t(exp.location, lang)}</p>
                         </div>
                       </div>
 

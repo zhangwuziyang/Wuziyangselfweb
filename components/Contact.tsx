@@ -35,7 +35,7 @@ export default function Contact() {
             >
               {tx(c.headline1, lang)}
               <br />{tx(c.headline2, lang)}
-              <br /><span style={{ color: "#424245" }}>{tx(c.headline3, lang)}</span>
+              <br /><span style={{ color: "#6e6e73" }}>{tx(c.headline3, lang)}</span>
             </h2>
           </ScrollReveal>
 
@@ -81,7 +81,7 @@ export default function Contact() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
               {INFO_KEYS.map((key) => (
                 <div key={key}>
-                  <p className="text-[10px] tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#48484a" }}>
+                  <p className="text-[10px] tracking-[0.2em] uppercase font-semibold mb-2" style={{ color: "#86868b" }}>
                     {tx(c.infoLabels[key], lang)}
                   </p>
                   <p className="text-sm font-medium" style={{ color: "#d1d1d6" }}>{infoValues[key]}</p>

@@ -15,11 +15,11 @@ const NAV_KEYS = [
 ] as const;
 
 function scrollTo(href: string) {
-  document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+  document.querySelector(href)?.scrollIntoView();
 }
 
 export default function Navbar() {
-  const { lang, toggle } = useLang();
+  const { lang, toggle, href: localHref } = useLang();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
 
@@ -59,7 +59,7 @@ export default function Navbar() {
 
           {/* Left — logo */}
           <Link
-            href="/"
+            href={localHref("/")}
             className="text-white/90 text-sm font-semibold tracking-[0.2em] uppercase hover:text-white transition-colors duration-200 w-fit"
           >
             WZ

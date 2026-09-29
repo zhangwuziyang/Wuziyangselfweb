@@ -116,7 +116,7 @@ export default function Hero() {
         >
           <button
             onClick={() =>
-              document.querySelector("#experience")?.scrollIntoView({ behavior: "smooth" })
+              document.querySelector("#experience")?.scrollIntoView()
             }
             className="group flex items-center gap-2 text-sm font-medium rounded-full transition-[background,transform] duration-300 hover:scale-[1.03] active:scale-[0.97] px-[30px] py-[11px] text-[#1a1a1a] bg-white/90 hover:bg-white"
           >
@@ -127,7 +127,7 @@ export default function Hero() {
           </button>
           <button
             onClick={() =>
-              document.querySelector("#about")?.scrollIntoView({ behavior: "smooth" })
+              document.querySelector("#about")?.scrollIntoView()
             }
             className="text-sm font-medium rounded-full transition-[background,transform] duration-300 hover:scale-[1.03] active:scale-[0.97] px-[30px] py-[11px] text-[#f5ede0] bg-transparent hover:bg-white/10"
             style={{ border: "1.5px solid rgba(255,255,255,0.7)" }}

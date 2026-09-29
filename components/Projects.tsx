@@ -7,7 +7,7 @@ import { useLang } from "@/context/LangContext";
 import { i18n, tx } from "@/lib/i18n";
 
 export default function Projects() {
-  const { lang } = useLang();
+  const { lang, href } = useLang();
   const p = i18n.projects;
   const cc = p.chartcreator;
   const cap = p.codeandpower;
@@ -73,7 +73,7 @@ export default function Projects() {
                       </span>
                     ))}
                   </div>
-                  <Link href="/experience/chartcreator" className="group inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 w-fit" style={{ color: "#0071e3" }}>
+                  <Link href={href("/experience/chartcreator")} className="group inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 w-fit" style={{ color: "#0071e3" }}>
                     {tx(cc.cta, lang)}
                     <span className="group-hover:translate-x-0.5 transition-transform duration-200 inline-block">→</span>
                   </Link>
@@ -120,7 +120,7 @@ export default function Projects() {
                       </span>
                     ))}
                   </div>
-                  <Link href="/projects/codeandpower" className="group inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 w-fit" style={{ color: "#0071e3" }}>
+                  <Link href={href("/projects/codeandpower")} className="group inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 w-fit" style={{ color: "#0071e3" }}>
                     {tx(cap.cta, lang)}
                     <span className="group-hover:translate-x-0.5 transition-transform duration-200 inline-block">→</span>
                   </Link>

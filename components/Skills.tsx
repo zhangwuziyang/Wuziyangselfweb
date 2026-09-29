@@ -35,7 +35,7 @@ export default function Skills() {
                 className="rounded-2xl p-8 h-full transition-[background,transform] duration-300 bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07] hover:-translate-y-0.5"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-lg select-none" style={{ color: "#48484a" }}>{group.symbol}</span>
+                  <span className="text-lg select-none" style={{ color: "#6e6e73" }}>{group.symbol}</span>
                   <h3 className="font-medium text-[15px] tracking-tight" style={{ color: "#f5f5f7" }}>
                     {tx(group.category, lang)}
                   </h3>

@@ -27,7 +27,7 @@ interface Props {
 }
 
 export default function ExperienceDetailClient({ exp }: Props) {
-  const { lang, toggle } = useLang();
+  const { lang, toggle, href } = useLang();
 
   return (
     <div style={{ background: "#000", minHeight: "100vh" }}>
@@ -38,7 +38,7 @@ export default function ExperienceDetailClient({ exp }: Props) {
         style={{ height: 48, background: "rgba(0,0,0,0.82)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
       >
         <Link
-          href="/#experience"
+          href={href("/#experience")}
           className="flex items-center gap-2 text-sm font-medium transition-colors duration-200 text-[#6e6e73] hover:text-[#f5f5f7]"
         >
           <span style={{ fontSize: 18, lineHeight: 1 }}>←</span>
@@ -175,7 +175,7 @@ export default function ExperienceDetailClient({ exp }: Props) {
             className="rounded-3xl p-10"
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
           >
-            <p className="text-xs font-semibold tracking-[0.12em] uppercase mb-6" style={{ color: "#48484a" }}>
+            <p className="text-xs font-semibold tracking-[0.12em] uppercase mb-6" style={{ color: "#86868b" }}>
               {lang === "en" ? "Tools & Stack" : "工具与技术栈"}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -193,7 +193,7 @@ export default function ExperienceDetailClient({ exp }: Props) {
       <div className="px-5 pb-20">
         <div className="max-w-[900px] mx-auto pt-12" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <Link
-            href="/#experience"
+            href={href("/#experience")}
             className="group inline-flex items-center gap-2 text-sm font-medium transition-colors duration-200 text-[#6e6e73] hover:text-[#f5f5f7]"
           >
             <span className="group-hover:-translate-x-0.5 transition-transform duration-200 inline-block">←</span>

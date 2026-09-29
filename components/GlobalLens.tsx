@@ -26,7 +26,7 @@ export default function GlobalLens() {
         <ScrollReveal delay={0.08}>
           <h2 className="font-semibold leading-[1.04] tracking-tight mb-6" style={{ fontSize: "clamp(2.2rem, 4vw, 3.4rem)", color: "#f5f5f7", letterSpacing: "-0.025em" }}>
             {tx(g.headline1, lang)}<br />
-            <span style={{ color: "#424245" }}>{tx(g.headline2, lang)}</span>
+            <span style={{ color: "#6e6e73" }}>{tx(g.headline2, lang)}</span>
           </h2>
         </ScrollReveal>
 

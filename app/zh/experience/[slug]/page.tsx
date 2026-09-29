@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { EXPERIENCE_DATA } from "@/lib/experienceData";
 import { localeAlternates } from "@/lib/locale";
-import ExperienceDetailClient from "./ExperienceDetailClient";
+import ExperienceDetailClient from "../../../experience/[slug]/ExperienceDetailClient";
 
 export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
 
@@ -20,12 +20,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const exp = EXPERIENCE_DATA.find((e) => e.slug === slug);
   if (!exp) return {};
   return {
-    title: `${exp.company} — ${exp.role.en}`,
-    description: exp.overview.en,
-    alternates: localeAlternates(`/experience/${slug}`, "en"),
+    title: `${exp.company} — ${exp.role.zh}`,
+    description: exp.overview.zh,
+    alternates: localeAlternates(`/experience/${slug}`, "zh"),
     openGraph: {
-      title: `${exp.company} — ${exp.role.en}`,
-      description: exp.overview.en,
+      title: `${exp.company} — ${exp.role.zh}`,
+      description: exp.overview.zh,
       type: "article",
     },
   };

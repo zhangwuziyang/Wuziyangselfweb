@@ -43,7 +43,7 @@ function ChatMark({ size = 24 }: { size?: number }) {
 }
 
 export default function ProfileChat() {
-  const { lang } = useLang();
+  const { lang, href } = useLang();
   const copy = PROFILE_CHAT_COPY;
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -345,7 +345,7 @@ export default function ProfileChat() {
                               transition={{ duration: 0.22 }}
                             >
                               <Link
-                                href={message.action.href}
+                                href={href(message.action.href)}
                                 onClick={() => setIsOpen(false)}
                                 className="mt-2.5 flex w-full items-center justify-between gap-3 rounded-xl border border-white/[0.12] bg-white/[0.07] px-3 py-2 text-[11px] font-semibold text-white transition-[background,border-color,transform] hover:border-white/25 hover:bg-white/[0.12] active:scale-[0.98]"
                               >
