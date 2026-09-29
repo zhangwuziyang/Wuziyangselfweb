@@ -35,11 +35,11 @@ export interface ExperienceDetail {
 export const EXPERIENCE_DATA: ExperienceDetail[] = [
   {
     slug:     "alibaba-international",
-    start:    "2026-06",
+    start:    "2026-05",
     company:  "Alibaba International",
     logo:     "/photos/logo-alibaba.png",
     role:     { en: "AI Business Analytics Intern", zh: "AI 商业分析实习生" },
-    period:   { en: "Summer 2026", zh: "2026年暑期" },
+    period:   { en: "May – Aug 2026", zh: "2026年5月 – 8月" },
     location: { en: "China", zh: "中国" },
     category: { en: "AI & Business Analytics", zh: "AI 与商业分析" },
     tagline:  {
@@ -365,11 +365,10 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
   {
     slug:     "chartcreator",
     start:    "2025-08",
-    current:  true,
     company:  "ChartCreator",
     logo:     "/photos/logo-chartcreator.jpg",
     role:     { en: "AI Product Manager & Builder", zh: "AI 产品经理 & 开发者" },
-    period:   { en: "Aug 2025 – Present", zh: "2025年8月 – 至今" },
+    period:   { en: "Aug 2025 – Apr 2026", zh: "2025年8月 – 2026年4月" },
     location: { en: "Remote", zh: "远程" },
     category: { en: "AI Product", zh: "AI 产品" },
     tagline:  {

@@ -490,8 +490,8 @@ const INTENTS: ProfileChatIntent[] = [
     id: "experience-timeline",
     keywords: ["经历顺序", "实习时间", "工作时间线", "哪年实习", "先后顺序", "timeline", "when did you work", "internship dates", "experience order"],
     answer: {
-      en: "My selected timeline runs from Guoyuan Securities in summer 2024, Roland Berger in May–August 2025, ChartCreator from August 2025 to the present, ByteDance from December 2025 to February 2026, and Alibaba International in summer 2026.",
-      zh: "我的代表经历时间线是：2024 年暑期国元证券，2025 年 5–8 月罗兰贝格，2025 年 8 月起持续构建 ChartCreator，2025 年 12 月至 2026 年 2 月字节跳动，以及 2026 年暑期阿里国际。",
+      en: "My selected timeline runs from Guoyuan Securities in summer 2024, Roland Berger in May–August 2025, ChartCreator from August 2025 to April 2026, ByteDance from December 2025 to February 2026, and Alibaba International from May to August 2026.",
+      zh: "我的代表经历时间线是：2024 年暑期国元证券，2025 年 5–8 月罗兰贝格，2025 年 8 月至 2026 年 4 月构建 ChartCreator，2025 年 12 月至 2026 年 2 月字节跳动，以及 2026 年 5–8 月阿里国际。",
     },
   },
   {
