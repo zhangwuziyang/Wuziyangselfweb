@@ -194,7 +194,7 @@ export default function CodeAndPowerClient() {
             style={{ aspectRatio: "16/9", border: "1px solid rgba(255,255,255,0.08)" }}
           >
             <Image
-              src="/photos/screenshot-codeandpower.png"
+              src="/photos/screenshot-codeandpower.webp"
               alt="Code and Power website screenshot"
               fill
               className="object-cover object-top"

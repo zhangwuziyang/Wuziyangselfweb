@@ -25,7 +25,7 @@ export default function About() {
           <ScrollReveal delay={0.08}>
             <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="/photos/portrait.jpg"
+                src="/photos/portrait.webp"
                 alt="Wuziyang Zhang"
                 fill
                 className="object-cover object-center"

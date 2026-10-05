@@ -98,10 +98,10 @@ export const i18n = {
     p1: { en: "I don't travel to collect countries. I travel to understand how people make decisions — what they value, what they build, and how they live. Every city teaches me something that a data table cannot.", zh: "旅行对我而言不是打卡，而是理解——理解人们如何做决策，重视什么、构建什么、怎样生活。每座城市都教会了我数据表格无法传递的东西。" },
     p2: { en: "Market behavior looks different when you've walked through the markets. User needs become clearer when you've been the user in a foreign context. A global perspective isn't a credential — it's a methodology.", zh: "真正走过那些市场之后，市场行为的含义就不一样了。在异国文化中成为那个用户，用户需求才会变得真实清晰。全球视野不是资历，而是一种方法论。" },
     cityPhotos: [
-      { city: { en: "New York",  zh: "纽约"    }, note: { en: "Finance",       zh: "金融"  }, src: "/photos/travel-nyc.jpg"       },
-      { city: { en: "Istanbul",  zh: "伊斯坦布尔" }, note: { en: "History",    zh: "历史"  }, src: "/photos/travel-istanbul.jpg"  },
-      { city: { en: "Toronto",   zh: "多伦多"  }, note: { en: "Architecture",  zh: "建筑"  }, src: "/photos/travel-toronto.jpg"   },
-      { city: { en: "Lima",      zh: "利马"    }, note: { en: "Coastal Living", zh: "滨海" }, src: "/photos/travel-lima.jpg"      },
+      { city: { en: "New York",  zh: "纽约"    }, note: { en: "Finance",       zh: "金融"  }, src: "/photos/travel-nyc.webp"       },
+      { city: { en: "Istanbul",  zh: "伊斯坦布尔" }, note: { en: "History",    zh: "历史"  }, src: "/photos/travel-istanbul.webp"  },
+      { city: { en: "Toronto",   zh: "多伦多"  }, note: { en: "Architecture",  zh: "建筑"  }, src: "/photos/travel-toronto.webp"   },
+      { city: { en: "Lima",      zh: "利马"    }, note: { en: "Coastal Living", zh: "滨海" }, src: "/photos/travel-lima.webp"      },
     ],
     cityGrid: [
       { city: { en: "Tokyo",     zh: "东京"   }, note: { en: "Product Design", zh: "产品设计" } },

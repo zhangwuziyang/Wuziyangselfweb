@@ -50,7 +50,7 @@ export default function Music() {
           <ScrollReveal delay={0.18}>
             <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="/photos/music-piano.jpg"
+                src="/photos/music-piano.webp"
                 alt="Playing piano"
                 fill
                 className="object-cover object-center"

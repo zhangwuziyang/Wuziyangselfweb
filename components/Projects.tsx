@@ -90,7 +90,7 @@ export default function Projects() {
             >
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <div className="lg:order-1 relative min-h-[280px] lg:min-h-0" style={{ background: "#f0f0f2" }}>
-                  <Image src="/photos/screenshot-codeandpower.png" alt="Code and Power" fill className="object-cover object-top" sizes="(max-width:1024px) 100vw, 50vw" />
+                  <Image src="/photos/screenshot-codeandpower.webp" alt="Code and Power" fill className="object-cover object-top" sizes="(max-width:1024px) 100vw, 50vw" />
                 </div>
                 <div className="p-10 md:p-14 flex flex-col justify-center lg:order-2">
                   <div className="flex items-center gap-2 mb-5">

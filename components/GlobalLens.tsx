@@ -49,7 +49,7 @@ export default function GlobalLens() {
         {/* Cinematic image */}
         <ScrollReveal delay={0.18}>
           <div className="relative w-full aspect-[21/9] rounded-3xl overflow-hidden mb-14">
-            <Image src="/photos/travel-machu-picchu.jpg" alt="Machu Picchu, Peru" fill className="object-cover object-center" sizes="100vw" />
+            <Image src="/photos/travel-machu-picchu.webp" alt="Machu Picchu, Peru" fill className="object-cover object-center" sizes="100vw" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)" }} />
             <p className="absolute bottom-4 right-5 text-[11px] tracking-[0.2em] uppercase font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
               {lang === "en" ? "Machu Picchu, Peru" : "马丘比丘，秘鲁"}

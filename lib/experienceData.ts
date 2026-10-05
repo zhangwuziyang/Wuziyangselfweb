@@ -366,7 +366,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
     slug:     "chartcreator",
     start:    "2025-08",
     company:  "ChartCreator",
-    logo:     "/photos/logo-chartcreator.jpg",
+    logo:     "/photos/logo-chartcreator.webp",
     role:     { en: "AI Product Manager & Builder", zh: "AI 产品经理 & 开发者" },
     period:   { en: "Aug 2025 – Apr 2026", zh: "2025年8月 – 2026年4月" },
     location: { en: "Remote", zh: "远程" },
