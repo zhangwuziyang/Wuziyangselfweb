@@ -67,7 +67,7 @@ export const i18n = {
     cityGrid: [
       { city: { en: "Tokyo",     zh: "东京"   }, note: { en: "Product Design", zh: "产品设计" } },
       { city: { en: "Paris",     zh: "巴黎"   }, note: { en: "Aesthetics",     zh: "美学"     } },
-      { city: { en: "New York",  zh: "纽约"   }, note: { en: "Finance",        zh: "金融"     } },
+      { city: { en: "Chicago",   zh: "芝加哥" }, note: { en: "Urban Design",   zh: "城市设计" } },
       { city: { en: "Singapore", zh: "新加坡" }, note: { en: "Strategy",       zh: "战略"     } },
       { city: { en: "London",    zh: "伦敦"   }, note: { en: "Markets",         zh: "商业市场"     } },
       { city: { en: "Seoul",     zh: "首尔"   }, note: { en: "Culture",        zh: "文化"     } },
