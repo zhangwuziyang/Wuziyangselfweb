@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: { ...siteOpenGraph, url: "/university" },
   title: "University of Wisconsin–Madison",
   description:
-    "My academic home — UW–Madison, a top-10 US public university. Economics & Information Science at CDIS.",
+    "UW–Madison, a top-10 US public university: studying Economics and Information Science at CDIS.",
 };
 
 export default function UniversityPage() {

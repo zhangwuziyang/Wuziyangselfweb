@@ -49,7 +49,7 @@ export default function Hero() {
           className="text-[10px] font-medium tracking-[0.42em] uppercase mb-6"
           style={{ color: "rgba(255,255,255,0.4)" }}
         >
-          <Localized en="Portfolio · Wuziyang Zhang" zh="张吴梓洋 · 个人作品集" />
+          <Localized en="Selected Works · 2024–2026" zh="个人作品集 · 2024–2026" />
         </p>
 
         <div style={{ lineHeight: 0.92, letterSpacing: "-0.04em" }}>
@@ -74,7 +74,7 @@ export default function Hero() {
             letterSpacing: "0.22em",
           }}
         >
-          <Localized en="Economics · Information Science · AI Products" zh="经济学 · 信息科学 · AI 产品" />
+          <Localized en="Economics & Information Science · Building AI Products" zh="经济学与信息科学 · 打造 AI 产品" />
         </p>
 
         <div

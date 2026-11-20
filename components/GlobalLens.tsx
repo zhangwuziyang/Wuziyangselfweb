@@ -49,7 +49,7 @@ export default function GlobalLens() {
             <Image src="/photos/travel-machu-picchu.jpg" alt="Machu Picchu, Peru" fill className="object-cover object-center" sizes="(max-width: 1100px) calc(100vw - 40px), 1060px" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)" }} />
             <p className="absolute bottom-4 right-5 text-[11px] tracking-[0.2em] uppercase font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
-              <Localized en="Machu Picchu, Peru" zh="马丘比丘，秘鲁" />
+              <Localized en="Machu Picchu, Peru" zh="秘鲁 · 马丘比丘" />
             </p>
           </div>
         </ScrollReveal>

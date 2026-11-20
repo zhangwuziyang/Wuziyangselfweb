@@ -29,11 +29,11 @@ export default function Philosophy() {
             style={{ fontSize: "clamp(1.8rem, 4.2vw, 3.6rem)", color: "#1d1d1f", letterSpacing: "-0.025em" }}
           >
             <Localized en={
-              <>&ldquo;I want to create things that are<span style={{ color: "#86868b" }}> useful, elegant,</span>
-                <br className="hidden md:block" /> and impossible to forget.&rdquo;</>
+              <>&ldquo;I want to build things that are<span style={{ color: "#86868b" }}> useful, elegant,</span>
+                <br className="hidden md:block" /> and hard to forget.&rdquo;</>
             } zh={
-              <>「我想创造<span style={{ color: "#86868b" }}>有用、优雅，</span>
-                <br className="hidden md:block" />且令人难以忘怀的事物。」</>
+              <>「我想做出<span style={{ color: "#86868b" }}>实用、优雅，</span>
+                <br className="hidden md:block" />又让人念念不忘的作品。」</>
             } />
           </blockquote>
 

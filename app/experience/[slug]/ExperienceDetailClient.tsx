@@ -145,7 +145,7 @@ export default function ExperienceDetailClient({ exp }: Props) {
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
           >
             <p className="text-xs font-semibold tracking-[0.12em] uppercase mb-6" style={{ color: "#48484a" }}>
-              {lang === "en" ? "Tools & Stack" : "工具与技术栈"}
+              {lang === "en" ? "Tools & Methods" : "工具与方法"}
             </p>
             <div className="flex flex-wrap gap-2">
               {exp.tools.map((tool) => (

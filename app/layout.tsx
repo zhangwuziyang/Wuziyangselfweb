@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s · Wuziyang Zhang",
   },
   description:
-    "Personal portfolio of Wuziyang Zhang (张吴梓洋) — a globally minded builder at the intersection of business strategy, AI products, data analysis, and creative thinking. UW–Madison, Economics & Information Science.",
+    "Personal portfolio of Wuziyang Zhang (张吴梓洋), an Economics & Information Science student at UW–Madison working across business strategy, data analysis, and AI products.",
   keywords: [
     "Wuziyang Zhang",
     "张吴梓洋",

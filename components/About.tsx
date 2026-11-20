@@ -47,9 +47,9 @@ export default function About() {
               style={{ fontSize: "clamp(2.2rem, 4vw, 3.4rem)", color: "#1d1d1f", letterSpacing: "-0.025em" }}
             >
               <Localized en={
-                <>I build where<br />strategy meets<br /><span style={{ color: "#86868b" }}>execution.</span></>
+                <>I turn messy<br />questions into<br /><span style={{ color: "#86868b" }}>working products.</span></>
               } zh={
-                <>我在战略<br />与执行的<br /><span style={{ color: "#86868b" }}>交汇处创造。</span></>
+                <>把理不清的问题，<br />做成用得上的<br /><span style={{ color: "#86868b" }}>好产品。</span></>
               } />
             </h2>
 
@@ -67,11 +67,11 @@ export default function About() {
                     >
                       University of Wisconsin–Madison
                     </a>
-                    , working at the intersection of market insight, data analysis, and AI-enabled product thinking.
+                    , splitting my time between market research, data analysis, and building AI products.
                   </>
                 } zh={
                   <>
-                    就读于{" "}
+                    我在
                     <a
                       href="https://www.wisc.edu"
                       target="_blank"
@@ -81,7 +81,7 @@ export default function About() {
                     >
                       威斯康星大学麦迪逊分校
                     </a>
-                    ，主修经济学与信息科学。我在市场洞察、数据分析与 AI 产品思维的交叉地带工作。
+                    读经济学与信息科学，平时把时间花在市场研究、数据分析和打造 AI 产品上。
                   </>
                 } />
               </p>

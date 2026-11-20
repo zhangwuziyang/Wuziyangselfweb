@@ -122,7 +122,7 @@ export default function Experience() {
 
                       {/* CTA */}
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium transition-all duration-200 group-hover:gap-2.5" style={{ color: exp.accent }}>
-                        <Localized en="View full case" zh="查看详细案例" />
+                        <Localized en="View details" zh="查看详情" />
                         <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                       </span>
                     </article>
