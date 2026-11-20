@@ -174,8 +174,6 @@ function hasEveryComparedEntity(question: string, answer: string): boolean {
     { query: /罗兰贝格|roland\s*berger/i, answer: /罗兰贝格|roland\s*berger/i },
     { query: /字节|bytedance/i, answer: /字节|bytedance/i },
     { query: /国元|guoyuan/i, answer: /国元|guoyuan/i },
-    { query: /chart\s*creator/i, answer: /chart\s*creator/i },
-    { query: /code\s*and\s*power/i, answer: /code\s*and\s*power/i },
   ].filter(({ query }) => query.test(question));
 
   return entities.length < 2 || entities.every(({ answer: pattern }) => pattern.test(answer));
@@ -202,8 +200,6 @@ function getRequiredTopicPattern(intentId?: string): RegExp | null {
   if (intentId.startsWith("bytedance")) return /字节|bytedance|小游戏|mini[-\s]?game/i;
   if (intentId.startsWith("roland")) return /罗兰贝格|roland\s*berger|东风本田|dongfeng|honda/i;
   if (intentId.startsWith("guoyuan")) return /国元|guoyuan|白酒|baijiu/i;
-  if (intentId.startsWith("chartcreator")) return /chart\s*creator|图表|数据可视化/i;
-  if (intentId.startsWith("code-and-power")) return /code\s*and\s*power|隐性偏见|交叉性|implicit bias|intersectionality/i;
   if (intentId === "music") return /音乐|钢琴|吉他|葫芦丝|music|piano|guitar/i;
   if (intentId === "interests-beyond-music" || intentId.startsWith("global")) {
     return /旅行|国家|城市|大洲|travel|countries|cities|continents/i;

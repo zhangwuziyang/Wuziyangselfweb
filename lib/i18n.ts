@@ -45,45 +45,6 @@ export const i18n = {
     label:    { en: "Building",     zh: "在建"         },
     headline: { en: "What I make.", zh: "我正在创造。"   },
     tagline:  { en: "The best products feel inevitable in hindsight.\nSimple enough to disappear. Useful enough to stay.", zh: "最好的产品，事后看来皆是必然。" },
-    chartcreator: {
-      tag1:  { en: "AI Product", zh: "AI 产品"  },
-      tag2:  { en: "Flagship",   zh: "主项目"   },
-      desc:  { en: "An AI-powered data visualization platform built for people who care about how their data looks — not just what it says.", zh: "AI 驱动的数据可视化平台。不只关注数据说了什么，更在意它的呈现方式。" },
-      cta:   { en: "View Project", zh: "查看项目" },
-      points: {
-        en: [
-          "Designed for non-technical users who need polished, presentation-ready output",
-          "Built through a vibe coding methodology — prompt-driven, fast iteration cycles",
-          "Owns the full product surface: IA, user flows, interface structure, and system design",
-          "Speed, usability, and aesthetic quality as the three non-negotiable product values",
-        ],
-        zh: [
-          "面向非技术用户，追求开箱即用的精美输出",
-          "Vibe Coding 驱动——提示词迭代，快速推进",
-          "掌控完整产品面：信息架构、用户流程与系统设计",
-          "速度、易用与美感，三条不可妥协的产品准则",
-        ],
-      },
-    },
-    codeandpower: {
-      tag1:  { en: "Academic",      zh: "学术项目"  },
-      tag2:  { en: "Ethics & Tech", zh: "科技伦理"  },
-      desc:  { en: "An educational website examining how implicit biases shape technology and promoting equitable, intersectional design thinking.", zh: "探讨隐性偏见如何塑造技术的教育网站，倡导公平、交叉性的设计思维。" },
-      cta:   { en: "View Project", zh: "查看项目" },
-      points: {
-        en: [
-          "Explores implicit bias and intersectionality in digital systems",
-          "Features educational resources and a Tech Hero profile advancing equity",
-          "Built with HTML/CSS in collaboration with Matt Steines",
-        ],
-        zh: [
-          "探索数字系统中的隐性偏见与交叉性议题",
-          "含教育资源与推动科技公平的人物专题",
-          "与 Matt Steines 合作以 HTML/CSS 共同完成",
-        ],
-      },
-    },
-    comingSoon: { en: "Coming soon", zh: "即将上线" },
   },
 
   global: {

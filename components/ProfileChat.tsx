@@ -148,7 +148,7 @@ export default function ProfileChat({ open, onClose }: { open: boolean; onClose:
       : "";
     const localAI = aiRef.current;
     const useModel = localAI && response.intentId && response.intentId !== "quick-summary"
-      && response.mode !== "reflection";
+      && !response.verbatim && response.mode !== "reflection";
 
     const userMessage: ChatMessage = { id: nextId.current++, role: "user", content: question };
     const assistantMessage: ChatMessage = {
@@ -310,7 +310,7 @@ export default function ProfileChat({ open, onClose }: { open: boolean; onClose:
                       : "rounded-[18px] rounded-bl-[6px] border border-white/[0.08] bg-white/[0.07] text-white/90"
                   }`}
                 >
-                  {message.content}
+                  <span className="whitespace-pre-wrap">{message.content}</span>
                   {message.typing && (
                     <span className="ml-0.5 inline-block h-[1.05em] w-[2px] translate-y-[2px] animate-pulse bg-white/65" />
                   )}

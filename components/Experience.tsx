@@ -7,7 +7,9 @@ import { i18n } from "@/lib/i18n";
 import { EXPERIENCE_DATA } from "@/lib/experienceData";
 
 /* Newest first */
-const TIMELINE = [...EXPERIENCE_DATA].sort((a, b) => b.start.localeCompare(a.start));
+const TIMELINE = EXPERIENCE_DATA
+  .filter((exp) => exp.slug !== "chartcreator")
+  .sort((a, b) => b.start.localeCompare(a.start));
 
 export default function Experience() {
   const e = i18n.experience;
