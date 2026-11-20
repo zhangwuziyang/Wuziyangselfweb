@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteOpenGraph.title,
     description:
-      "Business strategy, AI products, market research, and global perspective.",
+      "Business strategy, data analysis, AI products, and field-tested global perspective.",
     images: [OG_IMAGE],
   },
   robots: { index: true, follow: true },
