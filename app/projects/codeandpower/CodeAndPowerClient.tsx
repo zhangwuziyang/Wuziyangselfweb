@@ -2,24 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { useLang } from "@/context/LangContext";
 
-const EASE = [0.25, 0.1, 0.25, 1.0] as const;
 const ACCENT = "#a78bfa"; // violet
-
-function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay, ease: EASE }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 const content = {
   tagline: {
@@ -128,7 +114,7 @@ export default function CodeAndPowerClient() {
       <header className="pt-32 pb-20 px-5">
         <div className="max-w-[900px] mx-auto">
 
-          <FadeUp>
+          <ScrollReveal>
             <div className="flex items-center gap-3 mb-10">
               <span
                 className="text-[11px] font-semibold tracking-[0.1em] uppercase px-2.5 py-1 rounded-full"
@@ -143,18 +129,18 @@ export default function CodeAndPowerClient() {
                 {lang === "en" ? "Ethics & Tech" : "科技伦理"}
               </span>
             </div>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.08}>
+          <ScrollReveal delay={80}>
             <h1
               className="font-semibold leading-[1.04] tracking-tight mb-6"
               style={{ fontSize: "clamp(2.4rem, 5vw, 4.2rem)", color: "#f5f5f7", letterSpacing: "-0.03em" }}
             >
               Code and Power
             </h1>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.14}>
+          <ScrollReveal delay={140}>
             <div className="flex flex-wrap gap-3 mb-10">
               {(lang === "en"
                 ? ["Collaborative Project", "Matt Steines", "HTML / CSS", "GitHub Pages"]
@@ -165,31 +151,24 @@ export default function CodeAndPowerClient() {
                 </span>
               ))}
             </div>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.2}>
+          <ScrollReveal delay={180}>
             <p className="font-light leading-[1.8] max-w-2xl" style={{ fontSize: "clamp(1rem, 1.6vw, 1.1rem)", color: "#a1a1a6" }}>
               {content.overview[lang]}
             </p>
-          </FadeUp>
+          </ScrollReveal>
         </div>
       </header>
 
       {/* Accent divider */}
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1.2, delay: 0.3, ease: EASE }}
-        style={{ height: 1, background: `linear-gradient(90deg, ${ACCENT}60, transparent)`, transformOrigin: "left" }}
-      />
+      <div style={{ height: 1, background: `linear-gradient(90deg, ${ACCENT}60, transparent)`, transformOrigin: "left" }} />
 
       {/* Screenshot */}
       <section className="py-16 px-5" style={{ background: "rgba(255,255,255,0.02)" }}>
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.35, ease: EASE }}
+          <div
+            data-scroll-reveal=""
             className="relative w-full rounded-2xl overflow-hidden shadow-2xl"
             style={{ aspectRatio: "16/9", border: "1px solid rgba(255,255,255,0.08)" }}
           >
@@ -200,21 +179,19 @@ export default function CodeAndPowerClient() {
               className="object-cover object-top"
               sizes="(max-width:900px) 100vw, 900px"
             />
-          </motion.div>
+          </div>
 
           {/* Pull quote */}
-          <motion.blockquote
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
+          <blockquote
+            data-scroll-reveal=""
             className="mt-10 pl-6"
             style={{ borderLeft: `2px solid ${ACCENT}` }}
           >
             <p className="font-light leading-[1.8] italic mb-2" style={{ fontSize: "clamp(1rem, 1.5vw, 1.1rem)", color: "#86868b" }}>
-              "{content.tagline[lang]}"
+              &quot;{content.tagline[lang]}&quot;
             </p>
             <p className="text-sm" style={{ color: "#48484a" }}>{content.taglineAuthor}</p>
-          </motion.blockquote>
+          </blockquote>
         </div>
       </section>
 
@@ -222,12 +199,9 @@ export default function CodeAndPowerClient() {
       <section className="py-20 px-5 pb-16">
         <div className="max-w-[900px] mx-auto space-y-16">
           {content.sections.map((sec, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-8%" }}
-              transition={{ duration: 0.85, delay: i * 0.05, ease: EASE }}
+              data-scroll-reveal=""
               className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8"
             >
               <div className="md:pt-1">
@@ -244,7 +218,7 @@ export default function CodeAndPowerClient() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
@@ -252,11 +226,8 @@ export default function CodeAndPowerClient() {
       {/* Tools & live link */}
       <section className="px-5 pb-20">
         <div className="max-w-[900px] mx-auto space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: EASE }}
+          <div
+            data-scroll-reveal=""
             className="rounded-3xl p-10"
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
           >
@@ -270,14 +241,9 @@ export default function CodeAndPowerClient() {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1, ease: EASE }}
-          >
+          <div data-scroll-reveal="">
             <a
               href="https://mcsteines.github.io/lis500project3-1stiteration/"
               target="_blank"
@@ -290,7 +256,7 @@ export default function CodeAndPowerClient() {
               </span>
               <span className="text-sm group-hover:translate-x-0.5 transition-transform duration-200 inline-block" style={{ color: ACCENT }}>→</span>
             </a>
-          </motion.div>
+          </div>
         </div>
       </section>
 

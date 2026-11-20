@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import UniversityClient from "./UniversityClient";
+import { siteOpenGraph } from "@/lib/siteMetadata";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/university" },
+  openGraph: { ...siteOpenGraph, url: "/university" },
   title: "University of Wisconsin–Madison",
   description:
     "My academic home — UW–Madison, a top-10 US public university. Economics & Information Science at CDIS.",

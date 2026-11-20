@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { LangProvider } from "@/context/LangContext";
-import ProfileChat from "@/components/ProfileChat";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wuziyang.com";
-const OG_IMAGE = "/images/background.jpg";
+import ProfileChatLauncher from "@/components/ProfileChatLauncher";
+import ScrollEffects from "@/components/ui/ScrollEffects";
+import { OG_IMAGE, SITE_URL, siteOpenGraph } from "@/lib/siteMetadata";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -26,19 +26,9 @@ export const metadata: Metadata = {
     "Data Analysis",
   ],
   authors: [{ name: "Wuziyang Zhang" }],
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: "Wuziyang Zhang — Think in systems. Build with taste.",
-    description:
-      "Business strategy, AI products, market research, and global perspective — designed into one path.",
-    type: "website",
-    url: SITE_URL,
-    siteName: "Wuziyang Zhang",
-    images: [{ url: OG_IMAGE, width: 1600, height: 900, alt: "Wuziyang Zhang" }],
-  },
   twitter: {
     card: "summary_large_image",
-    title: "Wuziyang Zhang — Think in systems. Build with taste.",
+    title: siteOpenGraph.title,
     description:
       "Business strategy, AI products, market research, and global perspective.",
     images: [OG_IMAGE],
@@ -61,7 +51,10 @@ export default function RootLayout({
       <body className="bg-black antialiased">
         <LangProvider>
           {children}
-          <ProfileChat />
+          <ProfileChatLauncher />
+          <Suspense fallback={null}>
+            <ScrollEffects />
+          </Suspense>
         </LangProvider>
       </body>
     </html>

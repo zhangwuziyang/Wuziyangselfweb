@@ -1,44 +1,20 @@
-"use client";
-
-import { motion, useInView } from "framer-motion";
-import { useRef, type ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 interface ScrollRevealProps {
-  children:  ReactNode;
-  delay?:    number;
-  duration?: number;
-  y?:        number;
+  children: ReactNode;
+  delay?: number;
   className?: string;
-  once?:     boolean;
+  as?: "div" | "li";
 }
 
-/* Apple's signature easing — used across apple.com */
-const APPLE_EASE = [0.25, 0.1, 0.25, 1.0] as const;
-
-export function ScrollReveal({
-  children,
-  delay    = 0,
-  duration = 0.9,
-  y        = 36,
-  className = "",
-  once     = true,
-}: ScrollRevealProps) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once, margin: "-5%" });
-
+export function ScrollReveal({ children, delay = 0, className, as: Tag = "div" }: ScrollRevealProps) {
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y, scale: 0.98 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{
-        duration,
-        delay,
-        ease: APPLE_EASE,
-      }}
+    <Tag
+      data-scroll-reveal=""
       className={className}
+      style={delay ? { "--reveal-delay": `${delay}ms` } as CSSProperties : undefined}
     >
       {children}
-    </motion.div>
+    </Tag>
   );
 }

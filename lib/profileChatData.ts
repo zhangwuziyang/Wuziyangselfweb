@@ -26,13 +26,14 @@ export interface ProfileChatResponse {
   mode: ProfileChatAnswerMode;
   intentId?: string;
   useConversationContext: boolean;
-  action?: ProfileChatAction;
+  actions?: ProfileChatAction[];
 }
 
 type DestinationKey =
   | "about"
   | "university"
   | "experience"
+  | "projects"
   | "alibaba"
   | "bytedance"
   | "rolandBerger"
@@ -94,7 +95,6 @@ export const PROFILE_CHAT_COPY = {
   },
   placeholder: { en: "Ask a question…", zh: "输入你想问的问题…" },
   send: { en: "Send", zh: "发送" },
-  open: { en: "Ask me", zh: "问问我" },
   close: { en: "Close chat", zh: "关闭对话" },
   suggestionsLabel: { en: "Try asking", zh: "可以试着问" },
   suggestions: {
@@ -140,6 +140,10 @@ const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText 
   experience: {
     href: "/#experience",
     label: { en: "View my experience", zh: "查看工作经历" },
+  },
+  projects: {
+    href: "/#projects",
+    label: { en: "View my projects", zh: "查看我的项目" },
   },
   alibaba: {
     href: "/experience/alibaba-international",
@@ -195,7 +199,7 @@ const DESTINATION_BY_INTENT: Record<string, DestinationKey> = {
   courses: "university",
   location: "university",
   "experience-overview": "experience",
-  "projects-overview": "experience",
+  "projects-overview": "projects",
   "experience-timeline": "experience",
   alibaba: "alibaba",
   "alibaba-view": "alibaba",
@@ -1093,13 +1097,18 @@ function keywordScore(query: string, keyword: string): number {
   if (q === k) return 100;
 
   let score = diceCoefficient(q, k) * 46;
-  if (q.includes(k)) score = Math.max(score, 62 + Math.min(k.length, 18));
+  const queryTokens = tokenize(query);
+  const keywordTokens = tokenize(keyword);
+  const containsKeyword = /[\u3400-\u9fff]/.test(k)
+    ? q.includes(k)
+    : ` ${queryTokens.join(" ")} `.includes(` ${keywordTokens.join(" ")} `);
+  if (containsKeyword) score = Math.max(score, 62 + Math.min(k.length, 18));
   if (q.length >= 2 && k.includes(q)) score = Math.max(score, 42 + Math.min(q.length, 14));
 
-  const queryTokens = new Set(tokenize(query));
-  const keywordTokens = new Set(tokenize(keyword));
-  const tokenOverlap = [...queryTokens].filter((token) => keywordTokens.has(token)).length;
-  const tokenBase = Math.max(queryTokens.size, keywordTokens.size, 1);
+  const uniqueQueryTokens = new Set(queryTokens);
+  const uniqueKeywordTokens = new Set(keywordTokens);
+  const tokenOverlap = [...uniqueQueryTokens].filter((token) => uniqueKeywordTokens.has(token)).length;
+  const tokenBase = Math.max(uniqueQueryTokens.size, uniqueKeywordTokens.size, 1);
   score = Math.max(score, (tokenOverlap / tokenBase) * 38);
 
   return score;
@@ -1119,36 +1128,41 @@ function isExplicitExperienceComparison(query: string): boolean {
 }
 
 const EXPERIENCE_SUBJECTS = [
-  { pattern: /阿里|alibaba/i, opinionId: "alibaba-view", reflectionId: "alibaba-learning" },
-  { pattern: /字节|bytedance/i, opinionId: "bytedance-view", reflectionId: "bytedance-learning" },
-  { pattern: /罗兰贝格|roland\s*berger/i, opinionId: "roland-view", reflectionId: "roland-learning" },
-  { pattern: /国元|guoyuan/i, opinionId: "guoyuan-view", reflectionId: "guoyuan-learning" },
-  { pattern: /chart\s*creator/i, opinionId: "chartcreator-view", reflectionId: "chartcreator-learning" },
+  { pattern: /阿里|alibaba/i, id: "alibaba", opinionId: "alibaba-view", reflectionId: "alibaba-learning" },
+  { pattern: /字节|bytedance/i, id: "bytedance", opinionId: "bytedance-view", reflectionId: "bytedance-learning" },
+  { pattern: /罗兰贝格|roland\s*berger/i, id: "roland-berger", opinionId: "roland-view", reflectionId: "roland-learning" },
+  { pattern: /国元|guoyuan/i, id: "guoyuan", opinionId: "guoyuan-view", reflectionId: "guoyuan-learning" },
+  { pattern: /chart\s*creator/i, id: "chartcreator", opinionId: "chartcreator-view", reflectionId: "chartcreator-learning" },
 ] as const;
 
 const EXPERIENCE_COMPARISON_PROFILES = [
   {
     pattern: /阿里|alibaba/i,
+    destination: "alibaba",
     zh: "阿里经历更偏因果分析、物流商业分析与 AI Agent，重点是把分析接入日常运营",
     en: "Alibaba emphasized causal analytics, logistics business analysis, and AI agents that moved analysis into daily operations",
   },
   {
     pattern: /罗兰贝格|roland\s*berger/i,
+    destination: "rolandBerger",
     zh: "罗兰贝格经历更偏定量战略、用户分群与客户交付，重点是把模型转成可执行的 KOC 运营体系",
     en: "Roland Berger emphasized quantitative strategy, user segmentation, and turning models into a client-ready KOC operating system",
   },
   {
     pattern: /字节|bytedance/i,
+    destination: "bytedance",
     zh: "字节经历更偏平台、竞品与产品战略，重点是在尚未稳定的市场中搭建决策框架",
     en: "ByteDance emphasized platform, competitive, and product strategy in a market that was still taking shape",
   },
   {
     pattern: /国元|guoyuan/i,
+    destination: "guoyuan",
     zh: "国元证券经历更偏金融与行业研究，重点是把财务、渠道与宏观信号收敛成投资观点",
     en: "Guoyuan Securities emphasized financial and industry research that turned company, channel, and macro signals into an investment thesis",
   },
   {
     pattern: /chart\s*creator/i,
+    destination: "chartCreator",
     zh: "ChartCreator 更偏端到端产品所有权，重点是从用户研究一路推进到可部署的 MVP",
     en: "ChartCreator emphasized end-to-end product ownership from user research through a deployed MVP",
   },
@@ -1174,6 +1188,18 @@ function findExperienceSubject(value: string) {
 
 function resolveExplicitIntentId(query: string): string | undefined {
   const rules: Array<{ id: string; pattern: RegExp }> = [
+    {
+      id: "quick-summary",
+      pattern: /一句话介绍|简短介绍|\bone sentence\b|\bquick intro\b|\belevator pitch\b/i,
+    },
+    {
+      id: "resume",
+      pattern: /简历|\b(?:resume|résumé|cv)\b/i,
+    },
+    {
+      id: "experience-timeline",
+      pattern: /实习时间|哪年实习|when (?:was|were|did).*\binternships?\b|\binternship dates\b/i,
+    },
     {
       id: "projects-overview",
       pattern: /(?:你的|他的|梓洋的)(?:代表)?项目|做过哪些项目|有哪些项目|项目概览|项目经历|your projects|what projects have you built|project overview/i,
@@ -1261,12 +1287,16 @@ function resolveFocusedIntentId(
   if (mode === "comparison" && isExplicitExperienceComparison(query)) {
     return "experience-compare";
   }
-  if (mode !== "opinion" && mode !== "reflection") return undefined;
-
   const subject = findExperienceSubject(query)
     ?? (allowRecentContext ? findExperienceSubject(recentUserContext) : undefined);
   if (!subject) return undefined;
-  return mode === "opinion" ? subject.opinionId : subject.reflectionId;
+  if (mode === "opinion") return subject.opinionId;
+  if (mode === "reflection") return subject.reflectionId;
+  if (mode === "fact" && /^(?:what did you do(?: at)?|what about|tell me (?:more )?about)\b|做了什么|做过什么/i.test(query.trim())) {
+    const mentions = EXPERIENCE_SUBJECTS.filter(({ pattern }) => pattern.test(query)).length;
+    if (mentions <= 1) return subject.id;
+  }
+  return undefined;
 }
 
 export function findProfileResponse(
@@ -1294,25 +1324,45 @@ export function findProfileResponse(
     return { intent, directScore, score: Math.max(directScore, contextScore, focusedScore) };
   }).sort((a, b) => b.score - a.score);
 
-  const bestMatch = rankedIntents[0];
+  const [bestMatch] = rankedIntents;
+  const bestDestination = DESTINATION_BY_INTENT[bestMatch.intent.id];
+  // Answers about the same page often share phrases. Compare against competing topics.
+  const secondMatch = rankedIntents.find(({ intent }) =>
+    intent.id !== bestMatch.intent.id
+    && (!bestDestination || DESTINATION_BY_INTENT[intent.id] !== bestDestination),
+  );
   const genericIntroductionDrift = Boolean(
     bestMatch
     && ["intro", "education", "majors"].includes(bestMatch.intent.id)
     && /介绍(?:一下)?|tell me about|introduce/i.test(query)
     && !explicitIntentId,
   );
-  if (!bestMatch || bestMatch.score < 24 || genericIntroductionDrift) {
+  const ambiguous = bestMatch && secondMatch && !focusedIntentId
+    && bestMatch.score < 100 && bestMatch.score - secondMatch.score < 6;
+  const minimumScore = 30;
+  if (!bestMatch || bestMatch.score < minimumScore || genericIntroductionDrift || ambiguous) {
+    const clarification = lang === "zh"
+      ? "你想了解哪段经历、哪个项目，或哪项能力？"
+      : "Which experience, project, or skill would you like to know about?";
+    const answer = ambiguous && bestMatch.score >= minimumScore && !genericIntroductionDrift
+      ? clarification
+      : `${PROFILE_CHAT_COPY.fallback[lang]} ${clarification}`;
     return {
-      answer: PROFILE_CHAT_COPY.fallback[lang],
-      context: PROFILE_CHAT_COPY.fallback[lang],
+      answer,
+      context: answer,
       mode,
       useConversationContext,
     };
   }
 
   const bestIntent = bestMatch.intent;
-  const destinationKey = DESTINATION_BY_INTENT[bestIntent.id];
-  const destination = destinationKey ? DESTINATIONS[destinationKey] : undefined;
+  const destinationKey = bestDestination;
+  const comparedDestinations = bestIntent.id === "experience-compare"
+    ? EXPERIENCE_COMPARISON_PROFILES.filter(({ pattern }) => pattern.test(query)).map(({ destination }) => destination)
+    : [];
+  const destinations = comparedDestinations.length >= 2
+    ? comparedDestinations
+    : [destinationKey ?? "about"];
   const resolvedAnswer = bestIntent.id === "experience-compare"
     ? buildExperienceComparisonAnswer(query, lang) ?? bestIntent.answer[lang]
     : bestIntent.answer[lang];
@@ -1334,8 +1384,9 @@ export function findProfileResponse(
     mode,
     intentId: bestIntent.id,
     useConversationContext,
-    action: destination
-      ? { href: destination.href, label: destination.label[lang] }
-      : undefined,
+    actions: destinations.map((key) => ({
+      href: DESTINATIONS[key].href,
+      label: DESTINATIONS[key].label[lang],
+    })),
   };
 }

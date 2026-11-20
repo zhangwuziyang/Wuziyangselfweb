@@ -2,12 +2,11 @@ import type { MLCEngineInterface } from "@mlc-ai/web-llm";
 import type { Lang } from "@/lib/i18n";
 import type { ProfileChatAnswerMode } from "@/lib/profileChatData";
 
-export const LOCAL_AI_MODEL_ID = "Qwen2.5-0.5B-Instruct-q4f16_1-MLC";
-
-export type LocalAIProgress = {
-  progress: number;
-  text: string;
-};
+const DEFAULT_MODEL = "Qwen3.5-0.8B-q4f16_1-MLC";
+const LARGE_MODEL = "Qwen3.5-2B-q4f16_1-MLC";
+const INIT_TIMEOUT_MS = 5 * 60_000;
+const GENERATION_TIMEOUT_MS = 30_000;
+const MIB = 1024 * 1024;
 
 type GenerateLocalAnswerOptions = {
   question: string;
@@ -20,53 +19,106 @@ type GenerateLocalAnswerOptions = {
   onUpdate: (answer: string) => void;
 };
 
-let enginePromise: Promise<MLCEngineInterface> | null = null;
-let engine: MLCEngineInterface | null = null;
-let modelWorker: Worker | null = null;
+export interface LocalAI {
+  readonly disposed: boolean;
+  generate(options: GenerateLocalAnswerOptions, signal: AbortSignal): Promise<string>;
+  dispose(): void;
+}
 
-export function canUseLocalAI(): boolean {
-  return typeof window !== "undefined" && "gpu" in navigator && typeof Worker !== "undefined";
+type WebGPU = {
+  requestAdapter(options: { powerPreference: "high-performance" }): Promise<{
+    features: ReadonlySet<string>;
+    limits: { maxBufferSize: number; maxStorageBufferBindingSize: number };
+  } | null>;
+};
+
+function abortable<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const onAbort = () => reject(signal.reason);
+    if (signal.aborted) onAbort();
+    else signal.addEventListener("abort", onAbort, { once: true });
+
+    void promise.then(resolve, reject).finally(() => {
+      signal.removeEventListener("abort", onAbort);
+    });
+  });
 }
 
 export async function prepareLocalAI(
-  onProgress: (report: LocalAIProgress) => void,
-): Promise<MLCEngineInterface> {
-  if (engine) return engine;
-  if (!canUseLocalAI()) throw new Error("WebGPU is unavailable");
+  signal: AbortSignal,
+  onProgress: (progress: number) => void,
+): Promise<LocalAI> {
+  signal.throwIfAborted();
+  const gpu = (navigator as Navigator & { gpu?: WebGPU }).gpu;
+  if (!gpu || typeof Worker === "undefined") throw new Error("WebGPU is unavailable");
 
-  if (!enginePromise) {
-    enginePromise = (async () => {
-      const { CreateWebWorkerMLCEngine } = await import("@mlc-ai/web-llm");
-      modelWorker = new Worker(new URL("./profileChatAI.worker.ts", import.meta.url), {
-        type: "module",
-      });
+  const initSignal = AbortSignal.any([signal, AbortSignal.timeout(INIT_TIMEOUT_MS)]);
+  const adapter = await abortable(gpu.requestAdapter({ powerPreference: "high-performance" }), initSignal);
+  if (!adapter?.features.has("shader-f16")) throw new Error("WebGPU shader-f16 is unavailable");
 
-      const loadedEngine = await CreateWebWorkerMLCEngine(
-        modelWorker,
-        LOCAL_AI_MODEL_ID,
-        {
-          initProgressCallback: (report) => {
-            onProgress({
-              progress: Math.max(0, Math.min(1, report.progress)),
-              text: report.text,
-            });
-          },
-          logLevel: "ERROR",
+  // These limits indicate GPU capability. Browsers do not expose available VRAM.
+  const canTryLargeModel = adapter.limits.maxBufferSize >= 512 * MIB
+    && adapter.limits.maxStorageBufferBindingSize >= 256 * MIB;
+  const { WebWorkerMLCEngine } = await abortable(import("@mlc-ai/web-llm"), initSignal);
+
+  async function load(model: string): Promise<LocalAI> {
+    initSignal.throwIfAborted();
+    const lifetime = new AbortController();
+    const worker = new Worker(new URL("./profileChatAI.worker.ts", import.meta.url), { type: "module" });
+    function dispose() {
+      if (lifetime.signal.aborted) return;
+      lifetime.abort();
+      worker.terminate();
+    }
+
+    worker.addEventListener("error", dispose, { once: true });
+    worker.addEventListener("messageerror", dispose, { once: true });
+    const loading = AbortSignal.any([initSignal, lifetime.signal]);
+
+    try {
+      const engine = new WebWorkerMLCEngine(worker, {
+        initProgressCallback: ({ progress }) => {
+          if (!loading.aborted) onProgress(Math.max(0, Math.min(1, progress)));
         },
-        { context_window_size: 2048 },
-      );
+        logLevel: "ERROR",
+      });
+      await abortable(engine.reload(model, { context_window_size: 2048 }), loading);
 
-      engine = loadedEngine;
-      return loadedEngine;
-    })().catch((error) => {
-      enginePromise = null;
-      modelWorker?.terminate();
-      modelWorker = null;
+      return {
+        get disposed() { return lifetime.signal.aborted; },
+        dispose,
+        async generate(options, requestSignal) {
+          const deadline = AbortSignal.timeout(GENERATION_TIMEOUT_MS);
+          const generation = AbortSignal.any([requestSignal, deadline, lifetime.signal]);
+          const stop = () => {
+            // Releasing the Worker also cancels a stalled GPU step or pending stream request.
+            dispose();
+          };
+          generation.throwIfAborted();
+          generation.addEventListener("abort", stop, { once: true });
+
+          try {
+            return await generateLocalAnswer(engine, model, options, generation);
+          } finally {
+            generation.removeEventListener("abort", stop);
+          }
+        },
+      };
+    } catch (error) {
+      dispose();
       throw error;
-    });
+    }
   }
 
-  return enginePromise;
+  if (canTryLargeModel) {
+    try {
+      return await load(LARGE_MODEL);
+    } catch {
+      initSignal.throwIfAborted();
+      onProgress(0);
+    }
+  }
+  return load(DEFAULT_MODEL);
 }
 
 function buildPrompt({
@@ -168,14 +220,21 @@ function staysOnCurrentTopic(answer: string, intentId?: string): boolean {
   return !requiredTopic || requiredTopic.test(answer);
 }
 
-export async function generateLocalAnswer(
-  options: GenerateLocalAnswerOptions,
-): Promise<string> {
-  if (!engine) throw new Error("Local AI is not ready");
+function suppressThinking(output: string): string {
+  const hidden = /<think(?:\s[^>]*)?>[\s\S]*?(?:<\/think\s*>|$)/gi;
+  // A streaming chunk may end midway through an opening tag.
+  return output.replace(hidden, "").replace(/<(?:(?:\/?t(?:h(?:i(?:n(?:k)?)?)?)?)?)$/i, "");
+}
 
+async function generateLocalAnswer(
+  engine: MLCEngineInterface,
+  model: string,
+  options: GenerateLocalAnswerOptions,
+  signal: AbortSignal,
+): Promise<string> {
   const prompt = buildPrompt(options);
-  const stream = await engine.chat.completions.create({
-    model: LOCAL_AI_MODEL_ID,
+  const stream = await abortable(engine.chat.completions.create({
+    model,
     messages: [
       { role: "system", content: prompt.system },
       { role: "user", content: prompt.user },
@@ -185,19 +244,26 @@ export async function generateLocalAnswer(
     top_p: 0.58,
     repetition_penalty: 1.08,
     max_tokens: options.lang === "zh" ? 180 : 220,
-  });
+    extra_body: { enable_thinking: false },
+  }), signal);
 
-  let answer = "";
-  for await (const chunk of stream) {
-    const token = chunk.choices[0]?.delta?.content ?? "";
-    if (!token) continue;
-    answer += token;
-    if (staysOnCurrentTopic(answer, options.answerIntentId)) {
-      options.onUpdate(answer.trimStart());
+  const chunks = stream[Symbol.asyncIterator]();
+  let output = "";
+  let lastUpdate = 0;
+  while (true) {
+    const { value, done } = await abortable(chunks.next(), signal);
+    if (done) break;
+    output += value.choices[0]?.delta?.content ?? "";
+    const now = performance.now();
+    if (now - lastUpdate < 60) continue;
+    const partial = suppressThinking(output).trimStart();
+    if (partial && staysOnCurrentTopic(partial, options.answerIntentId)) {
+      options.onUpdate(partial);
+      lastUpdate = now;
     }
   }
 
-  const cleaned = cleanGeneratedAnswer(answer, options.question);
+  const cleaned = cleanGeneratedAnswer(suppressThinking(output), options.question);
   if (!cleaned) throw new Error("Local AI returned an empty answer");
   if (!staysOnCurrentTopic(cleaned, options.answerIntentId)) {
     throw new Error("Local AI drifted away from the current topic");

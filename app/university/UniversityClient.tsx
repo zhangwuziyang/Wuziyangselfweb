@@ -2,31 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { useLang } from "@/context/LangContext";
-
-const EASE = [0.25, 0.1, 0.25, 1.0] as const;
-
-function FadeUp({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay, ease: EASE }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 /* ─── Data ──────────────────────────────────────────────────── */
 
@@ -171,7 +148,7 @@ export default function UniversityClient() {
             fill
             className="object-cover"
             style={{ objectPosition: "center 85%" }}
-            priority
+            preload
             sizes="100vw"
           />
           <div
@@ -185,7 +162,7 @@ export default function UniversityClient() {
 
         {/* Hero copy */}
         <div className="relative z-10 max-w-[900px] mx-auto px-5 pt-20 pb-44">
-          <FadeUp>
+          <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl overflow-hidden bg-white shadow-md shrink-0 flex items-center justify-center p-1">
                 <Image src="/photos/uw-logo.jpg" alt="UW Logo" width={36} height={36} className="object-contain" />
@@ -194,18 +171,18 @@ export default function UniversityClient() {
                 {lang === "en" ? "University · Madison, Wisconsin" : "大学 · 威斯康星州麦迪逊市"}
               </p>
             </div>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.08}>
+          <ScrollReveal delay={80}>
             <h1
               className="font-semibold leading-[1.04] tracking-tight mb-4 text-white"
               style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.025em", textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}
             >
               {lang === "en" ? "University of Wisconsin–Madison" : "威斯康星大学麦迪逊分校"}
             </h1>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.15}>
+          <ScrollReveal delay={150}>
             <p
               className="font-light text-white/80 max-w-xl"
               style={{ fontSize: "clamp(1rem, 1.6vw, 1.1rem)", lineHeight: 1.7, textShadow: "0 1px 8px rgba(0,0,0,0.3)" }}
@@ -214,28 +191,22 @@ export default function UniversityClient() {
                 ? "Economics · Information Science — where I think and build."
                 : "经济学 · 信息科学——我思考与创造的地方。"}
             </p>
-          </FadeUp>
+          </ScrollReveal>
         </div>
       </header>
 
       {/* ── Rankings grid ── */}
       <section style={{ background: "#fff" }} className="py-16 px-5">
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-          >
+          <div data-scroll-reveal="">
             <p className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-8" style={{ color: "#c5050c" }}>
               {lang === "en" ? "Rankings & Numbers" : "排名与数据"}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.07)", borderRadius: 16, overflow: "hidden" }}>
-              {RANKINGS.map((r, i) => (
-                <motion.div
+              {RANKINGS.map((r) => (
+                <div
                   key={r.value}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.25 + i * 0.06, ease: EASE }}
+                  data-scroll-reveal=""
                   className="px-6 py-5"
                   style={{ background: "#fff" }}
                 >
@@ -248,22 +219,17 @@ export default function UniversityClient() {
                   <p className="text-[11px] font-mono" style={{ color: "#86868b" }}>
                     {lang === "en" ? r.source.en : r.source.zh}
                   </p>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── About UW ── */}
       <section style={{ background: "#f5f5f7" }} className="py-20 px-5">
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{ duration: 0.8, ease: EASE }}
-          >
+          <div data-scroll-reveal="">
             <p className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-6" style={{ color: "#c5050c" }}>
               {lang === "en" ? "About the University" : "关于这所大学"}
             </p>
@@ -296,32 +262,26 @@ export default function UniversityClient() {
                 />
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── Programs ── */}
       <section style={{ background: "#fff" }} className="py-20 px-5 pb-32">
         <div className="max-w-[900px] mx-auto">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{ duration: 0.7, ease: EASE }}
+          <p
+            data-scroll-reveal=""
             className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-14"
             style={{ color: "#0071e3" }}
           >
             {lang === "en" ? "My Programs" : "我的专业"}
-          </motion.p>
+          </p>
 
           <div className="space-y-16">
             {PROGRAMS.map((prog, pi) => (
-              <motion.div
+              <div
                 key={prog.name.en}
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-6%" }}
-                transition={{ duration: 0.85, delay: pi * 0.06, ease: EASE }}
+                data-scroll-reveal=""
               >
                 {/* Program header */}
                 <div className="flex items-start gap-4 mb-8">
@@ -390,7 +350,7 @@ export default function UniversityClient() {
                 {pi < PROGRAMS.length - 1 && (
                   <div className="mt-14 h-px" style={{ background: "rgba(0,0,0,0.06)" }} />
                 )}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -399,12 +359,7 @@ export default function UniversityClient() {
       {/* ── Why this combination ── */}
       <section style={{ background: "#1d1d1f" }} className="py-20 px-5">
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{ duration: 0.85, ease: EASE }}
-          >
+          <div data-scroll-reveal="">
             <p className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-8" style={{ color: "#c5050c" }}>
               {lang === "en" ? "Why This Combination" : "为何选择这两个专业"}
             </p>
@@ -414,7 +369,7 @@ export default function UniversityClient() {
             >
               {lang === "en" ? WHY.en : WHY.zh}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 

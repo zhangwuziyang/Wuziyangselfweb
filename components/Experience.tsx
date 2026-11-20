@@ -1,74 +1,57 @@
-"use client";
-
-import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { ExperienceTimeline } from "@/components/ui/ExperienceTimeline";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
-import { useLang } from "@/context/LangContext";
-import { i18n, tx } from "@/lib/i18n";
-import { EXPERIENCE_DATA, t } from "@/lib/experienceData";
+import { Localized } from "@/components/ui/Localized";
+import { i18n } from "@/lib/i18n";
+import { EXPERIENCE_DATA } from "@/lib/experienceData";
 
 /* Newest first */
 const TIMELINE = [...EXPERIENCE_DATA].sort((a, b) => b.start.localeCompare(a.start));
 
 export default function Experience() {
-  const { lang } = useLang();
   const e = i18n.experience;
 
-  /* Rail fills in as the timeline scrolls through the viewport */
-  const railRef = useRef<HTMLOListElement>(null);
-  const { scrollYProgress } = useScroll({ target: railRef, offset: ["start 75%", "end 60%"] });
-  const railFill = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-
   return (
-    <section id="experience" style={{ background: "#000" }} className="py-32 md:py-44">
+    <section id="experience" data-nav-surface="dark" style={{ background: "#000" }} className="py-32 md:py-44">
       <div className="max-w-[1100px] mx-auto px-5">
 
         <ScrollReveal>
-          <p className="section-label-dark mb-4">{tx(e.label, lang)}</p>
+          <p className="section-label-dark mb-4"><Localized {...e.label} /></p>
         </ScrollReveal>
-        <ScrollReveal delay={0.08}>
+        <ScrollReveal delay={80}>
           <h2
             className="font-semibold leading-[1.04] tracking-tight mb-20"
             style={{ fontSize: "clamp(2.2rem, 4vw, 3.4rem)", color: "#f5f5f7", letterSpacing: "-0.025em" }}
           >
-            {tx(e.headline, lang)}
+            <Localized {...e.headline} />
           </h2>
         </ScrollReveal>
 
-        <ol ref={railRef} className="relative">
-          {/* Rail: faint track + scroll-driven fill. x = centre of the node column */}
-          <div className="absolute top-2 bottom-2 left-[11px] md:left-[211px] w-px bg-white/[0.08]" aria-hidden />
-          <motion.div
-            className="absolute top-2 bottom-2 left-[11px] md:left-[211px] w-px origin-top"
-            style={{ scaleY: railFill, background: "linear-gradient(to bottom, #f5f5f7, rgba(245,245,247,0.25))" }}
-            aria-hidden
-          />
-
+        <ExperienceTimeline>
           {TIMELINE.map((exp, i) => {
             const year = exp.start.slice(0, 4);
             const newYear = i === 0 || TIMELINE[i - 1].start.slice(0, 4) !== year;
 
             return (
-              <li key={exp.slug} className="relative grid grid-cols-[24px_1fr] md:grid-cols-[180px_64px_1fr] gap-x-4 md:gap-x-0 pb-10 last:pb-0">
+              <ScrollReveal as="li" key={exp.slug} className="relative grid grid-cols-[24px_1fr] md:grid-cols-[180px_64px_1fr] gap-x-4 md:gap-x-0 pb-10 last:pb-0">
 
                 {/* Date column (desktop) */}
-                <ScrollReveal delay={0.04} className="hidden md:block pt-7 pr-6 text-right">
+                <div className="hidden md:block pt-7 pr-6 text-right">
                   {newYear && (
                     <p className="text-2xl font-semibold tracking-tight mb-1" style={{ color: "#f5f5f7", letterSpacing: "-0.02em" }}>
                       {year}
                     </p>
                   )}
-                  <p className="text-sm whitespace-nowrap" style={{ color: "#6e6e73" }}>{t(exp.period, lang)}</p>
-                  <p className="text-xs mt-0.5" style={{ color: "#48484a" }}>{t(exp.location, lang)}</p>
-                </ScrollReveal>
+                  <p className="text-sm whitespace-nowrap" style={{ color: "#6e6e73" }}><Localized {...exp.period} /></p>
+                  <p className="text-xs mt-0.5" style={{ color: "#48484a" }}><Localized {...exp.location} /></p>
+                </div>
 
                 {/* Node */}
                 <div className="relative flex justify-center pt-8 md:pt-9">
                   <span className="relative flex h-[11px] w-[11px]">
                     {exp.current && (
-                      <span className="absolute inset-0 rounded-full animate-ping opacity-60" style={{ background: exp.accent }} />
+                      <span className="absolute inset-0 rounded-full motion-safe:animate-ping opacity-60" style={{ background: exp.accent }} />
                     )}
                     <span
                       className="relative h-[11px] w-[11px] rounded-full"
@@ -78,12 +61,12 @@ export default function Experience() {
                 </div>
 
                 {/* Card */}
-                <ScrollReveal delay={0.08} className="min-w-0">
+                <div className="min-w-0">
                   {/* Date line (mobile) */}
                   <p className="md:hidden text-xs mb-3 pt-7" style={{ color: "#6e6e73" }}>
-                    <span className="font-semibold" style={{ color: "#f5f5f7" }}>{t(exp.period, lang)}</span>
+                    <span className="font-semibold" style={{ color: "#f5f5f7" }}><Localized {...exp.period} /></span>
                     <span className="mx-1.5">·</span>
-                    {t(exp.location, lang)}
+                    <Localized {...exp.location} />
                   </p>
 
                   <Link href={`/experience/${exp.slug}`}>
@@ -105,24 +88,24 @@ export default function Experience() {
                               className="inline-block text-[11px] font-semibold tracking-[0.1em] uppercase px-2.5 py-1 rounded-full"
                               style={{ color: exp.accent, background: `${exp.accent}18`, border: `1px solid ${exp.accent}30` }}
                             >
-                              {t(exp.category, lang)}
+                              <Localized {...exp.category} />
                             </span>
                             {exp.current && (
                               <span className="text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ color: "#30d158", background: "#30d15814", border: "1px solid #30d15830" }}>
-                                {lang === "en" ? "Current" : "进行中"}
+                                <Localized en="Current" zh="进行中" />
                               </span>
                             )}
                           </div>
                           <h3 className="text-xl font-semibold tracking-tight" style={{ color: "#f5f5f7", letterSpacing: "-0.015em" }}>
                             {exp.company}
                           </h3>
-                          <p className="text-sm font-light mt-0.5" style={{ color: "#86868b" }}>{t(exp.role, lang)}</p>
+                          <p className="text-sm font-light mt-0.5" style={{ color: "#86868b" }}><Localized {...exp.role} /></p>
                         </div>
                       </div>
 
                       {/* Tagline */}
                       <p className="text-sm font-light leading-relaxed mb-4" style={{ color: "#6e6e73" }}>
-                        {t(exp.tagline, lang)}
+                        <Localized {...exp.tagline} />
                       </p>
 
                       {/* Metric chips */}
@@ -130,23 +113,23 @@ export default function Experience() {
                         {exp.metrics.slice(0, 4).map((m) => (
                           <div key={m.value} className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs" style={{ background: `${exp.accent}0f`, border: `1px solid ${exp.accent}20` }}>
                             <span className="font-semibold" style={{ color: exp.accent }}>{m.value}</span>
-                            <span style={{ color: "#6e6e73" }}>{t(m.label, lang)}</span>
+                            <span style={{ color: "#6e6e73" }}><Localized {...m.label} /></span>
                           </div>
                         ))}
                       </div>
 
                       {/* CTA */}
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium transition-all duration-200 group-hover:gap-2.5" style={{ color: exp.accent }}>
-                        {lang === "en" ? "View full case" : "查看详细案例"}
+                        <Localized en="View full case" zh="查看详细案例" />
                         <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                       </span>
                     </article>
                   </Link>
-                </ScrollReveal>
-              </li>
+                </div>
+              </ScrollReveal>
             );
           })}
-        </ol>
+        </ExperienceTimeline>
       </div>
     </section>
   );
