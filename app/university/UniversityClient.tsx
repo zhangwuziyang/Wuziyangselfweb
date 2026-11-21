@@ -2,31 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { useLang } from "@/context/LangContext";
-
-const EASE = [0.25, 0.1, 0.25, 1.0] as const;
-
-function FadeUp({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay, ease: EASE }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 /* ─── Data ──────────────────────────────────────────────────── */
 
@@ -34,22 +11,22 @@ const RANKINGS = [
   {
     value: "#2",
     label: { en: "US Public University", zh: "美国公立大学" },
-    source: { en: "Time Magazine 2026",  zh: "时代杂志 2026" },
+    source: { en: "Time Magazine 2026",  zh: "《时代》周刊 2026" },
   },
   {
     value: "#20",
     label: { en: "Worldwide",            zh: "全球排名" },
-    source: { en: "Time Magazine 2026",  zh: "时代杂志 2026" },
+    source: { en: "Time Magazine 2026",  zh: "《时代》周刊 2026" },
   },
   {
     value: "#36",
-    label: { en: "National University",  zh: "全美大学" },
+    label: { en: "National University",  zh: "全美综合大学" },
     source: { en: "US News 2026",        zh: "US News 2026" },
   },
   {
     value: "1848",
     label: { en: "Founded",              zh: "创校年份" },
-    source: { en: "Madison, Wisconsin",  zh: "威斯康星·麦迪逊" },
+    source: { en: "Madison, Wisconsin",  zh: "威斯康星州麦迪逊" },
   },
   {
     value: "~49K",
@@ -59,20 +36,20 @@ const RANKINGS = [
   {
     value: "20+",
     label: { en: "Nobel Laureates",      zh: "诺贝尔奖得主" },
-    source: { en: "Faculty affiliated",  zh: "关联教职人员" },
+    source: { en: "Affiliated faculty",  zh: "相关教职人员" },
   },
 ];
 
 const UW_ABOUT = {
   en: [
-    "The University of Wisconsin–Madison sits on the western shore of Lake Mendota, in the heart of Madison — one of America's most consistently livable cities. Founded in 1848, the same year Wisconsin became a state, it was built on the belief that a university should serve not just its students, but society.",
-    "That philosophy — known as the Wisconsin Idea — still defines the place. Research here isn't siloed. It bleeds into policy, industry, and the wider world. UW is regularly ranked among the top five research universities in the United States, with strength across medicine, engineering, social sciences, and the humanities.",
-    "For me, it's the right tension: rigorous enough to challenge how I think, open enough to let me build across disciplines.",
+    "The University of Wisconsin–Madison sits on the western shore of Lake Mendota, in the heart of Madison, one of America's most consistently livable cities. Founded in 1848, the same year Wisconsin became a state, it was built on the idea that a university belongs to the wider public as much as to its students.",
+    "That ethos, known as the Wisconsin Idea, still defines the place. Research here rarely stays inside the ivory tower; it flows into policy, industry, and the wider world. UW regularly ranks among the top five research universities in the United States, with depth across medicine, engineering, social sciences, and the humanities.",
+    "For me, it offers the right balance: rigorous enough to stretch how I think, and open enough to let me work across disciplines.",
   ],
   zh: [
-    "威斯康星大学麦迪逊分校坐落于门多塔湖西岸，位于麦迪逊市中心——美国最宜居的城市之一。创建于 1848 年，与威斯康星州建州同年，其创立理念是：大学的使命不仅服务于学生，更服务于整个社会。",
-    "这一理念——即「威斯康星理念」——至今仍定义着这所学校。这里的研究不局限于象牙塔，它渗透进政策制定、产业实践与更广泛的社会议题。UW 长期跻身美国顶尖研究型大学行列，在医学、工程、社会科学与人文领域均有深厚积累。",
-    "对我而言，这里提供了恰到好处的张力：足够严格，挑战我的思维方式；足够开放，让我跨学科地构建与创造。",
+    "威斯康星大学麦迪逊分校坐落在门多塔湖西岸、麦迪逊市中心，这是美国一向以宜居著称的城市。学校创办于 1848 年，与威斯康星州建州同年，建校伊始便笃信：大学既服务于学生，更要回馈整个社会。",
+    "这份被称为「威斯康星理念」的精神，至今仍在塑造这所学校。这里的学术研究很少停留在象牙塔里，而是不断流入公共政策、产业实践与更广阔的现实世界。UW 长期位列全美前五研究型大学，在医学、工程、社会科学与人文领域都底蕴深厚。",
+    "对我而言，这里有种恰到好处的平衡：严谨到足以打磨我的思考方式，又开放到允许我跨学科地探索与创造。",
   ],
 };
 
@@ -85,13 +62,13 @@ const PROGRAMS = [
     points: {
       en: [
         "One of the top economics departments in the country, with particular strength in econometrics, behavioral economics, and applied microeconomics.",
-        "The training goes beyond theory — it builds the habit of reasoning from data, modeling uncertainty, and stress-testing assumptions.",
-        "It taught me how markets fail, how incentives shape behavior, and how to read a situation before deciding how to act in it.",
+        "The training goes well past pure theory, building the habit of reasoning from data, modeling uncertainty, and stress-testing assumptions.",
+        "It taught me why markets fail, how incentives steer behavior, and how to read a situation clearly before deciding how to move.",
       ],
       zh: [
         "全美顶尖经济学系之一，在计量经济学、行为经济学与应用微观经济学领域尤为突出。",
-        "这里的训练不止于理论——它培养的是从数据推理、对不确定性建模、对假设进行压力测试的思维习惯。",
-        "它教会了我市场如何失灵、激励如何塑造行为，以及在采取行动前如何透彻地理解一个情境。",
+        "这里的训练不止于纸面理论，更让我养成了一套思维习惯：从数据出发推演、为不确定性建模、反复检验每一个前提假设。",
+        "它让我看清市场为何失灵、激励如何左右人的选择，也教会我在出手之前先把局势读透。",
       ],
     },
     courses: {
@@ -106,14 +83,14 @@ const PROGRAMS = [
     icon:   "◇",
     points: {
       en: [
-        "CDIS is UW's interdisciplinary home for computing, data systems, and human-centered technology. The Information Science program sits at the intersection of people, systems, and society.",
+        "CDIS is UW's interdisciplinary home for computing, data systems, and human-centered technology, where Information Science brings together people, systems, and society.",
         "Coursework spans data management, AI and machine learning, human-computer interaction, information architecture, and digital ethics.",
-        "It gave me the technical vocabulary and systems-thinking lens I needed to move from strategy to actual product — to not just diagnose, but build.",
+        "It gave me the technical fluency and systems lens to move from strategy to real products, bridging analysis and hands-on building.",
       ],
       zh: [
-        "CDIS 是 UW 跨学科整合计算、数据系统与以人为本技术的核心学院。信息科学专业处于人、系统与社会的交叉地带。",
+        "CDIS 是 UW 汇聚计算、数据系统与以人为本技术的跨学科核心学院；信息科学专业立足于人、系统与社会的交汇处。",
         "课程涵盖数据管理、AI 与机器学习、人机交互、信息架构与数字伦理。",
-        "它给了我从战略走向产品所需的技术语言和系统思维视角——不只是诊断问题，而是真正去构建解决方案。",
+        "它补齐了我从战略走向产品所需的技术语言与系统视角，让我既能诊断问题，也能亲手把方案做出来。",
       ],
     },
     courses: {
@@ -124,8 +101,8 @@ const PROGRAMS = [
 ];
 
 const WHY = {
-  en: "The combination isn't accidental. Economics trained my analytical lens — how to frame a problem, weight evidence, and reason about trade-offs under uncertainty. Information Science gave me the systems vocabulary to act on those insights — to build products, think in architectures, and navigate the intersection of technology and human behavior. Together, they're the intellectual infrastructure behind everything I do.",
-  zh: "这两个专业的组合不是偶然。经济学训练了我的分析视角——如何框架问题、权衡证据、在不确定性中推理得失。信息科学给了我将洞察付诸实践的系统语言——构建产品、以架构思考、在技术与人类行为的交叉地带工作。两者合在一起，是我所做一切的智识基础。",
+  en: "Choosing both majors was deliberate. Economics sharpened my analytical lens: framing messy problems, weighing evidence, and reasoning through trade-offs under uncertainty. Information Science gave me the systems vocabulary to act on those insights, design products, think in architectures, and work where technology meets human behavior. Together, they form the foundation behind everything I do.",
+  zh: "选择这两个专业并非一时兴起。经济学磨炼了我的分析眼光：拆解问题、权衡证据、在不确定性里算清取舍；信息科学则给了我将洞察落地的系统语言，让我能以架构的眼光思考，在技术与人的交汇处把产品真正做出来。两者合在一处，正是我做每一件事的底层根基。",
 };
 
 /* ─── Component ─────────────────────────────────────────────── */
@@ -171,7 +148,7 @@ export default function UniversityClient() {
             fill
             className="object-cover"
             style={{ objectPosition: "center 85%" }}
-            priority
+            preload
             sizes="100vw"
           />
           <div
@@ -185,57 +162,51 @@ export default function UniversityClient() {
 
         {/* Hero copy */}
         <div className="relative z-10 max-w-[900px] mx-auto px-5 pt-20 pb-44">
-          <FadeUp>
+          <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl overflow-hidden bg-white shadow-md shrink-0 flex items-center justify-center p-1">
                 <Image src="/photos/uw-logo.jpg" alt="UW Logo" width={36} height={36} className="object-contain" />
               </div>
               <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-white/80">
-                {lang === "en" ? "University · Madison, Wisconsin" : "大学 · 威斯康星州麦迪逊市"}
+                {lang === "en" ? "University · Madison, Wisconsin" : "大学 · 威斯康星州麦迪逊"}
               </p>
             </div>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.08}>
+          <ScrollReveal delay={80}>
             <h1
               className="font-semibold leading-[1.04] tracking-tight mb-4 text-white"
               style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)", letterSpacing: "-0.025em", textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}
             >
               {lang === "en" ? "University of Wisconsin–Madison" : "威斯康星大学麦迪逊分校"}
             </h1>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.15}>
+          <ScrollReveal delay={150}>
             <p
               className="font-light text-white/80 max-w-xl"
               style={{ fontSize: "clamp(1rem, 1.6vw, 1.1rem)", lineHeight: 1.7, textShadow: "0 1px 8px rgba(0,0,0,0.3)" }}
             >
               {lang === "en"
-                ? "Economics · Information Science — where I think and build."
-                : "经济学 · 信息科学——我思考与创造的地方。"}
+                ? "Economics & Information Science: where I think and build."
+                : "经济学与信息科学，是我思考与创造的地方。"}
             </p>
-          </FadeUp>
+          </ScrollReveal>
         </div>
       </header>
 
       {/* ── Rankings grid ── */}
       <section style={{ background: "#fff" }} className="py-16 px-5">
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-          >
+          <div data-scroll-reveal="">
             <p className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-8" style={{ color: "#c5050c" }}>
               {lang === "en" ? "Rankings & Numbers" : "排名与数据"}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.07)", borderRadius: 16, overflow: "hidden" }}>
-              {RANKINGS.map((r, i) => (
-                <motion.div
+              {RANKINGS.map((r) => (
+                <div
                   key={r.value}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.25 + i * 0.06, ease: EASE }}
+                  data-scroll-reveal=""
                   className="px-6 py-5"
                   style={{ background: "#fff" }}
                 >
@@ -248,22 +219,17 @@ export default function UniversityClient() {
                   <p className="text-[11px] font-mono" style={{ color: "#86868b" }}>
                     {lang === "en" ? r.source.en : r.source.zh}
                   </p>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── About UW ── */}
       <section style={{ background: "#f5f5f7" }} className="py-20 px-5">
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{ duration: 0.8, ease: EASE }}
-          >
+          <div data-scroll-reveal="">
             <p className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-6" style={{ color: "#c5050c" }}>
               {lang === "en" ? "About the University" : "关于这所大学"}
             </p>
@@ -296,32 +262,26 @@ export default function UniversityClient() {
                 />
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── Programs ── */}
       <section style={{ background: "#fff" }} className="py-20 px-5 pb-32">
         <div className="max-w-[900px] mx-auto">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{ duration: 0.7, ease: EASE }}
+          <p
+            data-scroll-reveal=""
             className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-14"
             style={{ color: "#0071e3" }}
           >
             {lang === "en" ? "My Programs" : "我的专业"}
-          </motion.p>
+          </p>
 
           <div className="space-y-16">
             {PROGRAMS.map((prog, pi) => (
-              <motion.div
+              <div
                 key={prog.name.en}
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-6%" }}
-                transition={{ duration: 0.85, delay: pi * 0.06, ease: EASE }}
+                data-scroll-reveal=""
               >
                 {/* Program header */}
                 <div className="flex items-start gap-4 mb-8">
@@ -390,7 +350,7 @@ export default function UniversityClient() {
                 {pi < PROGRAMS.length - 1 && (
                   <div className="mt-14 h-px" style={{ background: "rgba(0,0,0,0.06)" }} />
                 )}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -399,12 +359,7 @@ export default function UniversityClient() {
       {/* ── Why this combination ── */}
       <section style={{ background: "#1d1d1f" }} className="py-20 px-5">
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{ duration: 0.85, ease: EASE }}
-          >
+          <div data-scroll-reveal="">
             <p className="text-[11px] font-semibold tracking-[0.2em] uppercase mb-8" style={{ color: "#c5050c" }}>
               {lang === "en" ? "Why This Combination" : "为何选择这两个专业"}
             </p>
@@ -414,7 +369,7 @@ export default function UniversityClient() {
             >
               {lang === "en" ? WHY.en : WHY.zh}
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -426,7 +381,7 @@ export default function UniversityClient() {
             className="group inline-flex items-center gap-2 text-sm font-medium transition-colors duration-200 text-[#6e6e73] hover:text-[#f5f5f7]"
           >
             <span className="group-hover:-translate-x-0.5 transition-transform duration-200 inline-block">←</span>
-            {lang === "en" ? "Back to About" : "返回关于"}
+            {lang === "en" ? "Back to About" : "返回关于板块"}
           </Link>
         </div>
       </div>

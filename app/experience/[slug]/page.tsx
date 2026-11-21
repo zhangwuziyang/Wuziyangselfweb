@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { EXPERIENCE_DATA } from "@/lib/experienceData";
+import { siteOpenGraph } from "@/lib/siteMetadata";
 import ExperienceDetailClient from "./ExperienceDetailClient";
 
 export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };
@@ -18,10 +19,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const exp = EXPERIENCE_DATA.find((e) => e.slug === slug);
   if (!exp) return {};
+  const url = `/experience/${exp.slug}`;
   return {
+    alternates: { canonical: url },
     title: `${exp.company} — ${exp.role.en}`,
     description: exp.overview.en,
     openGraph: {
+      ...siteOpenGraph,
+      url,
       title: `${exp.company} — ${exp.role.en}`,
       description: exp.overview.en,
       type: "article",

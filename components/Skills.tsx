@@ -1,52 +1,45 @@
-"use client";
-
+import StoryHeading from "@/components/home/StoryHeading";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
-import { useLang } from "@/context/LangContext";
-import { i18n, tx } from "@/lib/i18n";
+import { Localized } from "@/components/ui/Localized";
+import { i18n } from "@/lib/i18n";
+
+function renderSkills(skills: readonly string[]) {
+  return skills.map((skill) => (
+    <span key={skill} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[13px] text-[var(--story-muted)]"
+    >
+      {skill}
+    </span>
+  ));
+}
 
 export default function Skills() {
-  const { lang } = useLang();
   const s = i18n.skills;
 
   return (
-    <section id="skills" style={{ background: "#1d1d1f" }} className="py-32 md:py-44">
-      <div className="max-w-[1100px] mx-auto px-5">
+    <section id="skills" className="story-chapter">
+      <div className="story-shell">
 
+        <StoryHeading label={s.label}>
+          <Localized {...s.headline} />
+        </StoryHeading>
         <ScrollReveal>
-          <p className="section-label-dark mb-4">{tx(s.label, lang)}</p>
+          <p className="story-body mb-9 max-w-2xl"><Localized {...s.tagline} /></p>
         </ScrollReveal>
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-20">
-          <ScrollReveal delay={0.08}>
-            <h2 className="font-semibold leading-[1.04] tracking-tight" style={{ fontSize: "clamp(2.2rem, 4vw, 3.4rem)", color: "#f5f5f7", letterSpacing: "-0.025em" }}>
-              {tx(s.headline, lang)}
-            </h2>
-          </ScrollReveal>
-          <ScrollReveal delay={0.14}>
-            <p className="text-sm font-light max-w-xs leading-relaxed" style={{ color: "#6e6e73" }}>
-              {tx(s.tagline, lang)}
-            </p>
-          </ScrollReveal>
-        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {s.groups.map((group, i) => (
-            <ScrollReveal key={i} delay={i * 0.07}>
+          {s.groups.map((group) => (
+            <ScrollReveal key={group.symbol}>
               <div
-                className="rounded-2xl p-8 h-full transition-[background,transform] duration-300 bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07] hover:-translate-y-0.5"
+                className="story-panel h-full rounded-2xl p-6"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-lg select-none" style={{ color: "#48484a" }}>{group.symbol}</span>
+                  <span className="text-lg select-none" style={{ color: "var(--story-tint)" }}>{group.symbol}</span>
                   <h3 className="font-medium text-[15px] tracking-tight" style={{ color: "#f5f5f7" }}>
-                    {tx(group.category, lang)}
+                    <Localized {...group.category} />
                   </h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {group.skills[lang].map((skill) => (
-                    <span key={skill} className="text-[13px] px-3 py-1.5 rounded-full cursor-default transition-[color,border-color,transform] duration-200 hover:scale-[1.04] bg-white/[0.05] border text-[#86868b] border-white/[0.08] hover:text-[#f5f5f7] hover:border-white/20"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                  <Localized en={renderSkills(group.skills.en)} zh={renderSkills(group.skills.zh)} />
                 </div>
               </div>
             </ScrollReveal>

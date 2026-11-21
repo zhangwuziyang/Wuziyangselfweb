@@ -1,0 +1,618 @@
+[
+  {
+    "id": "health-agent-overview",
+    "keywords": {
+      "zh": [
+        "健康助理是什么",
+        "健康助理项目",
+        "My Health Agent",
+        "Apple Watch健康应用",
+        "健康助理解决什么问题",
+        "iOS健康AI产品",
+        "为什么做健康助理",
+        "健康助理给谁用"
+      ],
+      "en": [
+        "what is my health agent",
+        "health agent overview",
+        "apple watch ai health app",
+        "what problem does health agent solve",
+        "who is my health agent for",
+        "ios health coach project",
+        "tell me about health agent"
+      ]
+    },
+    "answer": {
+      "zh": "「健康助理」（My Health Agent）是我面向 Apple Watch 用户打造的一款 iOS AI 健康应用，打开就是对话而不是满屏图表。我做它主要是解决两个痛点：很多人每天戴表记录心率、睡眠和运动却看不懂满屏指标，而直接问通用 AI 又既不了解个人身体、还容易编数字。我们把十几项手表指标合成「身体电量、运动、睡眠」三个大白话分数，不出现 HRV、TRIMP 这类术语，再让 AI 结合你的目标、饮食和长期记忆每天给出吃、动、睡的具体安排。",
+      "en": "My Health Agent is an iOS AI health coach I built for Apple Watch users that opens straight into conversation instead of a wall of charts. I created it to solve two gaps: people record heart rate, sleep, and workouts daily without knowing what those metrics mean for today, while generic AI chats lack personal context and easily invent numbers. We distill over a dozen Watch signals into three plain-language scores—Energy, Activity, and Sleep—avoiding jargon like HRV or TRIMP, and let AI combine those grounded numbers with your goals, meals, and long-term memory for concrete daily plans."
+    },
+    "facts": [
+      {
+        "zh": "健康助理是一款面向 iPhone 和 Apple Watch 用户的 iOS AI 健康应用，打开直接进入与助理的对话。",
+        "en": "My Health Agent is an iOS AI health app for iPhone and Apple Watch that opens straight into chat.",
+        "source": "PDF 第3页"
+      },
+      {
+        "zh": "App 将十几项手表指标合成为身体电量、运动、睡眠三个大白话分数，界面不出现 HRV、TRIMP 等术语。",
+        "en": "The app distills over a dozen Watch metrics into three plain-language scores without surfacing jargon like HRV or TRIMP.",
+        "source": "PDF 第3页"
+      },
+      {
+        "zh": "AI 回答时可按需查询用户最多 90 天的历史健康数据。",
+        "en": "AI can query up to 90 days of the user's health data on demand when answering.",
+        "source": "PDF 第3页"
+      },
+      {
+        "zh": "任何页面右下角都支持「问问 AI」，提问时会自动带上当前页面显示的数据。",
+        "en": "Every screen offers an \"Ask AI\" button in the bottom right that automatically attaches the current page's data.",
+        "source": "PDF 第4页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-scores",
+    "keywords": {
+      "zh": [
+        "三个分数怎么算",
+        "身体电量算法",
+        "运动分数怎么算",
+        "睡眠分数怎么算",
+        "60天基准",
+        "70篇文献",
+        "健康助理算法",
+        "月经周期基准"
+      ],
+      "en": [
+        "how are the three scores calculated",
+        "energy score formula",
+        "activity and sleep scoring",
+        "60 day baseline",
+        "health agent algorithm",
+        "70 research papers",
+        "menstrual cycle baseline"
+      ]
+    },
+    "answer": {
+      "zh": "在这个项目里，我坚持所有分数都只和用户自己过去 60 天比、不和别人比，整套算法依据整理自约 70 篇文献。身体电量按身体放松度 35%、睡着时的心跳 25%、睡眠 25%、手腕温度 10% 和呼吸 5% 合成，积累 5 天 1–5 分自评后还可微调最多 ±12 分。运动分按心率算运动量并结合 iOS 18 训练强度评分，每天目标会随身体电量自动调整；睡眠分则综合睡够、作息规律与连续性，并为月经黄体期单独计算基准。",
+      "en": "In this project, I designed every score to compare only against your own past 60 days rather than other users, drawing on rules compiled from roughly 70 papers. Energy weights HRV at 35%, sleeping heart rate at 25%, sleep at 25%, wrist temperature at 10%, and respiration at 5%, and fine-tunes by up to ±12 points after five days of 1–5 self-ratings. Activity scores heart-rate load (TRIMP) plus iOS 18 strength ratings with targets that adapt to Energy, while Sleep combines duration, regularity, and continuity alongside a separate luteal-phase baseline."
+    },
+    "facts": [
+      {
+        "zh": "所有分数均只与用户自身过去 60 天数据对比，不与他人比较。",
+        "en": "All scores compare strictly against the user's own past 60 days rather than other people.",
+        "source": "PDF 第6页"
+      },
+      {
+        "zh": "三个分数的算法依据整理自约 70 篇文献。",
+        "en": "The scoring rules are compiled from roughly 70 research papers.",
+        "source": "PDF 第6页"
+      },
+      {
+        "zh": "身体电量权重为身体放松度（HRV）35%、睡着时的心跳 25%、睡眠 25%、手腕温度 10%、呼吸 5%。",
+        "en": "Energy weights HRV at 35%, sleeping heart rate at 25%, sleep at 25%, wrist temperature at 10%, and respiration at 5%.",
+        "source": "PDF 第6页"
+      },
+      {
+        "zh": "每天 1–5 分自评在积累 5 天后用于微调身体电量分数，幅度最多 ±12 分。",
+        "en": "Daily 1–5 self-ratings adjust the Energy score after 5 days by up to ±12 points.",
+        "source": "PDF 第6页"
+      },
+      {
+        "zh": "睡眠分按 0.6 睡够 + 0.25 作息规律 + 0.15 连续性计算。",
+        "en": "The Sleep score is calculated as 0.6 duration + 0.25 regularity + 0.15 continuity.",
+        "source": "PDF 第6页"
+      },
+      {
+        "zh": "月经黄体期单独计算基准，避免周期性波动被误判为状态差。",
+        "en": "The menstrual luteal phase uses a separate baseline so normal cycle shifts are not misjudged as poor recovery.",
+        "source": "PDF 第6页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-compute-first",
+    "keywords": {
+      "zh": [
+        "先算后说是什么意思",
+        "防止AI编数字",
+        "每日计划怎么算",
+        "热量安全范围",
+        "热量缺口上限",
+        "AI改计划",
+        "基础代谢下限",
+        "AI幻觉怎么防"
+      ],
+      "en": [
+        "what does compute first mean",
+        "prevent ai hallucinations health",
+        "how are daily plans calculated",
+        "safe calorie bounds",
+        "calorie deficit cap",
+        "how does ai adjust plans",
+        "calorie safety rules"
+      ]
+    },
+    "answer": {
+      "zh": "我把「先算后说」定为核心产品原则：三个分数和每日计划里的热量范围都在手机端按安全规则算好，AI 只负责定方向和用大白话写理由，这样即便模型说错也不会让人饿着减肥。热量计算基于近 14 天 Apple Watch 实测活动消耗，限定减脂总缺口不超过维持量的 25%，且不低于基础代谢以及女性 1200、男性 1500 千卡的安全下限。AI 写的理由还要经过校验，数字必须来自输入数据并拦截禁用表述，且只有用户当轮亲口要求时 AI 才能改计划并支持撤销。",
+      "en": "I made \"compute first, speak second\" our core principle: all scores and daily calorie bounds are computed on-device under strict rules, while AI only sets direction and explains the reasoning so it can never suggest unsafe dieting. Calorie targets use your 14-day Apple Watch activity factor, cap fat-loss deficits at 25% of maintenance, and stay above basal metabolic rate as well as 1,200 kcal for women and 1,500 kcal for men. Every AI rationale is validated so numbers match inputs and forbidden terms are blocked, and AI can only revise a plan when you explicitly ask in that turn, with undo support."
+    },
+    "facts": [
+      {
+        "zh": "热量维持量按基础代谢乘以活动系数计算，活动系数取近 14 天 Apple Watch 实测平均活动消耗。",
+        "en": "Maintenance calories equal basal metabolic rate times an activity factor measured from the past 14 days of Apple Watch activity.",
+        "source": "PDF 第8页"
+      },
+      {
+        "zh": "减脂计划总热量缺口上限为维持量的 25%。",
+        "en": "Total calorie deficit for fat-loss goals is capped at 25% of maintenance.",
+        "source": "PDF 第8页"
+      },
+      {
+        "zh": "热量目标不得低于安全下限（女性 1200 千卡、男性 1500 千卡）且不得低于基础代谢。",
+        "en": "Calorie targets never fall below safety floors (1,200 kcal for women, 1,500 kcal for men) or basal metabolic rate.",
+        "source": "PDF 第8页"
+      },
+      {
+        "zh": "热量区间宽度为 100–300 千卡并取整到 50，被安全规则抬高时卡片会标注「已按安全范围调整」。",
+        "en": "Calorie ranges span 100–300 kcal rounded to 50 and display a safety-adjustment notice whenever a floor raises the target.",
+        "source": "PDF 第8页"
+      },
+      {
+        "zh": "AI 撰写的计划理由会经过校验，数字必须来自输入数据且禁止出现「不能吃」「病」「药」等禁用表述。",
+        "en": "AI plan rationales are checked so all numbers come from input data and forbidden terms like \"cannot eat,\" \"disease,\" or \"medicine\" are blocked.",
+        "source": "PDF 第9页"
+      },
+      {
+        "zh": "只有用户在当轮亲口要求时 AI 才能修改计划，改后展示改前改后对照并可撤销最近一次改动。",
+        "en": "AI may revise a plan only when explicitly requested in that turn, showing a before/after diff with undo for the latest edit.",
+        "source": "PDF 第9页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-proactive",
+    "keywords": {
+      "zh": [
+        "主动复盘",
+        "早晚推送",
+        "健康助理会提醒什么",
+        "不打扰原则",
+        "异常提醒",
+        "周报月报",
+        "离线能用吗",
+        "没有AI能用吗"
+      ],
+      "en": [
+        "proactive check ins",
+        "morning and evening recaps",
+        "notifications and reminders",
+        "anomaly alerts",
+        "weekly and monthly reports",
+        "does it work offline without ai",
+        "anti spam notification rules"
+      ]
+    },
+    "answer": {
+      "zh": "我不想让用户每天靠意志力记得来提问，所以在用户同意开启 AI 后，助理会在早间睡眠同步后发今日结论，锻炼后做运动复盘，晚上 8 点后做晚间复盘，睡前 45 分钟发入睡提醒，并定期生成周报和月报。同时我们把「不打扰」做成硬规则：只有多个信号同时异常才提醒，同类提醒 72 小时最多一次，夜间不推送，前 14 天也不做基于基准的提醒。若遇到 AI 不可用、未同意 AI 或处于后台，App 会自动退回本地写好的版本，不会留白。",
+      "en": "I did not want users to rely on willpower to ask every day, so once AI is enabled, the assistant posts morning conclusions after sleep syncs, post-workout recaps, evening recaps after 8 p.m., bedtime reminders 45 minutes ahead, plus weekly and monthly reports. At the same time, I enforced strict restraint on alerts: anomalies fire only when multiple signals shift together, the same alert appears at most once every 72 hours, nothing pushes at night, and baseline alerts stay off for the first 14 days. Whenever AI is unavailable, declined, or backgrounded, the app falls back to local copy so nothing breaks."
+    },
+    "facts": [
+      {
+        "zh": "助理会在早间睡眠同步后发今日结论、锻炼后发运动复盘、晚上 8 点后发晚间复盘、睡前 45 分钟发睡前提醒，并在每周日和每月 1 号生成周报和月报。",
+        "en": "The assistant proactively sends morning conclusions, post-workout recaps, post-8 p.m. evening recaps, 45-minute bedtime reminders, and Sunday/monthly reports.",
+        "source": "PDF 第7页"
+      },
+      {
+        "zh": "异常提醒需要多个信号同时异常才触发，同一类提醒 72 小时最多一次，夜里不推送，前 14 天不做基于基准的提醒。",
+        "en": "Anomaly alerts require multiple simultaneous signals, fire at most once per 72 hours per type, pause at night, and stay off during the first 14 days.",
+        "source": "PDF 第6页"
+      },
+      {
+        "zh": "AI 不可用、用户未同意或处于后台时，App 会退回到本地写好的版本。",
+        "en": "When AI is unavailable, declined, or backgrounded, the app falls back to locally authored versions.",
+        "source": "PDF 第7页"
+      },
+      {
+        "zh": "后台调用 AI 设有失败重试上限（最多 3 次、间隔 6 小时），避免反复消耗额度。",
+        "en": "Background AI calls cap retries at 3 attempts spaced 6 hours apart to prevent quota drain.",
+        "source": "PDF 第7页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-logging",
+    "keywords": {
+      "zh": [
+        "怎么记饮食",
+        "拍照算热量",
+        "吃药提醒",
+        "习惯追踪",
+        "对话日历",
+        "语音提问",
+        "长期记忆",
+        "历史记录怎么看"
+      ],
+      "en": [
+        "meal logging",
+        "photo calorie estimation",
+        "medication reminders",
+        "habit tracking",
+        "chat calendar history",
+        "voice input",
+        "long term memory"
+      ]
+    },
+    "answer": {
+      "zh": "在日常记录上，我尽量消除繁琐表单：你可以拍照或从相册选图估算营养，甚至吃前吃后各拍一张按实际吃掉的份量计算，也可以直接在对话里说吃了什么、刚吃了药，或让助理记住旧伤等长期信息。吃药提醒支持标注影响心率的药物，让运动复盘避免误拿心率下结论；早上的习惯打卡则会把喝酒、晚吃等行为和空白日对比次日身体电量。所有过往记录都收进对话日历，每天以吃、动、睡三层同心圆环展示，并支持语音优先本地识别与全页面深色模式。",
+      "en": "For daily logging, I worked to eliminate form friction: you can snap a meal—even before and after eating to count actual intake—or simply chat what you ate, took, or want saved in long-term memory. Medication reminders let you flag heart-rate-affecting drugs so workout recaps avoid misleading heart-rate judgments, while morning habit check-ins compare alcohol or late meals against baseline days to estimate next-day Energy impact. Every day is archived in a searchable chat calendar with concentric Eat, Move, and Sleep rings, full dark mode, and local-first speech recognition."
+    },
+    "facts": [
+      {
+        "zh": "拍照记饮食支持吃前和吃后各拍一张按实际吃掉部分计算，也可填写多人同吃与备注。",
+        "en": "Photo meal logging supports before-and-after shots for actual intake along with shared-meal counts and notes.",
+        "source": "PDF 第10页"
+      },
+      {
+        "zh": "对话记饮食时，食物表能查到营养数据的菜直接用食物表，查不到的才问 AI。",
+        "en": "When logging meals in chat, foods found in the nutrition table bypass AI while unlisted dishes query AI.",
+        "source": "PDF 第10页"
+      },
+      {
+        "zh": "吃药提醒可从「健康」导入用药并标注影响心率的药，App 从不建议开始、停止或调整任何药物。",
+        "en": "Medication reminders import from Apple Health and can flag heart-rate-affecting drugs, while the app never advises starting, stopping, or changing medications.",
+        "source": "PDF 第10页"
+      },
+      {
+        "zh": "对话日历每天用一个由外到内代表吃、动、睡的三层同心圆环呈现，支持按月跳转、顶部搜索和深色模式。",
+        "en": "The chat calendar shows each day as concentric Eat, Move, and Sleep rings with month jumping, top search, and dark mode.",
+        "source": "PDF 第11页"
+      },
+      {
+        "zh": "App 支持语音提问，能在手机本地识别的语音不上传服务器。",
+        "en": "Voice questions run speech recognition on-device whenever possible without uploading audio.",
+        "source": "PDF 第4页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-safety",
+    "keywords": {
+      "zh": [
+        "敏感人群保护",
+        "进食障碍",
+        "孕期能用吗",
+        "未成年人保护",
+        "急症怎么办",
+        "医疗免责",
+        "隐藏热量",
+        "健康安全边界"
+      ],
+      "en": [
+        "sensitive group protection",
+        "eating disorder safeguards",
+        "pregnancy diabetes calories",
+        "under 18 safety",
+        "emergency keywords hotline",
+        "medical disclaimer",
+        "hide calories"
+      ]
+    },
+    "answer": {
+      "zh": "健康类产品最容易触碰的风险是热量焦虑和医疗越界，所以我专门设计了敏感人群保护与急症兜底机制。只要用户提到进食障碍、怀孕、哺乳、糖尿病等关键词，或者未满 18 岁、手动关闭「显示热量」，App 会立刻隐藏全部热量与营养数字，计划只保留运动和睡眠；就算在锁屏或后台读不到记忆，也会一律默认按敏感处理。遇到胸痛、自伤等急症关键词时，系统直接给出当地急救电话和心理援助热线、不交给 AI 自由发挥，且所有页面均明确标注仅供参考、不是医疗诊断。",
+      "en": "Calorie anxiety and medical overreach are the highest risks in health products, so I built dedicated sensitive-group and emergency safeguards. Whenever a user mentions eating disorders, pregnancy, breastfeeding, or diabetes—or is under 18 or turns off calorie display—the app hides all calorie and nutrition numbers, restricts plans to activity and sleep, and defaults to sensitive mode if memory is unreadable while locked or backgrounded. Urgent keywords like chest pain or self-harm bypass AI completely to surface local emergency and crisis hotlines, and every screen states that outputs are not medical diagnosis."
+    },
+    "facts": [
+      {
+        "zh": "用户提及进食障碍、怀孕、哺乳、糖尿病等中英文整词关键词时，界面和发给 AI 的饮食信息隐藏全部热量与营养数字，计划只留动和睡。",
+        "en": "Whole-word mentions of eating disorders, pregnancy, breastfeeding, or diabetes hide all calorie and nutrition numbers from the UI and AI context, leaving only activity and sleep in plans.",
+        "source": "PDF 第12页"
+      },
+      {
+        "zh": "出生日期显示未满 18 岁不出每日热量目标，不把身体数据和饮食数字发给 AI 定计划。",
+        "en": "Users under 18 receive no daily calorie target and their body/diet numbers are not sent to AI for planning.",
+        "source": "PDF 第12页"
+      },
+      {
+        "zh": "判断敏感状态时若因锁屏或后台运行读不到记忆，一律默认按敏感处理。",
+        "en": "If memory cannot be read while locked or in the background, the app defaults to sensitive-group handling.",
+        "source": "PDF 第12页"
+      },
+      {
+        "zh": "识别到胸痛、自伤等急症关键词时直接给出当地急救电话（国内 120、美国 911）和心理援助热线，不交给 AI 自由发挥。",
+        "en": "Urgent keywords such as chest pain or self-harm display local emergency numbers (120 in China, 911 in the US) and crisis hotlines instead of AI responses.",
+        "source": "PDF 第13页"
+      },
+      {
+        "zh": "AI 生成内容均有明确标识，且用户可长按举报。",
+        "en": "All AI-generated content carries clear labeling and supports long-press reporting.",
+        "source": "PDF 第14页"
+      },
+      {
+        "zh": "产品坚持只说相关不说因果、不做诊断，所有内容标注「仅供参考，不是医疗诊断」。",
+        "en": "The app reports correlation rather than causation, makes no diagnoses, and labels all content as for reference only and not medical diagnosis.",
+        "source": "PDF 第3页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-privacy",
+    "keywords": {
+      "zh": [
+        "隐私怎么保护",
+        "健康数据安全吗",
+        "服务器存聊天记录吗",
+        "HealthKit只读",
+        "可以关掉AI吗",
+        "一键删除数据",
+        "数据会上传吗",
+        "隐私合规"
+      ],
+      "en": [
+        "how do you protect health privacy",
+        "is health data stored on server",
+        "healthkit read only",
+        "can i use without ai",
+        "delete all data",
+        "chat encryption",
+        "privacy compliance"
+      ]
+    },
+    "answer": {
+      "zh": "面对高度敏感的健康数据，我从架构第一天就按最小化原则来设计：App 对苹果「健康」严格只读从不写入，算分、提醒与加密对话记录全部留在手机本地。聊天时只发送必要摘要，自建服务器只做转发、不保存对话内容和健康数据，发给模型的请求也不带账号标识。首次引导把「隐私政策 + 处理健康数据」与「把数据发给 AI」拆成两个独立勾选，不同意 AI 仍可用基础功能，并且随时可撤回同意或一键删除全部本地与服务端账号数据。",
+      "en": "Because health records are deeply sensitive, I designed around data minimization from day one: the app accesses Apple Health strictly read-only and keeps scoring, reminders, and encrypted chat logs on the iPhone. Chat sends only compact summaries; our server forwards requests without storing health or conversation data and strips account identifiers before calling the model. Onboarding separates health-data consent from AI consent so core features work without AI, and users can revoke consent anytime or wipe all local and server account data with one tap."
+    },
+    "facts": [
+      {
+        "zh": "App 对 Apple「健康」只读不写，数据读取、算分和提醒均在手机端完成。",
+        "en": "The app accesses Apple Health strictly read-only, running reading, scoring, and reminders on-device.",
+        "source": "PDF 第13页"
+      },
+      {
+        "zh": "对话记录加密保存在用户的手机本地。",
+        "en": "Chat history is stored encrypted locally on the user's iPhone.",
+        "source": "PDF 第11页"
+      },
+      {
+        "zh": "服务器只负责转发请求、不保存对话内容和健康数据，发给模型的请求不带账号标识。",
+        "en": "The backend only forwards requests without saving chats or health data and removes account identifiers before calling the model.",
+        "source": "PDF 第13页"
+      },
+      {
+        "zh": "聊天时 AI 仅接收必要摘要，包括当天分数、近 14 天概况、目标与最多 30 条长期记忆、近 7 天对话摘要及当前页数据。",
+        "en": "Chat sends only compact summaries: today's scores, 14-day summaries, goals, up to 30 long-term memories, 7-day chat summaries, and current-screen data.",
+        "source": "PDF 第13页"
+      },
+      {
+        "zh": "首次引导将基础健康数据同意与开启 AI 拆为两个独立勾选，支持随时撤回 AI 同意及一键删除全部本地与服务器账号记录。",
+        "en": "Onboarding separates health-data consent from AI consent, supporting anytime revocation and one-tap deletion of all local and server account records.",
+        "source": "PDF 第13页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-region-language",
+    "keywords": {
+      "zh": [
+        "为什么分通义千问和Claude",
+        "国内数据不出境",
+        "双区域架构",
+        "地区和语言怎么分",
+        "海外版用什么模型",
+        "国内用什么模型",
+        "阿里云杭州",
+        "中英文切换"
+      ],
+      "en": [
+        "why qwen and claude",
+        "china data residency",
+        "dual region architecture",
+        "region vs language",
+        "overseas model claude",
+        "mainland china qwen",
+        "bilingual localization"
+      ]
+    },
+    "answer": {
+      "zh": "为了同时满足中国大陆的数据不出境要求和海外用户体验，我在架构上做了双区域分流，并把「地区」与「语言」彻底解耦。地区由 App Store 账号所在地区决定，中国大陆用户只连阿里云（华东 1 杭州）与通义千问，且在确认地区之前 App 不发任何 AI 请求；其他地区则路由至海外服务器与 Claude。语言则只跟随手机界面语言，因此美国区的中文用户会看到全中文界面并匹配 911/988 急救电话，国内英文用户则会看到全英文界面并匹配 120/12356。",
+      "en": "To meet mainland China data-residency requirements alongside overseas needs, I designed dual-region routing and completely decoupled region from language. Region follows your App Store account—routing mainland China exclusively to Alibaba Cloud (Hangzhou) and Qwen while sending zero AI requests until region is confirmed, and routing overseas users to Claude. Language follows your iPhone UI independently, so a Chinese-speaking user on the US App Store sees full Chinese with 911/988 hotlines, while an English-speaking user in China sees English with 120/12356."
+    },
+    "facts": [
+      {
+        "zh": "中国大陆用户连接阿里云（华东 1 杭州）并调用通义千问，其他地区连接海外服务器并调用 Claude（Anthropic）。",
+        "en": "Mainland China users connect to Alibaba Cloud (Hangzhou) and Qwen, while other regions connect to overseas servers and Claude (Anthropic).",
+        "source": "PDF 第15页"
+      },
+      {
+        "zh": "国内用户只连国内服务器和国内模型，在确认用户所在地区之前 App 不发送任何 AI 请求。",
+        "en": "Mainland users connect exclusively to domestic servers and models, and the app sends no AI requests before region is confirmed.",
+        "source": "PDF 第13页"
+      },
+      {
+        "zh": "地区由 App Store 账号所在地区决定，控制服务器、模型、同意流程和急救电话号码。",
+        "en": "Region is governed by the App Store account region, controlling the server, model, consent flow, and emergency numbers.",
+        "source": "PDF 第16页"
+      },
+      {
+        "zh": "语言由手机界面语言决定，美国区中文用户界面全中文且急救电话为 911 和 988，国内英文用户全英文且急救电话为 120 和 12356。",
+        "en": "Language follows the device UI: US-store Chinese users get Chinese with 911/988, while China-store English users get English with 120/12356.",
+        "source": "PDF 第16页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-architecture",
+    "keywords": {
+      "zh": [
+        "健康助理技术栈",
+        "用了什么技术",
+        "SwiftUI和FastAPI",
+        "AI工具调用",
+        "后端怎么部署",
+        "限流和成本控制",
+        "PostgreSQL备份",
+        "服务器架构"
+      ],
+      "en": [
+        "health agent tech stack",
+        "swiftui fastapi postgresql",
+        "on device ai tools",
+        "backend deployment ops",
+        "rate limiting and cost control",
+        "server architecture",
+        "prompt versioning"
+      ]
+    },
+    "answer": {
+      "zh": "客户端我采用原生 SwiftUI（iOS 17+）加 HealthKit 构建，在手机端承载算分引擎、异常检测、安全热量计算、加密对话、桌面小组件与后台任务，并提供查询、记录、修改三类本地工具供 AI 在对话中按需调用。后端采用 FastAPI + PostgreSQL，配合 Nginx 和 systemd 部署在阿里云 Ubuntu，负责 Apple 登录、提示词按版本号统一管理以及每人每天次数与 token 的双重限流。运维方面我还配置了每日自动与异地 90 天备份、SSH 仅密钥登录、日志按周期自动清理，以及可不发新版临时关闭 AI 的远程开关。",
+      "en": "I built the client natively in SwiftUI (iOS 17+) with HealthKit to host on-device scoring, anomaly checks, calorie guardrails, encrypted chat, widgets, and background tasks, exposing query, logging, and plan-modification tools for AI to invoke locally. The backend uses FastAPI and PostgreSQL with Nginx and systemd on Alibaba Cloud Ubuntu, managing Sign in with Apple, versioned prompts, and dual daily request-count plus token limits. For operations, I set up daily plus 90-day off-site backups, key-only SSH hardening, scheduled log cleanup, and a remote switch to pause AI without shipping a new build."
+    },
+    "facts": [
+      {
+        "zh": "iOS App 基于 SwiftUI（iOS 17+）与 HealthKit 构建，内置查询、记录和修改三类手机端 AI 工具。",
+        "en": "The iOS app is built on SwiftUI (iOS 17+) and HealthKit, providing three categories of on-device AI tools: query, log, and modify.",
+        "source": "PDF 第15页"
+      },
+      {
+        "zh": "后端基于 FastAPI 与 PostgreSQL，所有提示词和工具定义存放在服务器并按版本号统一管理。",
+        "en": "The backend runs FastAPI and PostgreSQL, storing all prompts and tool definitions server-side under strict versioning.",
+        "source": "PDF 第15页"
+      },
+      {
+        "zh": "服务端部署在阿里云 Ubuntu（Python 3.10 虚拟环境 + systemd + Nginx），通过 Alembic 管理数据库迁移并每天自动异地备份保留 90 天。",
+        "en": "The server runs on Alibaba Cloud Ubuntu (Python 3.10 venv, systemd, Nginx) with Alembic migrations and daily off-site backups retained for 90 days.",
+        "source": "PDF 第17页"
+      },
+      {
+        "zh": "限流采用每人每天提问次数和 token 预算双重限制并设全站总上限，支持通过服务器远程开关临时关闭 AI 或要求升级。",
+        "en": "Quotas combine daily per-user request counts and token budgets under a site-wide cap, alongside a remote server switch to pause AI or require upgrades.",
+        "source": "PDF 第17页"
+      },
+      {
+        "zh": "服务端数据自动清理周期为使用记录 400 天、作废登录 30 天、访问日志 14 天、举报 180 天。",
+        "en": "Automatic server retention deletes usage records after 400 days, revoked logins after 30 days, access logs after 14 days, and reports after 180 days.",
+        "source": "PDF 第17页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-engineering",
+    "keywords": {
+      "zh": [
+        "代码量多大",
+        "有多少测试",
+        "工程质量",
+        "团队怎么分工",
+        "请求快照测试",
+        "Swift多少行",
+        "开发流程",
+        "怎么保证质量"
+      ],
+      "en": [
+        "codebase size lines of code",
+        "how many tests",
+        "engineering quality",
+        "team collaboration roles",
+        "prompt snapshot regression",
+        "swift and python codebase",
+        "development workflow"
+      ]
+    },
+    "answer": {
+      "zh": "因为健康计算和安全规则不能靠运气，我在工程质量上定了一套很严的规矩，目前全项目累积了约 2.6 万行 Swift 和 3,750 行 Python，配有 333 个 iOS 自动化测试和 248 个服务端测试。项目按产品与后端、前端、架构、审查、海外与营销五个角色分工推进，每一批改动都必须在独立分支完成并经独立审查通过才能合入主线。同时我们每次都会比对国内用户发给模型的请求内容是否与上一版一字不差，防止无意中改变 AI 行为，服务端测试也固定使用线上同版本的 Python 3.10。",
+      "en": "Because health math and safety boundaries cannot rely on luck, I enforced strict engineering standards across roughly 26,000 lines of Swift and 3,750 lines of Python, backed by 333 automated iOS tests and 248 server tests. Work spans five roles—product & backend, frontend, architecture, review, and overseas & marketing—with every batch completed on an isolated branch and requiring independent review before merging. We also compare mainland model request payloads verbatim against the previous version on every change to prevent unintended AI drift, and run server tests on the exact Python 3.10 used in production."
+    },
+    "facts": [
+      {
+        "zh": "App 客户端代码量约 2.6 万行 Swift，服务器端代码量约 3,750 行 Python。",
+        "en": "The codebase consists of roughly 26,000 lines of Swift for the iOS app and 3,750 lines of Python for the server.",
+        "source": "PDF 第18页"
+      },
+      {
+        "zh": "自动化测试覆盖 333 个 iOS 测试和 248 个服务器测试。",
+        "en": "Automated testing includes 333 iOS tests and 248 server tests.",
+        "source": "PDF 第18页"
+      },
+      {
+        "zh": "协作分为产品与后端、前端、架构、审查、海外与营销五个角色，所有改动在独立分支完成并经独立审查通过后才合入主线。",
+        "en": "Collaboration spans five roles (product & backend, frontend, architecture, review, overseas & marketing), requiring branch-based independent review before merge.",
+        "source": "PDF 第18页"
+      },
+      {
+        "zh": "每次改动都会比对国内用户发给模型的请求内容是否与上一版一字不差，且服务器测试固定使用线上同版 Python 3.10 运行。",
+        "en": "Every change diffs mainland model request payloads verbatim against the prior version, and server tests run strictly on production Python 3.10.",
+        "source": "PDF 第18页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  },
+  {
+    "id": "health-agent-status",
+    "keywords": {
+      "zh": [
+        "健康助理上架了吗",
+        "什么时候能下载",
+        "App Store进度",
+        "上架还要多久",
+        "示例数据模式",
+        "备案进度",
+        "海外版什么时候上",
+        "审核怎么准备的"
+      ],
+      "en": [
+        "is my health agent on the app store",
+        "when will it launch",
+        "current release status",
+        "sample data mode",
+        "china icp filing status",
+        "overseas launch timeline",
+        "app store review readiness"
+      ]
+    },
+    "answer": {
+      "zh": "健康助理目前还没有正式上架，我正在推进它上架 App Store，计划先上中国大陆区、海外版随后跟进。App 与服务器的全部功能、合规文本，以及供没有手表数据的审核员体验完整功能的「示例数据」模式都已经就绪，所有展示截图也均来自模拟器或内置示例数据。现阶段我们在并行办理企业邮箱、域名过户和企业苹果开发者账号，随后提交 ICP 备案、App 备案、公安备案和生成式 AI 应用登记，手续顺利的话国内版预计约 3–5 周上架。",
+      "en": "My Health Agent is not on the App Store yet—I am currently preparing it for release, starting with mainland China before expanding overseas. All core app and server features, compliance documents, and a built-in sample-data mode (so Apple reviewers without Watch data can test the full experience) are complete, and every demo screenshot comes from simulator or sample data. Right now we are progressing corporate email, domain transfer, and enterprise Apple Developer enrollment ahead of China ICP, App, public-security, and generative-AI filings, with mainland release estimated at roughly 3–5 weeks if filings go smoothly."
+    },
+    "facts": [
+      {
+        "zh": "项目当前状态为「准备上架 App Store」，计划先上线国内区，海外版待开始推进。",
+        "en": "The project is preparing for App Store release, launching in mainland China first with the overseas edition queued next.",
+        "source": "PDF 第19页"
+      },
+      {
+        "zh": "App 和服务器全部功能、合规文本及面向审核员的示例数据模式均已完成。",
+        "en": "All app and server features, compliance documents, and the reviewer sample-data mode are complete.",
+        "source": "PDF 第19页"
+      },
+      {
+        "zh": "示例数据模式全程标注「示例数据」，并在退出时清干净。",
+        "en": "Sample-data mode is labeled throughout and clears all sample records cleanly upon exit.",
+        "source": "PDF 第5页"
+      },
+      {
+        "zh": "企业邮箱、域名过户和企业苹果开发者账号（需邓白氏编码）正在进行中，后续将办理 ICP 备案、App 备案、公安备案与生成式 AI 应用登记。",
+        "en": "Corporate email, domain transfer, and enterprise Apple Developer enrollment (requiring a D-U-N-S number) are in progress ahead of ICP, App, public-security, and generative-AI filings.",
+        "source": "PDF 第19页"
+      },
+      {
+        "zh": "手续顺利的话，国内版预计约 3–5 周可以上架。",
+        "en": "If administrative filings go smoothly, the mainland China version is estimated to launch in roughly 3–5 weeks.",
+        "source": "PDF 第19页"
+      },
+      {
+        "zh": "所有展示截图均来自模拟器测试数据或 App 内置的示例数据模式，不含真实用户数据。",
+        "en": "All presentation screenshots come from simulator test data or the app's built-in sample-data mode, with no real user data.",
+        "source": "PDF 第1页"
+      }
+    ],
+    "link": "/projects/health-agent"
+  }
+]

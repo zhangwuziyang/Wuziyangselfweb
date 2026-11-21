@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/context/LangContext";
-import { i18n, tx } from "@/lib/i18n";
+import type { i18n } from "@/lib/i18n";
 
 const NAV_KEYS = [
   { key: "about",      href: "#about"      },
@@ -14,25 +13,16 @@ const NAV_KEYS = [
   { key: "contact",    href: "#contact"    },
 ] as const;
 
-function scrollTo(href: string) {
-  document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-}
-
-export default function Navbar() {
+export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
   const { lang, toggle } = useLang();
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 30);
-    fn();
-    window.addEventListener("scroll", fn, { passive: true });
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!open) return;
+    const desktop = window.matchMedia("(width >= 48rem)");
+    const onResize = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener("change", onResize);
+    return () => desktop.removeEventListener("change", onResize);
   }, [open]);
 
   useEffect(() => {
@@ -44,37 +34,30 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.header
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-[rgba(0,0,0,0.82)] backdrop-blur-2xl backdrop-saturate-150"
-            : "bg-transparent"
-        }`}
-        style={{ borderBottom: scrolled ? "1px solid rgba(255,255,255,0.07)" : "none" }}
+      <header
+        data-menu-open={open}
+        className="story-nav fixed top-0 inset-x-0 z-50"
       >
         <div className="max-w-[1200px] mx-auto px-5 h-12 grid grid-cols-3 items-center">
 
           {/* Left — logo */}
           <Link
             href="/"
-            className="text-white/90 text-sm font-semibold tracking-[0.2em] uppercase hover:text-white transition-colors duration-200 w-fit"
+            className="nav-link text-sm font-semibold tracking-[0.2em] uppercase transition-colors duration-200 w-fit"
           >
             WZ
           </Link>
 
           {/* Center — nav links (desktop only) */}
-          <nav className="hidden md:flex items-center justify-center gap-8">
+          <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8">
             {NAV_KEYS.map(({ key, href }) => (
-              <button
+              <a
                 key={href}
-                onClick={() => scrollTo(href)}
-                className="text-[13px] font-light text-white/70 hover:text-white transition-colors duration-200"
+                href={href}
+                className="nav-link text-[13px] font-light transition-colors duration-200"
               >
-                {tx(i18n.nav[key as keyof typeof i18n.nav] as { en: string; zh: string }, lang)}
-              </button>
+                {copy[key][lang]}
+              </a>
             ))}
           </nav>
 
@@ -82,17 +65,17 @@ export default function Navbar() {
           <div className="flex items-center justify-end gap-3">
             <button
               onClick={toggle}
-              className="hidden md:block text-[13px] font-light text-white/60 hover:text-white transition-colors duration-200 px-3 py-1.5 rounded-full border border-white/10 hover:border-white/25"
+              className="hidden md:block nav-link text-[13px] font-light transition-colors duration-200 px-3 py-1.5 rounded-full border border-current/20 hover:border-current/40"
             >
-              {tx(i18n.nav.lang, lang)}
+              {copy.lang[lang]}
             </button>
-            <button
-              onClick={() => scrollTo("#contact")}
-              className="hidden md:inline-flex items-center text-[13px] font-medium px-4 py-1.5 rounded-full text-white bg-white/10 hover:bg-white/18 transition-all duration-200"
+            <a
+              href="#contact"
+              className="hidden md:inline-flex items-center text-[13px] font-medium px-4 py-1.5 rounded-full bg-current/10 hover:bg-current/15 transition-all duration-200"
               style={{ backdropFilter: "blur(4px)" }}
             >
-              {tx(i18n.nav.cta, lang)}
-            </button>
+              {copy.cta[lang]}
+            </a>
 
             {/* Mobile hamburger */}
             <button
@@ -102,62 +85,49 @@ export default function Navbar() {
               onClick={() => setOpen(!open)}
               className="md:hidden w-7 h-7 flex flex-col items-center justify-center gap-[5px]"
             >
-              <span className={`block w-[20px] h-[1.5px] bg-white transition-all duration-300 origin-center ${open ? "rotate-45 translate-y-[3.5px]" : ""}`} />
-              <span className={`block w-[20px] h-[1.5px] bg-white transition-all duration-300 ${open ? "opacity-0" : ""}`} />
-              <span className={`block w-[20px] h-[1.5px] bg-white transition-all duration-300 origin-center ${open ? "-rotate-45 -translate-y-[3.5px]" : ""}`} />
+              <span className={`block w-[20px] h-[1.5px] bg-current transition-all duration-300 origin-center ${open ? "rotate-45 translate-y-[3.5px]" : ""}`} />
+              <span className={`block w-[20px] h-[1.5px] bg-current transition-all duration-300 ${open ? "opacity-0" : ""}`} />
+              <span className={`block w-[20px] h-[1.5px] bg-current transition-all duration-300 origin-center ${open ? "-rotate-45 -translate-y-[3.5px]" : ""}`} />
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       {/* Mobile full-screen overlay */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id="mobile-nav"
-            role="dialog"
-            aria-modal="true"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-7"
-            style={{ background: "rgba(0,0,0,0.96)", backdropFilter: "blur(24px)" }}
-          >
-            {NAV_KEYS.map(({ key, href }, i) => (
-              <motion.button
-                key={href}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 + 0.05, duration: 0.4, ease: [0.25,0.1,0.25,1] }}
-                onClick={() => { setOpen(false); scrollTo(href); }}
-                className="text-white text-[28px] font-light tracking-tight hover:text-white/60 transition-colors"
-              >
-                {tx(i18n.nav[key as keyof typeof i18n.nav] as { en: string; zh: string }, lang)}
-              </motion.button>
-            ))}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.35 }}
-              className="flex items-center gap-4 mt-4"
+      {open && (
+        <div
+          id="mobile-nav"
+          role="dialog"
+          aria-modal="true"
+          className="mobile-nav fixed inset-0 z-40 flex flex-col items-center justify-center gap-7"
+          style={{ background: "rgba(0,0,0,0.96)", backdropFilter: "blur(24px)" }}
+        >
+          {NAV_KEYS.map(({ key, href }) => (
+            <a
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className="text-white text-[28px] font-light tracking-tight hover:text-white/60 transition-colors"
             >
-              <button
-                onClick={toggle}
-                className="text-white/50 text-sm border border-white/15 px-5 py-2 rounded-full hover:border-white/30 hover:text-white/80 transition-all"
-              >
-                {tx(i18n.nav.lang, lang)}
-              </button>
-              <a
-                href={lang === "zh" ? "mailto:3168661545@qq.com" : "mailto:zhangwuziyang@gmail.com"}
-                className="text-white/50 text-sm font-mono"
-              >
-                {lang === "zh" ? "3168661545@qq.com" : "zhangwuziyang@gmail.com"}
-              </a>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              {copy[key][lang]}
+            </a>
+          ))}
+          <div className="flex items-center gap-4 mt-4">
+            <button
+              onClick={toggle}
+              className="text-white/50 text-sm border border-white/15 px-5 py-2 rounded-full hover:border-white/30 hover:text-white/80 transition-all"
+            >
+              {copy.lang[lang]}
+            </button>
+            <a
+              href={lang === "zh" ? "mailto:3168661545@qq.com" : "mailto:zhangwuziyang@gmail.com"}
+              className="text-white/50 text-sm font-mono"
+            >
+              {lang === "zh" ? "3168661545@qq.com" : "zhangwuziyang@gmail.com"}
+            </a>
+          </div>
+        </div>
+      )}
     </>
   );
 }

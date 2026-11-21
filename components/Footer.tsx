@@ -1,7 +1,5 @@
-"use client";
-
-import { useLang } from "@/context/LangContext";
-import { i18n, tx } from "@/lib/i18n";
+import { Localized } from "@/components/ui/Localized";
+import { i18n } from "@/lib/i18n";
 
 const FOOTER_LINKS = [
   { href: "https://www.linkedin.com/in/wuziyang-zhang-7b547229b", key: "linkedin" as const, label: { en: "LinkedIn", zh: "LinkedIn" }, external: true },
@@ -9,17 +7,17 @@ const FOOTER_LINKS = [
   { href: "/resume-wuziyang-zhang.pdf",                  key: "resume"   as const, label: i18n.footer.resume,                   external: true  },
 ];
 
-export default function Footer() {
-  const { lang } = useLang();
+export default async function Footer() {
+  "use cache";
   const f = i18n.footer;
   const year = new Date().getFullYear();
 
   return (
-    <footer style={{ background: "#1d1d1f", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-      <div className="max-w-[1100px] mx-auto px-5 py-10 flex flex-col md:flex-row items-center justify-between gap-5">
+    <footer className="border-t border-white/10 text-[var(--story-dim)]">
+      <div className="story-shell py-10 flex flex-col md:flex-row items-center justify-between gap-5">
 
-        <p className="text-sm" style={{ color: "#48484a" }}>
-          © {year} {tx(f.copy, lang)}
+        <p className="text-sm">
+          © {year} <Localized {...f.copy} />
         </p>
 
         <div className="flex items-center gap-6">
@@ -29,15 +27,15 @@ export default function Footer() {
               href={link.href}
               target={link.external ? "_blank" : undefined}
               rel={link.external ? "noopener noreferrer" : undefined}
-              className="text-sm transition-colors duration-200 text-[#48484a] hover:text-[#86868b]"
+              className="text-sm hover:text-white"
             >
-              {tx(link.label, lang)}
+              <Localized {...link.label} />
             </a>
           ))}
         </div>
 
-        <p className="text-xs font-mono tracking-widest" style={{ color: "#48484a" }}>
-          {tx(f.mono, lang)}
+        <p className="text-xs font-mono tracking-widest">
+          <Localized {...f.mono} />
         </p>
       </div>
     </footer>

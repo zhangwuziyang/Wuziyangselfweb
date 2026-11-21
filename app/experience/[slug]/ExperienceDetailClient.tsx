@@ -2,25 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { useLang } from "@/context/LangContext";
-import { t } from "@/lib/experienceData";
 import type { ExperienceDetail } from "@/lib/experienceData";
-
-const EASE = [0.25, 0.1, 0.25, 1.0] as const;
-
-function FadeUp({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay, ease: EASE }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 interface Props {
   exp: ExperienceDetail;
@@ -56,78 +40,69 @@ export default function ExperienceDetailClient({ exp }: Props) {
       <header className="pt-32 pb-20 px-5">
         <div className="max-w-[900px] mx-auto">
 
-          <FadeUp>
+          <ScrollReveal>
             <div className="flex items-center gap-4 mb-10">
               <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <Image src={exp.logo} alt={exp.company} width={56} height={56} className="object-contain w-full h-full" />
               </div>
               <div>
-                <p className="text-xs font-semibold tracking-[0.12em] uppercase mb-0.5" style={{ color: exp.accent }}>{t(exp.category, lang)}</p>
+                <p className="text-xs font-semibold tracking-[0.12em] uppercase mb-0.5" style={{ color: exp.accent }}>{exp.category[lang]}</p>
                 <p className="font-semibold text-lg" style={{ color: "#f5f5f7" }}>{exp.company}</p>
               </div>
             </div>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.08}>
+          <ScrollReveal delay={80}>
             <h1
               className="font-semibold leading-[1.04] tracking-tight mb-6"
               style={{ fontSize: "clamp(2rem, 4.5vw, 4rem)", color: "#f5f5f7", letterSpacing: "-0.03em" }}
             >
-              {t(exp.role, lang)}
+              {exp.role[lang]}
             </h1>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.14}>
+          <ScrollReveal delay={140}>
             <div className="flex flex-wrap gap-3 mb-10">
-              {[t(exp.period, lang), t(exp.location, lang)].map((item) => (
+              {[exp.period[lang], exp.location[lang]].map((item) => (
                 <span key={item} className="text-sm px-3 py-1.5 rounded-full" style={{ color: "#86868b", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                   {item}
                 </span>
               ))}
             </div>
-          </FadeUp>
+          </ScrollReveal>
 
-          <FadeUp delay={0.2}>
+          <ScrollReveal delay={180}>
             <p className="font-light leading-[1.8] max-w-2xl" style={{ fontSize: "clamp(1rem, 1.6vw, 1.1rem)", color: "#a1a1a6" }}>
-              {t(exp.overview, lang)}
+              {exp.overview[lang]}
             </p>
-          </FadeUp>
+          </ScrollReveal>
         </div>
       </header>
 
       {/* Accent divider */}
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1.2, delay: 0.3, ease: EASE }}
-        style={{ height: 1, background: `linear-gradient(90deg, ${exp.accent}60, transparent)`, transformOrigin: "left" }}
-      />
+      <div style={{ height: 1, background: `linear-gradient(90deg, ${exp.accent}60, transparent)`, transformOrigin: "left" }} />
 
       {/* Metrics */}
       <section className="py-20 px-5" style={{ background: "rgba(255,255,255,0.02)" }}>
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.35, ease: EASE }}
+          <div
+            data-scroll-reveal=""
             className="grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {exp.metrics.map((m, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.4 + i * 0.08, ease: EASE }}
+                data-scroll-reveal=""
                 className="rounded-2xl p-6"
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
               >
                 <p className="font-semibold leading-none tracking-tight mb-2" style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", color: exp.accent, letterSpacing: "-0.02em" }}>
                   {m.value}
                 </p>
-                <p className="text-xs font-medium leading-relaxed" style={{ color: "#6e6e73" }}>{t(m.label, lang)}</p>
-              </motion.div>
+                <p className="text-xs font-medium leading-relaxed" style={{ color: "#6e6e73" }}>{m.label[lang]}</p>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -135,19 +110,16 @@ export default function ExperienceDetailClient({ exp }: Props) {
       <section className="py-20 px-5 pb-32">
         <div className="max-w-[900px] mx-auto space-y-16">
           {exp.sections.map((sec, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-8%" }}
-              transition={{ duration: 0.85, delay: i * 0.05, ease: EASE }}
+              data-scroll-reveal=""
               className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8"
             >
               {/* Section title */}
               <div className="md:pt-1">
                 <div className="w-5 h-0.5 mb-3 rounded-full" style={{ background: exp.accent }} />
                 <h3 className="text-sm font-semibold tracking-tight" style={{ color: "#86868b" }}>
-                  {t(sec.title, lang)}
+                  {sec.title[lang]}
                 </h3>
               </div>
               {/* Points */}
@@ -159,7 +131,7 @@ export default function ExperienceDetailClient({ exp }: Props) {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
@@ -167,16 +139,13 @@ export default function ExperienceDetailClient({ exp }: Props) {
       {/* Tools */}
       <section className="px-5 pb-32">
         <div className="max-w-[900px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: EASE }}
+          <div
+            data-scroll-reveal=""
             className="rounded-3xl p-10"
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
           >
             <p className="text-xs font-semibold tracking-[0.12em] uppercase mb-6" style={{ color: "#48484a" }}>
-              {lang === "en" ? "Tools & Stack" : "工具与技术栈"}
+              {lang === "en" ? "Tools & Methods" : "工具与方法"}
             </p>
             <div className="flex flex-wrap gap-2">
               {exp.tools.map((tool) => (
@@ -185,7 +154,7 @@ export default function ExperienceDetailClient({ exp }: Props) {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
