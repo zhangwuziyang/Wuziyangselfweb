@@ -1,0 +1,321 @@
+/* ─── Apple-inspired continuous scroll story craft ───────────────────────── */
+
+.storyRoot {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  font-family: var(--font-sans);
+}
+
+.displayTitle {
+  text-wrap: balance;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.chapterHeadline {
+  text-wrap: balance;
+  white-space: pre-line;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ─── 3D Perspective container for pinned device ─────────────────────────── */
+.devicePerspective {
+  perspective: 1450px;
+  perspective-origin: 50% 50%;
+}
+
+.deviceTransform {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ─── Titanium iPhone 16 Pro hardware frame ──────────────────────────────── */
+/* Note: screenshots (560x1217) already include the real iOS status bar &
+   Dynamic Island, so we frame them with a precision titanium chassis without
+   drawing a duplicate island pill on top. */
+.iphoneChassis {
+  position: relative;
+  border-radius: 48px;
+  padding: 10px;
+  background: linear-gradient(
+    145deg,
+    #8d8983 0%,
+    #52504c 18%,
+    #292827 42%,
+    #4c4a46 68%,
+    #959089 88%,
+    #5d5b57 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.32),
+    inset 0 0 0 2.5px rgba(15, 15, 16, 0.85),
+    0 34px 80px -22px rgba(0, 0, 0, 0.42),
+    0 14px 32px -12px rgba(0, 0, 0, 0.28);
+}
+
+.iphoneChassisCompact {
+  border-radius: 34px;
+  padding: 7px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 0 0 2px rgba(15, 15, 16, 0.82),
+    0 24px 54px -18px rgba(0, 0, 0, 0.48),
+    0 8px 20px -10px rgba(0, 0, 0, 0.3);
+}
+
+.iphoneBezel {
+  position: relative;
+  border-radius: 39px;
+  padding: 3px;
+  background: #070708;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.iphoneChassisCompact .iphoneBezel {
+  border-radius: 28px;
+  padding: 2px;
+}
+
+.iphoneViewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 560 / 1217;
+  overflow: hidden;
+  border-radius: 36px;
+  background: #0c0d10;
+}
+
+.iphoneChassisCompact .iphoneViewport {
+  border-radius: 26px;
+}
+
+.iphoneGlassSheen {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: inherit;
+  background: linear-gradient(
+    126deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.03) 26%,
+    transparent 44%,
+    transparent 86%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.14);
+}
+
+/* Hardware side buttons */
+.iphoneButton {
+  position: absolute;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #9b9790 0%, #4b4945 50%, #86827b 100%);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
+}
+
+.iphoneActionBtn {
+  left: -2.5px;
+  top: 17%;
+  height: 22px;
+}
+
+.iphoneVolUpBtn {
+  left: -2.5px;
+  top: 24.5%;
+  height: 44px;
+}
+
+.iphoneVolDownBtn {
+  left: -2.5px;
+  top: 34.5%;
+  height: 44px;
+}
+
+.iphonePowerBtn {
+  right: -2.5px;
+  top: 27%;
+  height: 64px;
+}
+
+/* ─── MacBook Pro / Desktop Browser hardware frame ───────────────────────── */
+.macbookWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.macbookLid {
+  position: relative;
+  border-radius: 18px 18px 8px 8px;
+  padding: 10px 10px 11px;
+  background: linear-gradient(
+    158deg,
+    #3b3d46 0%,
+    #191a1f 22%,
+    #111216 62%,
+    #252730 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 36px 86px -22px rgba(0, 0, 0, 0.44),
+    0 14px 34px -14px rgba(0, 0, 0, 0.28);
+}
+
+.macbookLidCompact {
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 24px 56px -18px rgba(0, 0, 0, 0.45);
+}
+
+.macbookCamera {
+  position: absolute;
+  top: 3.5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #3f4b6e, #0c0e14 70%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.macbookScreenWrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #0d101b;
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}
+
+.macbookLidCompact .macbookScreenWrap {
+  border-radius: 9px;
+}
+
+.browserBar {
+  position: relative;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  user-select: none;
+}
+
+.browserBarCompact {
+  height: 22px;
+  padding: 0 8px;
+}
+
+.browserBarLight {
+  background: linear-gradient(180deg, #f7f8fc 0%, #eff1f8 100%);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  color: rgba(15, 23, 42, 0.52);
+}
+
+.browserBarDark {
+  background: linear-gradient(180deg, #161926 0%, #10131e 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(245, 245, 247, 0.55);
+}
+
+.macbookViewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1800 / 1125;
+  overflow: hidden;
+  background: #0d101b;
+}
+
+.macbookGlassSheen {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.02) 22%,
+    transparent 42%,
+    transparent 100%
+  );
+}
+
+/* Slim anodized MacBook deck lip under the display */
+.macbookDeck {
+  position: relative;
+  margin: 0 auto;
+  width: 104%;
+  margin-left: -2%;
+  height: 11px;
+  border-radius: 2px 2px 10px 10px;
+  background: linear-gradient(
+    90deg,
+    #25272f 0%,
+    #525663 10%,
+    #353842 28%,
+    #3f424e 50%,
+    #353842 72%,
+    #525663 90%,
+    #25272f 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 18px 34px -10px rgba(0, 0, 0, 0.55);
+}
+
+.macbookDeck::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 13%;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 0 0 6px 6px;
+  background: rgba(10, 11, 16, 0.52);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/* ─── Subtle scroll cue animation ────────────────────────────────────────── */
+@keyframes gentleNudge {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
+.scrollCueDot {
+  animation: gentleNudge 2.1s ease-in-out infinite;
+}
+
+/* ─── Gallery card hover lift (GPU-only) ─────────────────────────────────── */
+.galleryCard {
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.galleryCard:hover {
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollCueDot {
+    animation: none;
+  }
+
+  .galleryCard {
+    transition: none;
+  }
+
+  .galleryCard:hover {
+    transform: none;
+  }
+}

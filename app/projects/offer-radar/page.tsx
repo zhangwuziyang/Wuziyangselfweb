@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { card, detail } from "@/lib/projectData/offer-radar-copy.json";
+import ScrollStory from "@/components/projects/ScrollStory";
+import { offerRadarStory } from "@/lib/projectData/offerRadarStory";
 import { siteOpenGraph } from "@/lib/siteMetadata";
-import ProjectDetailClient from "../ProjectDetailClient";
 
 const url = "/projects/offer-radar";
-const video = { src: "/projects/offer-radar-web.mp4", poster: "/projects/offer-radar-poster.jpg" };
-const { title, subtitle: description } = detail.en;
-const image = { url: video.poster, width: 1280, height: 720, alt: title };
+const title = offerRadarStory.title.en;
+const description = offerRadarStory.subtitle.en;
+const image = {
+  url: "/images/projects/offer-radar/o-001.webp",
+  width: 1800,
+  height: 1125,
+  alt: `${title} web workspace`,
+};
 
 export const metadata: Metadata = {
   title,
@@ -17,13 +22,5 @@ export const metadata: Metadata = {
 };
 
 export default function OfferRadarPage() {
-  return (
-    <ProjectDetailClient
-      copy={{
-        en: { ...detail.en, techTags: card.en.techTags },
-        zh: { ...detail.zh, techTags: card.zh.techTags },
-      }}
-      video={video}
-    />
-  );
+  return <ScrollStory story={offerRadarStory} />;
 }
