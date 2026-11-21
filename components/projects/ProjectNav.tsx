@@ -32,8 +32,12 @@ export function ProjectNav({
     setIsDark((prev) => (prev === nextDark ? prev : nextDark));
   });
 
-  const darkBackdropOpacity = useTransform(progress, darkTransition, [0, 1]);
-  const titleOpacity = useTransform(progress, [0.05, 0.13], [0, 1]);
+  const darkBackdropOpacity = useTransform(
+    progress,
+    [0, darkTransition[0], darkTransition[1], 1],
+    [0, 0, 1, 1]
+  );
+  const titleOpacity = useTransform(progress, [0, 0.06, 0.12, 1], [0, 0, 1, 1]);
 
   return (
     <nav
@@ -43,13 +47,13 @@ export function ProjectNav({
       {/* Light frosted backdrop */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 border-b border-black/[0.07] bg-[#fbfaf8]/75 backdrop-blur-2xl"
+        className="pointer-events-none absolute inset-0 border-b border-black/[0.07] bg-[#fbfaf8]/78 backdrop-blur-2xl"
       />
 
       {/* Dark frosted backdrop cross-fades cleanly in sync with twilight glide */}
       <motion.div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 border-b border-white/[0.08] bg-[#0a0e16]/80 backdrop-blur-2xl"
+        className="pointer-events-none absolute inset-0 border-b border-white/[0.08] bg-[#0a0e16]/86 backdrop-blur-2xl"
         style={{ opacity: darkBackdropOpacity }}
       />
 
@@ -62,7 +66,7 @@ export function ProjectNav({
         <Link
           href="/#projects"
           className={`inline-flex w-fit items-center gap-2 text-[13px] font-medium transition-opacity duration-200 hover:opacity-100 ${
-            isDark ? "text-white/75" : "text-black/70"
+            isDark ? "text-white/80" : "text-black/70"
           }`}
         >
           <span aria-hidden="true" className="text-base leading-none">
@@ -86,8 +90,8 @@ export function ProjectNav({
             aria-label={zh ? "Switch to English" : "切换至中文"}
             className={`rounded-full border px-3 py-1 text-[11px] font-semibold tracking-[0.08em] transition-colors duration-200 ${
               isDark
-                ? "border-white/15 text-white/80 hover:border-white/35 hover:text-white"
-                : "border-black/15 text-black/70 hover:border-black/35 hover:text-black"
+                ? "border-white/20 text-white/85 hover:border-white/40 hover:text-white"
+                : "border-black/15 text-black/75 hover:border-black/35 hover:text-black"
             }`}
           >
             {zh ? "EN" : "中文"}

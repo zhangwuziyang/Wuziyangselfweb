@@ -18,8 +18,8 @@ interface ScreenSlideProps {
 
 /**
  * Renders one screenshot inside a pinned device viewport.
- * Incoming screens glide gently over the fully opaque outgoing screen before
- * the outgoing screen drops to opacity 0, preventing mid-fade bleed-through.
+ * Every transform range spans [0, ..., 1] explicitly and runs on a non-WAAPI
+ * clamped scroll MotionValue so cross-fades stay locked in sync with chapters.
  */
 function ScreenSlide({
   screen,
@@ -32,30 +32,31 @@ function ScreenSlide({
 }: ScreenSlideProps) {
   const isFirst = index === 0;
   const fadeWindow = 0.045;
-  const inStart = Math.max(0, enterAt - 0.01);
-  const inEnd = Math.min(0.99, enterAt + fadeWindow);
+  const inStart = Math.max(0.005, enterAt);
+  const inEnd = Math.min(0.98, enterAt + fadeWindow);
+  const outEnd = coveredAt !== null ? Math.min(0.995, coveredAt + 0.012) : null;
 
   const opacityRange = isFirst
-    ? coveredAt !== null
-      ? [0, coveredAt, Math.min(1, coveredAt + 0.015)]
+    ? coveredAt !== null && outEnd !== null
+      ? [0, coveredAt, outEnd, 1]
       : [0, 1]
-    : coveredAt !== null
-      ? [inStart, inEnd, coveredAt, Math.min(1, coveredAt + 0.015)]
-      : [inStart, inEnd, 1];
+    : coveredAt !== null && outEnd !== null
+      ? [0, inStart, inEnd, coveredAt, outEnd, 1]
+      : [0, inStart, inEnd, 1];
 
   const opacityOutput = isFirst
-    ? coveredAt !== null
-      ? [1, 1, 0]
+    ? coveredAt !== null && outEnd !== null
+      ? [1, 1, 0, 0]
       : [1, 1]
-    : coveredAt !== null
-      ? [0, 1, 1, 0]
-      : [0, 1, 1];
+    : coveredAt !== null && outEnd !== null
+      ? [0, 0, 1, 1, 0, 0]
+      : [0, 0, 1, 1];
 
-  const yRange = isFirst ? [0, 1] : [inStart, inEnd];
-  const yOutput = isFirst ? [0, 0] : [16, 0];
+  const yRange = isFirst ? [0, 1] : [0, inStart, inEnd, 1];
+  const yOutput = isFirst ? [0, 0] : [16, 16, 0, 0];
 
-  const scaleRange = isFirst ? [0, 1] : [inStart, inEnd];
-  const scaleOutput = isFirst ? [1, 1] : [1.022, 1];
+  const scaleRange = isFirst ? [0, 1] : [0, inStart, inEnd, 1];
+  const scaleOutput = isFirst ? [1, 1] : [1.02, 1.02, 1, 1];
 
   const opacity = useTransform(progress, opacityRange, opacityOutput);
   const y = useTransform(progress, yRange, yOutput);
@@ -95,7 +96,7 @@ export function IPhoneStageFrame({
   progress,
   lang,
 }: StageFrameProps) {
-  const sizes = "(max-width: 767px) 76vw, 340px";
+  const sizes = "(max-width: 767px) 76vw, 310px";
 
   return (
     <div className={styles.iphoneChassis}>
@@ -108,7 +109,7 @@ export function IPhoneStageFrame({
         <div className={styles.iphoneViewport}>
           {screens.map((screen, idx) => {
             const nextEnter = idx < screens.length - 1 ? enterPoints[idx + 1] : null;
-            const coveredAt = nextEnter !== null ? Math.min(0.99, nextEnter + 0.048) : null;
+            const coveredAt = nextEnter !== null ? Math.min(0.985, nextEnter + 0.048) : null;
             return (
               <ScreenSlide
                 key={screen.src}
@@ -144,11 +145,15 @@ export function MacBookStageFrame({
   enterPoints,
   progress,
   lang,
-  darkTransition = [0.77, 0.83],
+  darkTransition = [0.81, 0.87],
   browserDomain = "offerradar.cn",
 }: StageFrameProps) {
-  const sizes = "(max-width: 767px) 92vw, (max-width: 1280px) 54vw, 760px";
-  const darkChromeOpacity = useTransform(progress, darkTransition, [0, 1]);
+  const sizes = "(max-width: 767px) 92vw, (max-width: 1280px) 52vw, 620px";
+  const darkChromeOpacity = useTransform(
+    progress,
+    [0, darkTransition[0], darkTransition[1], 1],
+    [0, 0, 1, 1]
+  );
 
   return (
     <div className={styles.macbookWrapper}>
@@ -180,7 +185,7 @@ export function MacBookStageFrame({
           <div className={styles.macbookViewport}>
             {screens.map((screen, idx) => {
               const nextEnter = idx < screens.length - 1 ? enterPoints[idx + 1] : null;
-              const coveredAt = nextEnter !== null ? Math.min(0.99, nextEnter + 0.048) : null;
+              const coveredAt = nextEnter !== null ? Math.min(0.985, nextEnter + 0.048) : null;
               return (
                 <ScreenSlide
                   key={screen.src}

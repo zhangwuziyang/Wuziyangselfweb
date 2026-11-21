@@ -15,7 +15,6 @@ import {
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
   type MotionValue,
 } from "framer-motion";
@@ -51,18 +50,24 @@ function getDesktopServerSnapshot() {
   return true;
 }
 
-/** Beat windows for 5 chapters inside [0, 1] scroll progress. */
+/**
+ * Evenly spaced beat windows for 5 chapters inside [0, 1].
+ * Opening hero exits completely by 0.105 (and visibility:hidden by 0.11),
+ * strictly before Chapter 1 starts fading in at 0.14.
+ * Device lateral sweeps occur inside the inter-chapter gaps:
+ *   0.04–0.15, 0.28–0.34, 0.46–0.52, 0.64–0.70, 0.82–0.88
+ */
 const CHAPTER_WINDOWS: ReadonlyArray<readonly [number, number, number, number]> = [
-  [0.13, 0.19, 0.25, 0.3],
-  [0.3, 0.36, 0.42, 0.47],
-  [0.47, 0.53, 0.59, 0.64],
-  [0.64, 0.7, 0.76, 0.81],
-  [0.81, 0.87, 0.96, 1.0],
+  [0.14, 0.185, 0.255, 0.29],
+  [0.33, 0.375, 0.44, 0.475],
+  [0.51, 0.555, 0.62, 0.655],
+  [0.69, 0.735, 0.8, 0.835],
+  [0.87, 0.915, 0.98, 1.0],
 ];
 
-const SCREEN_ENTER_POINTS = [0, 0.13, 0.3, 0.47, 0.64, 0.81];
+const SCREEN_ENTER_POINTS = [0, 0.11, 0.29, 0.47, 0.65, 0.83];
 
-const SCRUBBER_TARGETS = [0, 0.22, 0.39, 0.56, 0.73, 0.9];
+const SCRUBBER_TARGETS = [0, 0.22, 0.41, 0.59, 0.77, 0.94];
 
 interface BackdropLayerViewProps {
   layer: BackdropLayer;
@@ -72,10 +77,11 @@ interface BackdropLayerViewProps {
 
 function BackdropLayerView({ layer, index, progress }: BackdropLayerViewProps) {
   const isBase = index === 0;
+  const [start, end] = layer.fadeIn;
   const opacity = useTransform(
     progress,
-    isBase ? [0, 1] : layer.fadeIn,
-    isBase ? [1, 1] : [0, 1]
+    isBase ? [0, 1] : [0, start, end, 1],
+    isBase ? [1, 1] : [0, 0, 1, 1]
   );
 
   return (
@@ -114,44 +120,48 @@ function ChapterOverlay({
   const opacity = useTransform(
     progress,
     isLast
-      ? [enterStart, enterEnd, 1]
-      : [enterStart, enterEnd, exitStart, exitEnd],
-    isLast ? [0, 1, 1] : [0, 1, 1, 0]
+      ? [0, enterStart, enterEnd, 1]
+      : [0, enterStart, enterEnd, exitStart, exitEnd, 1],
+    isLast ? [0, 0, 1, 1] : [0, 0, 1, 1, 0, 0]
   );
 
   const y = useTransform(
     progress,
     isLast
-      ? [enterStart, enterEnd, 1]
-      : [enterStart, enterEnd, exitStart, exitEnd],
-    isLast ? [42, 0, 0] : [42, 0, 0, -38]
+      ? [0, enterStart, enterEnd, 1]
+      : [0, enterStart, enterEnd, exitStart, exitEnd, 1],
+    isLast ? [40, 40, 0, 0] : [40, 40, 0, 0, -36, -36]
   );
 
-  const [interactive, setInteractive] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useMotionValueEvent(progress, "change", (latest) => {
-    const active = latest >= enterStart && (isLast || latest <= exitEnd);
-    setInteractive((prev) => (prev === active ? prev : active));
+    const active = latest >= enterStart - 0.005 && (isLast || latest <= exitEnd + 0.005);
+    setVisible((prev) => (prev === active ? prev : active));
   });
 
   const isDark = chapter.surface === "dark";
+
+  /* Disjoint safe text zones guaranteed never to intersect the device zone
+     across 768 / 1024 / 1280 / 1440 / 1920px viewports. */
   const widthClass =
     device === "macbook"
-      ? "w-[40%] max-w-[440px]"
-      : "w-[44%] max-w-[480px]";
+      ? "w-[37%] max-w-[430px]"
+      : "w-[43%] max-w-[470px]";
 
-  const alignClass =
-    chapter.textSide === "left"
-      ? "left-0 pl-2 lg:pl-6"
-      : "right-0 pr-2 lg:pr-6";
+  const alignClass = chapter.textSide === "left" ? "left-0" : "right-0";
 
   return (
     <motion.article
-      aria-hidden={!interactive}
+      aria-hidden={!visible}
       className={`absolute top-1/2 -translate-y-1/2 ${widthClass} ${alignClass} ${
-        interactive ? "pointer-events-auto z-20" : "pointer-events-none z-10"
+        visible ? "pointer-events-auto z-20" : "pointer-events-none z-10"
       }`}
-      style={{ opacity, y }}
+      style={{
+        opacity,
+        y,
+        visibility: visible ? "visible" : "hidden",
+      }}
     >
       <div className="mb-4 flex items-center gap-3">
         <span
@@ -174,7 +184,7 @@ function ChapterOverlay({
       </div>
 
       <h2
-        className={`${styles.chapterHeadline} mb-5 text-[clamp(1.75rem,3vw,2.85rem)] font-semibold leading-[1.1] tracking-[-0.03em] ${
+        className={`${styles.chapterHeadline} mb-5 text-[clamp(1.65rem,2.75vw,2.65rem)] font-semibold leading-[1.1] tracking-[-0.03em] ${
           isDark ? "text-[#f5f5f7]" : "text-[#1d1d1f]"
         }`}
       >
@@ -182,7 +192,7 @@ function ChapterOverlay({
       </h2>
 
       <p
-        className={`mb-7 text-[clamp(0.95rem,1.25vw,1.08rem)] font-normal leading-[1.78] ${
+        className={`mb-7 text-[clamp(0.92rem,1.15vw,1.05rem)] font-normal leading-[1.78] ${
           isDark ? "text-[#b6b9c6]" : "text-[#4c4d54]"
         }`}
       >
@@ -196,7 +206,7 @@ function ChapterOverlay({
             className={`rounded-full px-3.5 py-1.5 text-[12px] font-medium tracking-[-0.005em] ${
               isDark
                 ? "border border-white/[0.11] bg-white/[0.06] text-[#e2e4ec]"
-                : "border border-black/[0.08] bg-white/70 text-[#2b2c32] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
+                : "border border-black/[0.08] bg-white/75 text-[#2b2c32] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
             }`}
           >
             {item}
@@ -221,21 +231,21 @@ function PinnedStageContent({
   onJumpToProgress,
 }: PinnedStageContentProps) {
   const zh = lang === "zh";
-  const smooth = useSpring(progress, {
-    stiffness: 125,
-    damping: 28,
-    mass: 0.28,
-  });
 
   const allScreens = useMemo(
     () => [story.openingScreen, ...story.chapters.map((c) => c.screen)],
     [story]
   );
 
+  /**
+   * Direct scroll-locked device keyframes (no spring lag) so the device
+   * finishes sweeping across to the opposite half BEFORE the incoming text
+   * chapter fades in, guaranteeing zero overlap during both reading and motion.
+   */
   const poseKeyframes = useMemo(() => {
     const o = story.openingPose;
     const ch = story.chapters;
-    const stops = [0, 0.04, 0.18, 0.25, 0.35, 0.42, 0.52, 0.59, 0.69, 0.76, 0.86, 1];
+    const stops = [0, 0.04, 0.15, 0.28, 0.34, 0.46, 0.52, 0.64, 0.7, 0.82, 0.88, 1];
 
     const x = [
       `${o.xPct}%`,
@@ -254,30 +264,30 @@ function PinnedStageContent({
 
     const y = [
       `${o.yVh}vh`,
-      `${Math.max(12, o.yVh - 5)}vh`,
+      `${Math.max(18, o.yVh - 4)}vh`,
       `${ch[0].pose.yVh}vh`,
-      `${ch[0].pose.yVh - 0.7}vh`,
+      `${ch[0].pose.yVh - 0.6}vh`,
       `${ch[1].pose.yVh}vh`,
-      `${ch[1].pose.yVh - 0.7}vh`,
+      `${ch[1].pose.yVh - 0.6}vh`,
       `${ch[2].pose.yVh}vh`,
-      `${ch[2].pose.yVh - 0.7}vh`,
+      `${ch[2].pose.yVh - 0.6}vh`,
       `${ch[3].pose.yVh}vh`,
-      `${ch[3].pose.yVh - 0.7}vh`,
+      `${ch[3].pose.yVh - 0.6}vh`,
       `${ch[4].pose.yVh}vh`,
       `${ch[4].pose.yVh}vh`,
     ];
 
     const scale = [
       o.scale,
-      o.scale + 0.02,
+      o.scale + 0.015,
       ch[0].pose.scale,
-      ch[0].pose.scale + 0.015,
+      ch[0].pose.scale + 0.01,
       ch[1].pose.scale,
-      ch[1].pose.scale + 0.015,
+      ch[1].pose.scale + 0.01,
       ch[2].pose.scale,
-      ch[2].pose.scale + 0.015,
+      ch[2].pose.scale + 0.01,
       ch[3].pose.scale,
-      ch[3].pose.scale + 0.015,
+      ch[3].pose.scale + 0.01,
       ch[4].pose.scale,
       ch[4].pose.scale,
     ];
@@ -286,28 +296,28 @@ function PinnedStageContent({
       o.rotateY,
       o.rotateY,
       ch[0].pose.rotateY,
-      ch[0].pose.rotateY * 0.82,
+      ch[0].pose.rotateY * 0.84,
       ch[1].pose.rotateY,
-      ch[1].pose.rotateY * 0.82,
+      ch[1].pose.rotateY * 0.84,
       ch[2].pose.rotateY,
-      ch[2].pose.rotateY * 0.82,
+      ch[2].pose.rotateY * 0.84,
       ch[3].pose.rotateY,
-      ch[3].pose.rotateY * 0.82,
+      ch[3].pose.rotateY * 0.84,
       ch[4].pose.rotateY,
-      ch[4].pose.rotateY * 0.82,
+      ch[4].pose.rotateY * 0.84,
     ];
 
     const rotateX = [
       o.rotateX,
-      Math.max(0, o.rotateX - 2.5),
+      Math.max(0, o.rotateX - 2),
       ch[0].pose.rotateX,
-      ch[0].pose.rotateX - 0.6,
+      ch[0].pose.rotateX - 0.5,
       ch[1].pose.rotateX,
-      ch[1].pose.rotateX - 0.6,
+      ch[1].pose.rotateX - 0.5,
       ch[2].pose.rotateX,
-      ch[2].pose.rotateX - 0.6,
+      ch[2].pose.rotateX - 0.5,
       ch[3].pose.rotateX,
-      ch[3].pose.rotateX - 0.6,
+      ch[3].pose.rotateX - 0.5,
       ch[4].pose.rotateX,
       ch[4].pose.rotateX,
     ];
@@ -315,22 +325,27 @@ function PinnedStageContent({
     return { stops, x, y, scale, rotateY, rotateX };
   }, [story]);
 
-  const deviceX = useTransform(smooth, poseKeyframes.stops, poseKeyframes.x);
-  const deviceY = useTransform(smooth, poseKeyframes.stops, poseKeyframes.y);
-  const deviceScale = useTransform(smooth, poseKeyframes.stops, poseKeyframes.scale);
-  const deviceRotateY = useTransform(smooth, poseKeyframes.stops, poseKeyframes.rotateY);
-  const deviceRotateX = useTransform(smooth, poseKeyframes.stops, poseKeyframes.rotateX);
+  const deviceX = useTransform(progress, poseKeyframes.stops, poseKeyframes.x);
+  const deviceY = useTransform(progress, poseKeyframes.stops, poseKeyframes.y);
+  const deviceScale = useTransform(progress, poseKeyframes.stops, poseKeyframes.scale);
+  const deviceRotateY = useTransform(progress, poseKeyframes.stops, poseKeyframes.rotateY);
+  const deviceRotateX = useTransform(progress, poseKeyframes.stops, poseKeyframes.rotateX);
 
-  const heroOpacity = useTransform(progress, [0, 0.045, 0.125], [1, 1, 0]);
-  const heroY = useTransform(progress, [0, 0.125], [0, -56]);
-  const heroScale = useTransform(progress, [0, 0.125], [1, 0.97]);
-  const scrubberOpacity = useTransform(progress, [0.02, 0.07, 0.96, 1], [0, 1, 1, 0]);
+  /* Opening header exits completely by 0.105 (well before Ch 1 at 0.14) and stays hidden through 1.0 */
+  const heroOpacity = useTransform(progress, [0, 0.035, 0.105, 1], [1, 1, 0, 0]);
+  const heroY = useTransform(progress, [0, 0.105, 1], [0, -76, -76]);
+  const heroScale = useTransform(progress, [0, 0.105, 1], [1, 0.96, 0.96]);
+  const scrubberOpacity = useTransform(progress, [0, 0.03, 0.08, 0.96, 1], [0, 0, 1, 1, 0]);
 
+  const [heroHidden, setHeroHidden] = useState(false);
   const [activeBeat, setActiveBeat] = useState(0);
   const [darkDots, setDarkDots] = useState(false);
   const darkMid = (story.darkTransition[0] + story.darkTransition[1]) / 2;
 
   useMotionValueEvent(progress, "change", (latest) => {
+    const nextHeroHidden = latest >= 0.11;
+    setHeroHidden((prev) => (prev === nextHeroHidden ? prev : nextHeroHidden));
+
     let beat = 0;
     for (let i = 0; i < CHAPTER_WINDOWS.length; i += 1) {
       if (latest >= CHAPTER_WINDOWS[i][0]) beat = i + 1;
@@ -341,10 +356,12 @@ function PinnedStageContent({
     setDarkDots((prev) => (prev === isDarkNow ? prev : isDarkNow));
   });
 
+  /* Sized strictly relative to the inner safe frame W so the device always fits
+     inside its opposite half with >=75px clear gutter at 1280/1440/1920px. */
   const deviceBoxClass =
     story.device === "iphone"
-      ? "w-[clamp(240px,22vw,308px)] max-w-[32vh]"
-      : "w-[clamp(395px,49vw,680px)] max-w-[92vh]";
+      ? "shrink-0 w-[min(24%,296px,31vh)] min-w-[210px]"
+      : "shrink-0 w-[min(52%,610px,80vh)]";
 
   const scrubberLabels = useMemo(
     () => [
@@ -356,113 +373,122 @@ function PinnedStageContent({
 
   return (
     <div className="sticky top-0 h-dvh w-full overflow-x-clip">
-      <div className="relative mx-auto h-full w-full max-w-[1280px] px-7 lg:px-12">
-        {/* Opening Keynote Header */}
-        <motion.header
-          className="pointer-events-none absolute inset-x-0 top-[62px] z-20 flex flex-col items-center px-6 text-center xl:top-[76px]"
-          style={{ opacity: heroOpacity, y: heroY, scale: heroScale }}
-        >
-          {story.mascotIcon && (
-            <div className="mb-3 h-12 w-12 overflow-hidden rounded-[14px] shadow-[0_14px_30px_-8px_rgba(11,25,41,0.38)] ring-1 ring-black/10 xl:mb-4 xl:h-14 xl:w-14 xl:rounded-[16px]">
-              <Image
-                src={story.mascotIcon.src}
-                alt={story.mascotIcon.alt[lang]}
-                width={56}
-                height={56}
-                preload
-                className="h-full w-full object-cover"
-              />
-            </div>
-          )}
+      <div className="relative mx-auto h-full w-full max-w-[1320px] px-8 lg:px-14">
+        {/* Shared Inner Safe Frame (exact width W for both text zones & deviceX %) */}
+        <div className="relative h-full w-full">
+          {/* Opening Keynote Header */}
+          <motion.header
+            aria-hidden={heroHidden}
+            className="pointer-events-none absolute inset-x-0 top-[62px] z-20 flex flex-col items-center px-6 text-center xl:top-[76px]"
+            style={{
+              opacity: heroOpacity,
+              y: heroY,
+              scale: heroScale,
+              visibility: heroHidden ? "hidden" : "visible",
+            }}
+          >
+            {story.mascotIcon && (
+              <div className="mb-3 h-12 w-12 overflow-hidden rounded-[14px] shadow-[0_14px_30px_-8px_rgba(11,25,41,0.38)] ring-1 ring-black/10 xl:mb-4 xl:h-14 xl:w-14 xl:rounded-[16px]">
+                <Image
+                  src={story.mascotIcon.src}
+                  alt={story.mascotIcon.alt[lang]}
+                  width={56}
+                  height={56}
+                  preload
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
 
-          <div className="mb-2.5 flex flex-wrap items-center justify-center gap-2 xl:mb-3.5">
-            {story.badges[lang].map((badge, idx) => (
-              <span
-                key={badge}
-                className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.06em] ${
-                  idx === 0
-                    ? "border border-black/10 bg-white/80 text-[#1d1d1f] shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
-                    : "border border-black/[0.08] bg-black/[0.04] text-[#55565d]"
-                }`}
-              >
-                {badge}
+            <div className="mb-2.5 flex flex-wrap items-center justify-center gap-2 xl:mb-3.5">
+              {story.badges[lang].map((badge, idx) => (
+                <span
+                  key={badge}
+                  className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.06em] ${
+                    idx === 0
+                      ? "border border-black/10 bg-white/80 text-[#1d1d1f] shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                      : "border border-black/[0.08] bg-black/[0.04] text-[#55565d]"
+                  }`}
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+
+            <h1
+              className={`${styles.displayTitle} mb-2.5 max-w-4xl text-[clamp(2.4rem,5vw,4.6rem)] font-semibold leading-[1.03] tracking-[-0.036em] text-[#1d1d1f] xl:mb-3`}
+            >
+              {story.title[lang]}
+            </h1>
+
+            <p className="max-w-xl text-[clamp(0.95rem,1.25vw,1.16rem)] font-normal leading-[1.5] text-[#53545c]">
+              {story.subtitle[lang]}
+            </p>
+
+            <div className="mt-3.5 flex items-center gap-2 text-[11px] font-medium tracking-[0.1em] text-[#6e6e73] uppercase xl:mt-5">
+              <span>{zh ? "向下滚动，跟随界面展开" : "Scroll to explore"}</span>
+              <span aria-hidden="true" className={`${styles.scrollCueDot} inline-block`}>
+                ↓
               </span>
-            ))}
-          </div>
-
-          <h1
-            className={`${styles.displayTitle} mb-2.5 max-w-4xl text-[clamp(2.4rem,5vw,4.6rem)] font-semibold leading-[1.03] tracking-[-0.036em] text-[#1d1d1f] xl:mb-3`}
-          >
-            {story.title[lang]}
-          </h1>
-
-          <p className="max-w-xl text-[clamp(0.95rem,1.25vw,1.16rem)] font-normal leading-[1.5] text-[#53545c]">
-            {story.subtitle[lang]}
-          </p>
-
-          <div className="mt-3.5 flex items-center gap-2 text-[11px] font-medium tracking-[0.1em] text-[#6e6e73] uppercase xl:mt-5">
-            <span>{zh ? "向下滚动，跟随界面展开" : "Scroll to explore"}</span>
-            <span aria-hidden="true" className={`${styles.scrollCueDot} inline-block`}>
-              ↓
-            </span>
-          </div>
-        </motion.header>
-
-        {/* Floating Editorial Chapters 01–05 */}
-        {story.chapters.map((chapter, idx) => (
-          <ChapterOverlay
-            key={chapter.id}
-            chapter={chapter}
-            index={idx}
-            isLast={idx === story.chapters.length - 1}
-            progress={progress}
-            lang={lang}
-            device={story.device}
-          />
-        ))}
-
-        {/* Single Pinned Hardware Device */}
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-          <motion.div
-            className="flex w-full items-center justify-center will-change-transform"
-            style={{ x: deviceX, y: deviceY }}
-          >
-            <div className={styles.devicePerspective}>
-              <motion.div
-                className={`${styles.deviceTransform} ${deviceBoxClass}`}
-                style={{
-                  scale: deviceScale,
-                  rotateY: deviceRotateY,
-                  rotateX: deviceRotateX,
-                }}
-              >
-                {story.device === "iphone" ? (
-                  <IPhoneStageFrame
-                    screens={allScreens}
-                    enterPoints={SCREEN_ENTER_POINTS}
-                    progress={progress}
-                    lang={lang}
-                  />
-                ) : (
-                  <MacBookStageFrame
-                    screens={allScreens}
-                    enterPoints={SCREEN_ENTER_POINTS}
-                    progress={progress}
-                    lang={lang}
-                    darkTransition={story.darkTransition}
-                    browserDomain={story.browserDomain}
-                  />
-                )}
-              </motion.div>
             </div>
-          </motion.div>
+          </motion.header>
+
+          {/* Floating Editorial Chapters 01–05 */}
+          {story.chapters.map((chapter, idx) => (
+            <ChapterOverlay
+              key={chapter.id}
+              chapter={chapter}
+              index={idx}
+              isLast={idx === story.chapters.length - 1}
+              progress={progress}
+              lang={lang}
+              device={story.device}
+            />
+          ))}
+
+          {/* Single Pinned Hardware Device */}
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+            <motion.div
+              className="flex w-full items-center justify-center will-change-transform"
+              style={{ x: deviceX, y: deviceY }}
+            >
+              <div className={`${styles.devicePerspective} ${deviceBoxClass}`}>
+                <motion.div
+                  className={`${styles.deviceTransform} w-full`}
+                  style={{
+                    scale: deviceScale,
+                    rotateY: deviceRotateY,
+                    rotateX: deviceRotateX,
+                  }}
+                >
+                  {story.device === "iphone" ? (
+                    <IPhoneStageFrame
+                      screens={allScreens}
+                      enterPoints={SCREEN_ENTER_POINTS}
+                      progress={progress}
+                      lang={lang}
+                    />
+                  ) : (
+                    <MacBookStageFrame
+                      screens={allScreens}
+                      enterPoints={SCREEN_ENTER_POINTS}
+                      progress={progress}
+                      lang={lang}
+                      darkTransition={story.darkTransition}
+                      browserDomain={story.browserDomain}
+                    />
+                  )}
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Right-edge chapter progress scrubber */}
       <motion.div
         aria-label={zh ? "章节进度导航" : "Story chapters"}
-        className="fixed right-5 top-1/2 z-30 hidden -translate-y-1/2 flex-col items-center gap-3 lg:flex"
+        className="fixed right-4 top-1/2 z-30 hidden -translate-y-1/2 flex-col items-center gap-3 xl:right-5 lg:flex"
         style={{ opacity: scrubberOpacity }}
       >
         {SCRUBBER_TARGETS.map((target, idx) => {
@@ -519,12 +545,12 @@ function StackedStory({ story, lang, reducedMotion }: StackedStoryProps) {
   const frameWrapClass =
     story.device === "iphone"
       ? "mx-auto w-[min(76vw,300px)]"
-      : "mx-auto w-full max-w-[660px]";
+      : "mx-auto w-full max-w-[640px]";
 
   const frameSizes =
     story.device === "iphone"
       ? "(max-width: 767px) 76vw, 300px"
-      : "(max-width: 767px) 92vw, 660px";
+      : "(max-width: 767px) 92vw, 640px";
 
   return (
     <div style={{ background: continuousGradient }}>
@@ -761,6 +787,16 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
     offset: ["start start", "end end"],
   });
 
+  /**
+   * Deriving a clamped MotionValue via a function transformer intentionally
+   * opts out of framer-motion 12's native WAAPI ViewTimeline acceleration,
+   * which in Chrome desyncs non-[0..1] keyframes (causing hero ghosting and
+   * backdrop reset once scrolled past the sticky target into the ending).
+   */
+  const clampedProgress = useTransform(scrollYProgress, (v) =>
+    v <= 0 ? 0 : v >= 1 ? 1 : v
+  );
+
   const handleJumpToProgress = useCallback(
     (targetProgress: number) => {
       const el = storyRef.current;
@@ -793,7 +829,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
               key={layer.id}
               layer={layer}
               index={idx}
-              progress={scrollYProgress}
+              progress={clampedProgress}
             />
           ))}
         </div>
@@ -802,7 +838,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
       {/* Adaptive floating top navigation */}
       <ProjectNav
         title={story.title}
-        progress={scrollYProgress}
+        progress={clampedProgress}
         darkTransition={story.darkTransition}
         accentLight={story.accentLight}
         accentDark={story.accentDark}
@@ -818,7 +854,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
           {pinnedMode ? (
             <PinnedStageContent
               story={story}
-              progress={scrollYProgress}
+              progress={clampedProgress}
               lang={lang}
               onJumpToProgress={handleJumpToProgress}
             />
@@ -831,11 +867,11 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
           )}
         </section>
 
-        {/* Calm Ending: continuous dark studio continuation (zero hard seam) */}
+        {/* Calm Ending: explicit solid ending surface matching the final backdrop stop */}
         <div
           className="relative z-10 text-[#f5f5f7]"
           style={{
-            backgroundColor: pinnedMode ? "transparent" : story.endingBackground,
+            backgroundColor: story.endingBackground,
           }}
         >
           <div className="mx-auto max-w-[1160px] px-5 pb-24 pt-20 md:px-8 md:pt-28">
@@ -907,7 +943,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
                     key={item.src}
                     type="button"
                     onClick={() => setLightboxItem(item)}
-                    className={`${styles.galleryCard} group flex flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-3xl`}
+                    className={`${styles.galleryCard} group flex flex-col rounded-3xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40`}
                   >
                     <div
                       className={
