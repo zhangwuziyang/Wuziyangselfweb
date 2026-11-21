@@ -1,17 +1,15 @@
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import Image from "next/image";
 import Link from "next/link";
-import StoryHeading from "@/components/home/StoryHeading";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { HEALTH_FRAMES, OFFER_FRAMES } from "@/components/home/story-media";
 import { Localized } from "@/components/ui/Localized";
 import { i18n } from "@/lib/i18n";
 import healthAgent from "@/lib/projectData/health-agent-copy.json";
 import offerRadar from "@/lib/projectData/offer-radar-copy.json";
 
 const projects = [
-  { slug: "offer-radar", card: offerRadar.card },
-  { slug: "health-agent", card: healthAgent.card },
+  { slug: "offer-radar", card: offerRadar.card, cover: OFFER_FRAMES[1], device: "browser" },
+  { slug: "health-agent", card: healthAgent.card, cover: HEALTH_FRAMES[0], device: "phone" },
 ];
 
 function renderPoints(points: readonly string[]) {
@@ -35,61 +33,82 @@ export default function Projects() {
   const p = i18n.projects;
 
   return (
-    <section id="projects" className="story-chapter">
-      <div className="story-shell">
-        <StoryHeading label={p.label}><Localized {...p.headline} /></StoryHeading>
-        <ScrollReveal>
-          <p className="story-body mb-9 max-w-xl">
+    <section id="projects" className="story-chapter story-projects">
+      <div className="story-projects__runway" data-project-runway="">
+        <header className="story-projects__caption story-shell">
+          <p className="story-eyebrow"><Localized {...p.label} /></p>
+          <h2 className="story-title"><Localized {...p.headline} /></h2>
+          <p className="story-body">
             <Localized en={p.tagline.en.split("\n")[0]} zh={p.tagline.zh.split("\n")[0]} />
           </p>
-        </ScrollReveal>
+          <a href="#project-gallery" className="mt-2.5 inline-block text-sm font-medium text-[var(--story-tint)] hover:text-white">
+            <Localized en="View project details" zh="查看项目详情" />
+          </a>
+        </header>
+      </div>
 
-        <div className="flex flex-col gap-6">
-          {projects.map(({ slug, card: { en, zh } }) => {
-            const asset = `images/projects/${slug}/cover.webp`;
-            const hasCover = existsSync(join(process.cwd(), "public", asset));
-
-            return (
-              <ScrollReveal key={slug}>
-                <article className="story-project story-panel">
-                  <div className={`story-project__media story-project__media--${slug}`} data-project-cover={`/${asset}`}>
-                    {hasCover ? (
-                      <Image src={`/${asset}`} alt="" fill className="object-contain p-5" sizes="(max-width: 767px) 90vw, 38vw" />
-                    ) : (
-                      <div className="story-project__placeholder" aria-hidden="true" />
-                    )}
+      <div id="project-gallery" className="story-projects__gallery story-shell">
+        {projects.map(({ slug, card: { en, zh }, cover, device }) => (
+          <ScrollReveal key={slug}>
+            <article className={device === "phone" ? "story-project story-project--health story-panel" : "story-project story-panel"}>
+              <div className={`story-project__media story-project__media--${slug}`}>
+                {device === "browser" ? (
+                  <div className="project-browser">
+                    <div className="project-browser__chrome" aria-hidden="true"><span /><span /><span /></div>
+                    <Image
+                      src={cover}
+                      alt="Offer Radar recruiting dashboard"
+                      width={1800}
+                      height={1125}
+                      sizes="(max-width: 831px) 89vw, (max-width: 1600px) 47vw, 760px"
+                      loading="lazy"
+                      className="block h-auto w-full"
+                    />
                   </div>
-
-                  <div className="flex min-w-0 flex-col justify-center p-5 sm:p-7 xl:p-8">
-                    <div className="mb-4 flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-[#9cbbff]/25 bg-[#9cbbff]/10 px-2.5 py-1 text-xs font-semibold text-[#c4d8ff]">
-                        <Localized en={en.tag1} zh={zh.tag1} />
-                      </span>
-                      <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-[var(--story-muted)]">
-                        <Localized en={en.tag2} zh={zh.tag2} />
-                      </span>
+                ) : (
+                  <div className="project-phone phone-shell">
+                    <div className="phone-shell__screen">
+                      <Image
+                        src={cover}
+                        alt="My Health Agent activity and health dashboard"
+                        fill
+                        sizes="(max-width: 831px) 32vw, (max-width: 1480px) 15vw, 224px"
+                        loading="lazy"
+                        className="object-contain"
+                      />
                     </div>
-                    <h3 className="mb-3 text-[clamp(1.7rem,3.3vw,3rem)] font-semibold leading-tight tracking-tight">
-                      <Localized en={en.title} zh={zh.title} />
-                    </h3>
-                    <p className="mb-5 text-sm leading-relaxed text-[var(--story-muted)]"><Localized en={en.desc} zh={zh.desc} /></p>
-                    <ul className="mb-5 space-y-2">
-                      <Localized en={renderPoints(en.points)} zh={renderPoints(zh.points)} />
-                    </ul>
-                    <div className="mb-5 flex flex-wrap gap-2">
-                      <Localized en={renderTechTags(en.techTags)} zh={renderTechTags(zh.techTags)} />
-                    </div>
-                    <Link href={`/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:text-white">
-                      <Localized en={en.cta} zh={zh.cta} />
-                      <span className="sr-only"><Localized en={` ${en.title}`} zh={` ${zh.title}`} /></span>
-                      <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
-                    </Link>
                   </div>
-                </article>
-              </ScrollReveal>
-            );
-          })}
-        </div>
+                )}
+              </div>
+
+              <div className="flex min-w-0 flex-col justify-center p-5 sm:p-7 xl:p-8">
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-[#9cbbff]/25 bg-[#9cbbff]/10 px-2.5 py-1 text-xs font-semibold text-[#c4d8ff]">
+                    <Localized en={en.tag1} zh={zh.tag1} />
+                  </span>
+                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-[var(--story-muted)]">
+                    <Localized en={en.tag2} zh={zh.tag2} />
+                  </span>
+                </div>
+                <h3 className="mb-3 text-[clamp(1.7rem,3.3vw,3rem)] font-semibold leading-tight tracking-tight">
+                  <Localized en={en.title} zh={zh.title} />
+                </h3>
+                <p className="mb-5 text-sm leading-relaxed text-[var(--story-muted)]"><Localized en={en.desc} zh={zh.desc} /></p>
+                <ul className="mb-5 space-y-2">
+                  <Localized en={renderPoints(en.points)} zh={renderPoints(zh.points)} />
+                </ul>
+                <div className="mb-5 flex flex-wrap gap-2">
+                  <Localized en={renderTechTags(en.techTags)} zh={renderTechTags(zh.techTags)} />
+                </div>
+                <Link href={`/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:text-white">
+                  <Localized en={en.cta} zh={zh.cta} />
+                  <span className="sr-only"><Localized en={` ${en.title}`} zh={` ${zh.title}`} /></span>
+                  <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
+                </Link>
+              </div>
+            </article>
+          </ScrollReveal>
+        ))}
       </div>
     </section>
   );
