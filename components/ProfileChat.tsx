@@ -2,7 +2,7 @@
 
 import { type FormEvent, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChatMark } from "@/components/ui/ChatMark";
+import CindyAvatar from "@/components/home/CindyAvatar";
 import { useLang } from "@/context/LangContext";
 import type { LocalAI } from "@/lib/profileChatAI";
 import {
@@ -242,10 +242,9 @@ export default function ProfileChat({ open, onClose }: { open: boolean; onClose:
         <header className="relative flex items-center justify-between border-b border-white/[0.08] px-4 py-3.5">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg"
-              style={{ background: "linear-gradient(135deg, #0071e3, #7c3aed)" }}
+              className="grid size-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/5"
             >
-              <ChatMark size={22} />
+              <CindyAvatar />
             </div>
             <div className="min-w-0">
               <h2 className="truncate text-[14px] font-semibold tracking-[-0.01em] text-white">

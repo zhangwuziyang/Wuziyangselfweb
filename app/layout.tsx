@@ -50,8 +50,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="bg-black antialiased">
         <LangProvider>
-          {children}
-          <ProfileChatLauncher />
+          <ProfileChatLauncher>{children}</ProfileChatLauncher>
           <Suspense fallback={null}>
             <ScrollEffects />
           </Suspense>

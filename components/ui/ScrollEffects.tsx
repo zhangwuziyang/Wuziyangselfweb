@@ -7,8 +7,6 @@ export default function ScrollEffects() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname === "/") return;
-
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const pending = new Set<HTMLElement>();
     let observer: IntersectionObserver | undefined;

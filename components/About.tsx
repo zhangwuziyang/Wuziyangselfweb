@@ -116,6 +116,22 @@ export default function About() {
             </div>
           </div>
         </ScrollReveal>
+        <ScrollReveal className="story-about-media">
+          <figure>
+            <div className="story-about-media__image">
+              <Image src="/photos/uw-campus.jpg" alt="University of Wisconsin–Madison campus" fill
+                sizes="(max-width: 767px) 90vw, 50vw" className="object-cover" />
+            </div>
+            <figcaption><Localized en="UW–Madison campus" zh="威斯康星大学麦迪逊分校校园" /></figcaption>
+          </figure>
+          <figure>
+            <div className="story-about-media__image">
+              <Image src="/photos/uw-ranking.jpg" alt="UW–Madison ranking graphic" fill
+                sizes="(max-width: 767px) 90vw, 26vw" className="object-contain" />
+            </div>
+            <figcaption><Localized en="UW–Madison ranking" zh="威斯康星大学麦迪逊分校排名" /></figcaption>
+          </figure>
+        </ScrollReveal>
       </div>
     </section>
   );

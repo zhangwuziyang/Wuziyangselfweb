@@ -23,8 +23,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <HomeStory>
-      <Navbar copy={i18n.nav} />
+    <HomeStory navigation={<Navbar copy={i18n.nav} />}>
       <main>
         <Hero />
         <About />

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import ProjectPreview from "@/components/home/ProjectPreview";
 import { HEALTH_FRAMES, OFFER_FRAMES } from "@/components/home/story-media";
 import { Localized } from "@/components/ui/Localized";
 import { i18n } from "@/lib/i18n";
@@ -8,8 +8,8 @@ import healthAgent from "@/lib/projectData/health-agent-copy.json";
 import offerRadar from "@/lib/projectData/offer-radar-copy.json";
 
 const projects = [
-  { slug: "offer-radar", card: offerRadar.card, cover: OFFER_FRAMES[1], device: "browser" },
-  { slug: "health-agent", card: healthAgent.card, cover: HEALTH_FRAMES[0], device: "phone" },
+  { slug: "offer-radar", card: offerRadar.card, frames: [OFFER_FRAMES[1], OFFER_FRAMES[0], ...OFFER_FRAMES.slice(2)], device: "browser" },
+  { slug: "health-agent", card: healthAgent.card, frames: HEALTH_FRAMES, device: "phone" },
 ];
 
 function renderPoints(points: readonly string[]) {
@@ -34,51 +34,20 @@ export default function Projects() {
 
   return (
     <section id="projects" className="story-chapter story-projects">
-      <div className="story-projects__runway" data-project-runway="">
-        <header className="story-projects__caption story-shell">
-          <p className="story-eyebrow"><Localized {...p.label} /></p>
-          <h2 className="story-title"><Localized {...p.headline} /></h2>
-          <p className="story-body">
-            <Localized en={p.tagline.en.split("\n")[0]} zh={p.tagline.zh.split("\n")[0]} />
-          </p>
-          <a href="#project-gallery" className="mt-2.5 inline-block text-sm font-medium text-[var(--story-tint)] hover:text-white">
-            <Localized en="View project details" zh="查看项目详情" />
-          </a>
-        </header>
-      </div>
+      <header className="story-projects__caption story-shell">
+        <p className="story-eyebrow"><Localized {...p.label} /></p>
+        <h2 className="story-title"><Localized {...p.headline} /></h2>
+        <p className="story-body">
+          <Localized en={p.tagline.en.split("\n")[0]} zh={p.tagline.zh.split("\n")[0]} />
+        </p>
+      </header>
 
       <div id="project-gallery" className="story-projects__gallery story-shell">
-        {projects.map(({ slug, card: { en, zh }, cover, device }) => (
+        {projects.map(({ slug, card: { en, zh }, frames, device }) => (
           <ScrollReveal key={slug}>
             <article className={device === "phone" ? "story-project story-project--health story-panel" : "story-project story-panel"}>
               <div className={`story-project__media story-project__media--${slug}`}>
-                {device === "browser" ? (
-                  <div className="project-browser">
-                    <div className="project-browser__chrome" aria-hidden="true"><span /><span /><span /></div>
-                    <Image
-                      src={cover}
-                      alt="Offer Radar recruiting dashboard"
-                      width={1800}
-                      height={1125}
-                      sizes="(max-width: 831px) 89vw, (max-width: 1600px) 47vw, 760px"
-                      loading="lazy"
-                      className="block h-auto w-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="project-phone phone-shell">
-                    <div className="phone-shell__screen">
-                      <Image
-                        src={cover}
-                        alt="My Health Agent activity and health dashboard"
-                        fill
-                        sizes="(max-width: 831px) 32vw, (max-width: 1480px) 15vw, 224px"
-                        loading="lazy"
-                        className="object-contain"
-                      />
-                    </div>
-                  </div>
-                )}
+                <ProjectPreview frames={frames} phone={device === "phone"} name={{ en: en.title, zh: zh.title }} />
               </div>
 
               <div className="flex min-w-0 flex-col justify-center p-5 sm:p-7 xl:p-8">

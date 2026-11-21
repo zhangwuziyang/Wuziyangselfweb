@@ -91,7 +91,7 @@ const PROJECTS_OVERVIEW = {
 };
 
 export const PROFILE_CHAT_COPY = {
-  title: { en: "Ask Wuziyang", zh: "问问梓洋" },
+  title: { en: "Cindy", zh: "Cindy" },
   subtitle: { en: "About me", zh: "关于我" },
   status: { en: "Portfolio assistant", zh: "个人网站助手" },
   aiLoading: { en: "Ask now · Local AI warming up", zh: "可直接提问 · 本地 AI 后台准备中" },
@@ -134,8 +134,8 @@ export const PROFILE_CHAT_COPY = {
     zh: "低置信度或未命中 → 停止生成，并明确说明知识库暂无对应信息。",
   },
   greeting: {
-    en: "Hi — I’m Wuziyang, and you can also think of me as this portfolio’s interactive guide. I can introduce who I am, unpack my experience and projects, compare my skills, recommend what to explore, or help you find the right way to contact me.",
-    zh: "你好，我是梓洋，也可以把我当作这份个人网站的互动向导。我可以介绍我是谁、讲清每段经历与项目、总结能力特点、推荐浏览路线，也能帮你找到合适的联系方式。",
+    en: "Hi, I’m Cindy, Wuziyang’s portfolio guide. I can show you his experience, projects, and skills or help you get in touch.",
+    zh: "你好，我是 Cindy，这个网站的小管家。我可以介绍梓洋的经历、项目和技能，也可以帮你找到联系方式。",
   },
   placeholder: { en: "Ask a question…", zh: "输入你想问的问题…" },
   send: { en: "Send", zh: "发送" },
@@ -332,16 +332,16 @@ const INTENTS: ProfileChatIntent[] = [
     id: "greeting",
     keywords: ["你好", "您好", "嗨", "哈喽", "在吗", "hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
     answer: {
-      en: "Hi, nice to meet you. I’m Wuziyang, speaking through this interactive portfolio guide. You can treat this as a conversation rather than a menu — ask naturally about who I am, what I’ve built, where I’ve worked, or what I’m looking for next.",
-      zh: "你好，很高兴认识你。我是梓洋，正在通过这个互动向导和你交流。你不必把这里当成菜单，可以像聊天一样自然地问我是谁、做过什么、有哪些项目，或者接下来想寻找什么机会。",
+      en: "Hi, nice to meet you. I’m Cindy. Ask me about Wuziyang, what he’s built, where he’s worked, or what he’s looking for next.",
+      zh: "你好，很高兴认识你。我是 Cindy。可以问我梓洋是谁、做过哪些项目、在哪里工作过，或者他接下来想找什么机会。",
     },
   },
   {
     id: "assistant-identity",
     keywords: ["你是ai吗", "你是机器人吗", "你是真人吗", "你是什么助手", "这是ai吗", "are you ai", "are you a robot", "are you real", "what kind of assistant are you"],
     answer: {
-      en: "I’m Wuziyang’s interactive presence inside this portfolio. I answer questions about my experience, skills, and projects using the information on this site, then point you to the most relevant page. Think of me as a conversational guide to my work, not a general-purpose chatbot.",
-      zh: "我是梓洋在这份个人网站里的互动分身，会基于站内信息回答关于我的经历、能力和项目，再把你带到最相关的页面。可以把我理解为一个会对话的作品集向导，而不是通用聊天机器人。",
+      en: "I’m Cindy, the guide to Wuziyang’s portfolio. I answer questions about his experience, skills, and projects using the information on this site and can show you where to read more.",
+      zh: "我是 Cindy，这个网站的导览员。我会根据站内信息回答关于梓洋经历、能力和项目的问题，也可以带你去看相关页面。",
     },
   },
   {
