@@ -1,3 +1,4 @@
+import StoryHeading from "@/components/home/StoryHeading";
 import Image from "next/image";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
@@ -8,8 +9,7 @@ function renderTags(tags: readonly string[]) {
   return tags.map((tag) => (
     <span
       key={tag}
-      className="px-4 py-1.5 text-sm font-medium rounded-full transition-all duration-200 hover:scale-[1.03]"
-      style={{ background: "#f5f5f7", color: "#1d1d1f", border: "1px solid rgba(0,0,0,0.06)" }}
+      className="story-panel rounded-full px-3 py-1.5 text-sm text-[var(--story-muted)]"
     >
       {tag}
     </span>
@@ -20,14 +20,18 @@ export default function About() {
   const a = i18n.about;
 
   return (
-    <section id="about" data-nav-surface="light" style={{ background: "#fff" }} className="py-32 md:py-44">
-      <div className="max-w-[1100px] mx-auto px-5">
+    <section id="about" className="story-chapter">
+      <div className="story-shell">
 
-        <ScrollReveal>
-          <p className="section-label mb-14"><Localized {...a.label} /></p>
-        </ScrollReveal>
+        <StoryHeading label={a.label}>
+          <Localized en={
+            <>I turn messy<br />questions into<br /><span className="story-title-accent">working products.</span></>
+          } zh={
+            <>把理不清的问题，<br />做成用得上的<br /><span className="story-title-accent">好产品。</span></>
+          } />
+        </StoryHeading>
 
-        <ScrollReveal delay={60} className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+        <ScrollReveal className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,.78fr)_minmax(0,1fr)] md:gap-9 xl:gap-14 items-start">
 
           {/* Portrait */}
           <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
@@ -42,18 +46,7 @@ export default function About() {
 
           {/* Copy */}
           <div className="lg:pt-2">
-            <h2
-              className="font-semibold leading-[1.04] tracking-tight mb-8"
-              style={{ fontSize: "clamp(2.2rem, 4vw, 3.4rem)", color: "#1d1d1f", letterSpacing: "-0.025em" }}
-            >
-              <Localized en={
-                <>I turn messy<br />questions into<br /><span style={{ color: "#86868b" }}>working products.</span></>
-              } zh={
-                <>把理不清的问题，<br />做成用得上的<br /><span style={{ color: "#86868b" }}>好产品。</span></>
-              } />
-            </h2>
-
-            <div className="space-y-4 font-light leading-[1.8]" style={{ fontSize: "clamp(1rem, 1.4vw, 1.125rem)", color: "#6e6e73" }}>
+            <div className="story-body space-y-4">
               <p>
                 <Localized en={
                   <>
@@ -63,7 +56,7 @@ export default function About() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline transition-colors duration-200"
-                      style={{ color: "#0071e3" }}
+                      style={{ color: "var(--story-tint)" }}
                     >
                       University of Wisconsin–Madison
                     </a>
@@ -77,7 +70,7 @@ export default function About() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline transition-colors duration-200"
-                      style={{ color: "#0071e3" }}
+                      style={{ color: "var(--story-tint)" }}
                     >
                       威斯康星大学麦迪逊分校
                     </a>
@@ -98,25 +91,24 @@ export default function About() {
             <div className="mt-6">
               <Link
                 href="/university"
-                className="group flex items-center justify-between gap-4 px-5 py-4 rounded-2xl transition-[background,box-shadow] duration-300 hover:shadow-md"
-                style={{ background: "#f5f5f7", border: "1px solid rgba(0,0,0,0.07)" }}
+                className="story-panel group flex flex-wrap items-center justify-between gap-4 rounded-2xl px-4 py-3 hover:border-white/30"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="shrink-0 w-9 h-9 rounded-xl overflow-hidden bg-white shadow-sm flex items-center justify-center p-0.5">
                     <Image src="/photos/uw-logo.jpg" alt="UW" width={32} height={32} className="object-contain" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-semibold leading-none truncate" style={{ color: "#1d1d1f" }}>
+                    <p className="text-[13px] font-semibold leading-snug" style={{ color: "var(--story-ink)" }}>
                       <Localized en="University of Wisconsin–Madison" zh="威斯康星大学麦迪逊分校" />
                     </p>
-                    <p className="text-[11px] mt-1 font-mono" style={{ color: "#86868b" }}>
+                    <p className="text-[11px] mt-1 font-mono" style={{ color: "var(--story-dim)" }}>
                       <Localized en="Economics · Information Science · CDIS" zh="经济学 · 信息科学 · CDIS" />
                     </p>
                   </div>
                 </div>
                 <span
-                  className="shrink-0 text-sm font-medium transition-[color,transform] duration-200 group-hover:translate-x-0.5"
-                  style={{ color: "#c5050c" }}
+                  className="shrink-0 text-sm font-medium transition-transform duration-200 group-hover:translate-x-0.5"
+                  style={{ color: "var(--story-tint)" }}
                 >
                   <Localized en="Learn more →" zh="了解更多 →" />
                 </span>

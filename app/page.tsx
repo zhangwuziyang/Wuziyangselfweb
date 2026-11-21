@@ -1,59 +1,57 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Suspense } from "react";
-import Navbar    from "@/components/Navbar";
-import Hero       from "@/components/Hero";
-import About      from "@/components/About";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import About from "@/components/About";
 import Experience from "@/components/Experience";
-import Projects   from "@/components/Projects";
+import Projects from "@/components/Projects";
 import GlobalLens from "@/components/GlobalLens";
-import Music      from "@/components/Music";
-import Skills     from "@/components/Skills";
+import Music from "@/components/Music";
+import Skills from "@/components/Skills";
 import Philosophy from "@/components/Philosophy";
-import Contact    from "@/components/Contact";
-import Footer     from "@/components/Footer";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
+import HomeStory from "@/components/home/HomeStory";
+import StoryLens from "@/components/home/StoryLens";
 import { i18n } from "@/lib/i18n";
 import { siteOpenGraph } from "@/lib/siteMetadata";
+import "./home-story.css";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: { ...siteOpenGraph, url: "/" },
 };
 
-function SectionTransition({ from, to }: { from: string; to: string }) {
-  return (
-    <div
-      aria-hidden="true"
-      className="section-transition"
-      style={{ background: `linear-gradient(to bottom, ${from}, ${to})` }}
-    />
-  );
-}
-
 export default function Home() {
   return (
-    <>
+    <HomeStory stage={
+      <>
+        <div className="story-stage__photo" data-story-photo="">
+          <Image src="/images/background.jpg" alt="Wuziyang Zhang" fill sizes="100vw" className="object-cover object-[center_32%]" />
+        </div>
+        <div className="story-stage__light story-stage__light--violet" data-story-light="violet" />
+        <div className="story-stage__light story-stage__light--teal" data-story-light="teal" />
+        <div className="story-stage__light story-stage__light--amber" data-story-light="amber" />
+        <StoryLens />
+        <div className="story-stage__shade" />
+      </>
+    }>
       <Navbar copy={i18n.nav} />
       <main>
         <Hero />
         <About />
-        <SectionTransition from="#fff" to="#000" />
         <Experience />
-        <SectionTransition from="#000" to="#f5f5f7" />
         <Projects />
-        <SectionTransition from="#f5f5f7" to="#000" />
         <GlobalLens />
-        <SectionTransition from="#000" to="#fff" />
         <Music />
-        <SectionTransition from="#fff" to="#1d1d1f" />
         <Skills />
-        <SectionTransition from="#1d1d1f" to="#f5f5f7" />
         <Philosophy />
-        <SectionTransition from="#f5f5f7" to="#000" />
         <Contact />
       </main>
       <Suspense fallback={null}>
         <Footer />
       </Suspense>
-    </>
+    </HomeStory>
   );
 }

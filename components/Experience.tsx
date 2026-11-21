@@ -1,3 +1,4 @@
+import StoryHeading from "@/components/home/StoryHeading";
 import Link from "next/link";
 import Image from "next/image";
 import { ExperienceTimeline } from "@/components/ui/ExperienceTimeline";
@@ -15,20 +16,12 @@ export default function Experience() {
   const e = i18n.experience;
 
   return (
-    <section id="experience" data-nav-surface="dark" style={{ background: "#000" }} className="py-32 md:py-44">
-      <div className="max-w-[1100px] mx-auto px-5">
+    <section id="experience" className="story-chapter">
+      <div className="story-shell">
 
-        <ScrollReveal>
-          <p className="section-label-dark mb-4"><Localized {...e.label} /></p>
-        </ScrollReveal>
-        <ScrollReveal delay={80}>
-          <h2
-            className="font-semibold leading-[1.04] tracking-tight mb-20"
-            style={{ fontSize: "clamp(2.2rem, 4vw, 3.4rem)", color: "#f5f5f7", letterSpacing: "-0.025em" }}
-          >
-            <Localized {...e.headline} />
-          </h2>
-        </ScrollReveal>
+        <StoryHeading label={e.label}>
+          <Localized {...e.headline} />
+        </StoryHeading>
 
         <ExperienceTimeline>
           {TIMELINE.map((exp, i) => {
@@ -36,28 +29,25 @@ export default function Experience() {
             const newYear = i === 0 || TIMELINE[i - 1].start.slice(0, 4) !== year;
 
             return (
-              <ScrollReveal as="li" key={exp.slug} className="relative grid grid-cols-[24px_1fr] md:grid-cols-[180px_64px_1fr] gap-x-4 md:gap-x-0 pb-10 last:pb-0">
+              <ScrollReveal as="li" key={exp.slug} className="relative grid grid-cols-[24px_1fr] lg:grid-cols-[180px_64px_1fr] gap-x-4 lg:gap-x-0 pb-10 last:pb-0">
 
                 {/* Date column (desktop) */}
-                <div className="hidden md:block pt-7 pr-6 text-right">
+                <div className="hidden lg:block pt-7 pr-6 text-right">
                   {newYear && (
                     <p className="text-2xl font-semibold tracking-tight mb-1" style={{ color: "#f5f5f7", letterSpacing: "-0.02em" }}>
                       {year}
                     </p>
                   )}
-                  <p className="text-sm whitespace-nowrap" style={{ color: "#6e6e73" }}><Localized {...exp.period} /></p>
-                  <p className="text-xs mt-0.5" style={{ color: "#48484a" }}><Localized {...exp.location} /></p>
+                  <p className="text-sm whitespace-nowrap" style={{ color: "var(--story-muted)" }}><Localized {...exp.period} /></p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--story-dim)" }}><Localized {...exp.location} /></p>
                 </div>
 
                 {/* Node */}
                 <div className="relative flex justify-center pt-8 md:pt-9">
                   <span className="relative flex h-[11px] w-[11px]">
-                    {exp.current && (
-                      <span className="absolute inset-0 rounded-full motion-safe:animate-ping opacity-60" style={{ background: exp.accent }} />
-                    )}
                     <span
                       className="relative h-[11px] w-[11px] rounded-full"
-                      style={{ background: exp.accent, boxShadow: `0 0 0 4px #000, 0 0 14px ${exp.accent}80` }}
+                      style={{ background: exp.accent, boxShadow: `0 0 0 4px #111b31, 0 0 14px ${exp.accent}80` }}
                     />
                   </span>
                 </div>
@@ -65,7 +55,7 @@ export default function Experience() {
                 {/* Card */}
                 <div className="min-w-0">
                   {/* Date line (mobile) */}
-                  <p className="md:hidden text-xs mb-3 pt-7" style={{ color: "#6e6e73" }}>
+                  <p className="lg:hidden text-xs mb-3 pt-7" style={{ color: "var(--story-muted)" }}>
                     <span className="font-semibold" style={{ color: "#f5f5f7" }}><Localized {...exp.period} /></span>
                     <span className="mx-1.5">·</span>
                     <Localized {...exp.location} />
@@ -73,7 +63,7 @@ export default function Experience() {
 
                   <Link href={`/experience/${exp.slug}`}>
                     <article
-                      className="group relative rounded-2xl p-6 md:p-8 cursor-pointer overflow-hidden transition-[background,border-color,transform] duration-[400ms] bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] hover:border-white/[0.15] hover:-translate-y-0.5"
+                      className="story-panel group relative overflow-hidden rounded-2xl p-5 hover:border-white/25 sm:p-7"
                     >
                       {/* Ambient glow */}
                       <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-[0.04] blur-3xl group-hover:opacity-[0.08] transition-opacity duration-500" style={{ background: exp.accent }} />
@@ -101,12 +91,12 @@ export default function Experience() {
                           <h3 className="text-xl font-semibold tracking-tight" style={{ color: "#f5f5f7", letterSpacing: "-0.015em" }}>
                             {exp.company}
                           </h3>
-                          <p className="text-sm font-light mt-0.5" style={{ color: "#86868b" }}><Localized {...exp.role} /></p>
+                          <p className="text-sm font-light mt-0.5" style={{ color: "var(--story-dim)" }}><Localized {...exp.role} /></p>
                         </div>
                       </div>
 
                       {/* Tagline */}
-                      <p className="text-sm font-light leading-relaxed mb-4" style={{ color: "#6e6e73" }}>
+                      <p className="text-sm font-light leading-relaxed mb-4" style={{ color: "var(--story-muted)" }}>
                         <Localized {...exp.tagline} />
                       </p>
 
@@ -115,13 +105,13 @@ export default function Experience() {
                         {exp.metrics.slice(0, 4).map((m) => (
                           <div key={m.value} className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs" style={{ background: `${exp.accent}0f`, border: `1px solid ${exp.accent}20` }}>
                             <span className="font-semibold" style={{ color: exp.accent }}>{m.value}</span>
-                            <span style={{ color: "#6e6e73" }}><Localized {...m.label} /></span>
+                            <span style={{ color: "var(--story-muted)" }}><Localized {...m.label} /></span>
                           </div>
                         ))}
                       </div>
 
                       {/* CTA */}
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium transition-all duration-200 group-hover:gap-2.5" style={{ color: exp.accent }}>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium" style={{ color: exp.accent }}>
                         <Localized en="View details" zh="查看详情" />
                         <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                       </span>

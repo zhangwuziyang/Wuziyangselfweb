@@ -35,9 +35,8 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
   return (
     <>
       <header
-        data-site-nav="top"
         data-menu-open={open}
-        className="fixed top-0 inset-x-0 z-50 transition-[background,color,border-color] duration-300"
+        className="story-nav fixed top-0 inset-x-0 z-50"
       >
         <div className="max-w-[1200px] mx-auto px-5 h-12 grid grid-cols-3 items-center">
 
@@ -50,7 +49,7 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
           </Link>
 
           {/* Center — nav links (desktop only) */}
-          <nav className="hidden md:flex items-center justify-center gap-8">
+          <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8">
             {NAV_KEYS.map(({ key, href }) => (
               <a
                 key={href}

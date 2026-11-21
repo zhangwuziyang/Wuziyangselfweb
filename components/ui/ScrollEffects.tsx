@@ -7,34 +7,16 @@ export default function ScrollEffects() {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname === "/") return;
+
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const pending = new Set<HTMLElement>();
-    const counting = new Map<HTMLElement, number>();
     let observer: IntersectionObserver | undefined;
-    let frame = 0;
-    let navSurface = "";
-    let indicator = document.querySelector<HTMLElement>("[data-scroll-indicator]");
-    const sections = [...document.querySelectorAll<HTMLElement>("main > section[data-nav-surface]")];
-    const nav = document.querySelector<HTMLElement>("[data-site-nav]");
 
     function reveal(element: HTMLElement, animated: boolean) {
       pending.delete(element);
       observer?.unobserve(element);
       element.dataset.scrollReveal = animated ? "entered" : "visible";
-      if (!animated) return;
-
-      for (const counter of element.querySelectorAll<HTMLElement>("[data-count-up]")) {
-        const total = Number(counter.dataset.countUp);
-        const start = performance.now();
-        const tick = (now: number) => {
-          const progress = Math.min((now - start) / 1000, 1);
-          counter.textContent = String(Math.floor((1 - (1 - progress) ** 3) * total));
-          if (progress < 1) counting.set(counter, requestAnimationFrame(tick));
-          else counting.delete(counter);
-        };
-        counter.textContent = "0";
-        counting.set(counter, requestAnimationFrame(tick));
-      }
     }
 
     function anchorTarget() {
@@ -53,19 +35,10 @@ export default function ScrollEffects() {
       }
     }
 
-    function finishCounting() {
-      for (const [counter, animation] of counting) {
-        cancelAnimationFrame(animation);
-        counter.textContent = counter.dataset.countUp ?? "";
-      }
-      counting.clear();
-    }
-
     function observe() {
       observer?.disconnect();
       if (motion.matches || !("IntersectionObserver" in window)) {
         for (const element of pending) reveal(element, false);
-        finishCounting();
         return;
       }
 
@@ -88,27 +61,6 @@ export default function ScrollEffects() {
       }
     }
 
-    function onPageScroll() {
-      frame = 0;
-      if (indicator && window.scrollY > 0) {
-        indicator.dataset.scrollIndicator = "stopped";
-        indicator = null;
-      }
-      if (nav) {
-        const surface = window.scrollY > 30
-          ? sections.findLast((section) => section.getBoundingClientRect().top <= 24)?.dataset.navSurface ?? "dark"
-          : "top";
-        if (surface !== navSurface) {
-          navSurface = surface;
-          nav.dataset.siteNav = surface;
-        }
-      }
-    }
-
-    function scheduleScroll() {
-      if (!frame) frame = requestAnimationFrame(onPageScroll);
-    }
-
     if (!motion.matches && "IntersectionObserver" in window) {
       const target = anchorTarget();
       for (const element of document.querySelectorAll<HTMLElement>('[data-scroll-reveal=""]')) {
@@ -121,19 +73,14 @@ export default function ScrollEffects() {
       observe();
     }
 
-    window.addEventListener("scroll", scheduleScroll, { passive: true });
     window.addEventListener("resize", observe);
     window.addEventListener("hashchange", revealAnchor);
     document.addEventListener("focusin", onFocus);
     motion.addEventListener("change", observe);
-    onPageScroll();
 
     return () => {
       observer?.disconnect();
-      cancelAnimationFrame(frame);
-      finishCounting();
       for (const element of pending) delete element.dataset.scrollReveal;
-      window.removeEventListener("scroll", scheduleScroll);
       window.removeEventListener("resize", observe);
       window.removeEventListener("hashchange", revealAnchor);
       document.removeEventListener("focusin", onFocus);

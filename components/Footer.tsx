@@ -13,10 +13,10 @@ export default async function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer style={{ background: "#1d1d1f", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-      <div className="max-w-[1100px] mx-auto px-5 py-10 flex flex-col md:flex-row items-center justify-between gap-5">
+    <footer className="border-t border-white/10 text-[var(--story-dim)]">
+      <div className="story-shell py-10 flex flex-col md:flex-row items-center justify-between gap-5">
 
-        <p className="text-sm" style={{ color: "#48484a" }}>
+        <p className="text-sm">
           © {year} <Localized {...f.copy} />
         </p>
 
@@ -27,14 +27,14 @@ export default async function Footer() {
               href={link.href}
               target={link.external ? "_blank" : undefined}
               rel={link.external ? "noopener noreferrer" : undefined}
-              className="text-sm transition-colors duration-200 text-[#48484a] hover:text-[#86868b]"
+              className="text-sm hover:text-white"
             >
               <Localized {...link.label} />
             </a>
           ))}
         </div>
 
-        <p className="text-xs font-mono tracking-widest" style={{ color: "#48484a" }}>
+        <p className="text-xs font-mono tracking-widest">
           <Localized {...f.mono} />
         </p>
       </div>
