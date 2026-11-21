@@ -19,12 +19,13 @@ export default function CindyGuide() {
   const button = useRef<HTMLButtonElement>(null);
   const sprite = useRef<HTMLCanvasElement>(null);
   const motion = useRef<HTMLSpanElement>(null);
+  const note = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!overlay.current || !dock.current || !button.current || !sprite.current || !motion.current) return;
+    if (!overlay.current || !dock.current || !button.current || !sprite.current || !motion.current || !note.current) return;
     return mountCindy({
       overlay: overlay.current, dock: dock.current, button: button.current, sprite: sprite.current,
-      motion: motion.current, onChapter: setChapter, onReaction: setReaction, openChat,
+      motion: motion.current, note: note.current, onChapter: setChapter, onReaction: setReaction, openChat,
     });
   }, [openChat]);
 
@@ -58,10 +59,12 @@ export default function CindyGuide() {
             </span>
           </button>
         </div>
-        <div key={chapter} className="cindy-note">
+        <div ref={note} className="cindy-note">
           <span className="cindy-note__name">Cindy</span>
           <p className="cindy-note__full">{reply ?? scene.line[lang]}</p>
           <p className="cindy-note__short">{reply ?? scene.short[lang]}</p>
+          <p className="cindy-note__transit">{reply ?? (lang === "zh" ? "这边走。" : "This way.")}</p>
+          <p className="cindy-note__docked">{lang === "zh" ? "点我聊聊。" : "Tap to chat."}</p>
         </div>
         <span className="sr-only" role="status">{typeof reaction === "number" || reaction === "egg" ? reply : ""}</span>
       </div>

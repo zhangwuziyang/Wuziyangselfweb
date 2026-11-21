@@ -32,7 +32,7 @@
 
 [data-story-wash] {
   background: radial-gradient(ellipse at 62% 16%, #fffbf4, transparent 74%);
-  opacity: .32;
+  opacity: .10;
 }
 
 .story-content { position: relative; }
@@ -98,6 +98,14 @@
 .story-chapter {
   position: relative;
   padding-block: clamp(4.375rem, 8.5vw, 8.75rem);
+}
+
+.story-content :is(#experience, #skills, #philosophy) {
+  padding-block-end: clamp(2.5rem, 5.2vw, 4rem);
+}
+
+.story-content :is(#projects, #philosophy, #contact) {
+  padding-block-start: clamp(2.5rem, 5.2vw, 4rem);
 }
 
 .story-heading {
@@ -370,6 +378,8 @@ body:has(.home-story) .profile-chat-launcher { display: none; }
 @media (min-width: 70rem) and (min-height: 34rem) {
   .home-story { --story-wing: clamp(9.625rem, 10.7vw, 11.5rem); }
   .story-chapter { padding-block: clamp(6rem, 8.5vw, 9rem); }
+  .story-content :is(#experience, #skills, #philosophy) { padding-block-end: clamp(4.625rem, 5.1vw, 5rem); }
+  .story-content :is(#projects, #philosophy, #contact) { padding-block-start: clamp(4.625rem, 5.1vw, 5rem); }
   .story-hero__track { padding-block-end: clamp(6rem, 10svh, 8rem); }
   .story-about-perch { padding-block-start: 8.5rem; }
 

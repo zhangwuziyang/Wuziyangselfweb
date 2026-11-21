@@ -21,44 +21,44 @@ export const CINDY_SCENES: Record<Chapter, Scene> = {
     short: { en: "Hi, I’m Cindy.", zh: "嗨，我是 Cindy。" },
   },
   about: {
-    pose: "perch", expression: "neutral", side: "left", color: [248, 242, 232],
+    pose: "perch", expression: "neutral", side: "left", color: [227, 216, 198],
     line: { en: "Let me show you what Wuziyang studies at UW–Madison.", zh: "我先带你看看梓洋在威斯康星大学麦迪逊分校学什么。" },
     short: { en: "I’ll show you UW–Madison.", zh: "我带你看校园。" },
   },
   experience: {
-    pose: "timeline", expression: "wink", side: "left", color: [246, 241, 233],
+    pose: "timeline", expression: "wink", side: "left", color: [246, 239, 229],
     line: { en: "I’ll follow his work across strategy, research, and finance.", zh: "我沿时间线带你看他的战略、研究和金融经历。" },
     short: { en: "I’ll light the timeline.", zh: "我来点亮时间线。" },
   },
   projects: {
-    pose: "flag", expression: "neutral", side: "right", color: [245, 240, 232],
+    pose: "flag", expression: "neutral", side: "right", color: [224, 213, 201],
     line: { en: "I picked two stops here, Offer Radar and My Health Agent.", zh: "我在这里安排了两站，Offer 雷达和健康助理。" },
     short: { en: "I’ve got two demos.", zh: "我带你看两个项目。" },
   },
   global: {
-    pose: "earth", expression: "surprise", side: "right", color: [244, 237, 226],
+    pose: "earth", expression: "surprise", side: "right", color: [243, 239, 231],
     line: { en: "I’ve got stories to share from his travels across more than 20 countries.", zh: "我想跟你分享他走过二十多个国家的故事。" },
     short: { en: "I’ll take you traveling.", zh: "我带你去旅行。" },
   },
   music: {
-    pose: "music", expression: "happy", side: "right", color: [235, 226, 213],
+    pose: "music", expression: "happy", side: "right", color: [225, 212, 192],
     line: { en: "I hear the years he spent at the piano in how he thinks about rhythm.", zh: "我听得出，多年练琴塑造了他对节奏的感觉。" },
     short: { en: "I’m listening to piano.", zh: "我在听钢琴。" },
   },
   skills: {
-    pose: "skills", expression: "wink", side: "right", color: [242, 234, 223],
+    pose: "skills", expression: "wink", side: "right", color: [245, 237, 223],
     line: { en: "I’ve gathered his tools for strategy, product, data, and design.", zh: "我把他的战略、产品、数据和设计工具都找来了。" },
     short: { en: "I found his toolkit.", zh: "我找齐了他的工具。" },
   },
   philosophy: {
-    pose: "think", expression: "think", side: "left", color: [245, 239, 230],
+    pose: "think", expression: "think", side: "left", color: [222, 211, 197],
     line: { en: "I like his test for good work. Make it useful, elegant, and memorable.", zh: "我喜欢他的标准。做得实用、优雅，也让人记得住。" },
     short: { en: "I’ll pause and think.", zh: "我也停下来想想。" },
   },
   contact: {
-    pose: "bye", expression: "shy", side: "right", color: [248, 241, 231],
+    pose: "bye", expression: "shy", side: "right", color: [247, 237, 223],
     line: { en: "I enjoyed showing you around. I’m here if you’d like to chat.", zh: "我很高兴带你逛完这一路。还想聊的话，点我就好。" },
-    short: { en: "I’m here to chat.", zh: "我还在，点我聊聊。" },
+    short: { en: "Thanks for coming. Tap to chat.", zh: "谢谢你跟我逛完。想聊就点我。" },
   },
 };
 

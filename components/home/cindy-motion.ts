@@ -1,5 +1,5 @@
 import { CINDY_REPLIES, CINDY_SCENES, type Chapter, type CindyReaction, type Side } from "./cindy-scenes";
-import { between, clamp, ease, finale, measureRoute, rgb, sampleRoute, spriteRadius, wingCenter } from "./cindy-route";
+import { between, clamp, ease, finale, measureRoute, placeCindyNote, rgb, sampleRoute, spriteRadius, wingCenter } from "./cindy-route";
 import { paintCindy, type PixelOffset } from "./cindy-sprite";
 
 const IDLE_MS = 20_000;
@@ -17,6 +17,7 @@ type Guide = {
   button: HTMLButtonElement;
   sprite: HTMLCanvasElement;
   motion: HTMLSpanElement;
+  note: HTMLDivElement;
   onChapter: (chapter: Chapter) => void;
   onReaction: (reaction: CindyReaction) => void;
   openChat: (trigger: HTMLButtonElement) => void;
@@ -30,7 +31,7 @@ function writeVariable(element: HTMLElement, name: string, value: string) {
   if (element.style.getPropertyValue(name) !== value) element.style.setProperty(name, value);
 }
 
-export function mountCindy({ overlay, dock, button, sprite, motion, onChapter, onReaction, openChat }: Guide) {
+export function mountCindy({ overlay, dock, button, sprite, motion, note, onChapter, onReaction, openChat }: Guide) {
   const story = overlay.closest<HTMLElement>(".home-story");
   if (!story) return;
   const home = story;
@@ -68,6 +69,8 @@ export function mountCindy({ overlay, dock, button, sprite, motion, onChapter, o
   let flight: { from: PixelOffset; to: PixelOffset; side: Side; start: number } | null = null;
   let drawnAt = { x: 0, y: 0 };
   let animation: Animation | undefined;
+  const noteSize = { width: note.offsetWidth, height: note.offsetHeight };
+  let noteAnchor: Parameters<typeof placeCindyNote> | undefined;
 
   function readTimeline() {
     const rect = timeline?.parentElement?.getBoundingClientRect();
@@ -83,6 +86,22 @@ export function mountCindy({ overlay, dock, button, sprite, motion, onChapter, o
     writeStyle(dock, "transform", `translate3d(${Math.round(point.x)}px, ${Math.round(point.y)}px, 0)`);
     writeVariable(dock, "--cindy-lift", `${Math.round(jump)}px`);
     writeVariable(dock, "--cindy-scale", size.toFixed(3));
+  }
+
+  function positionNote() {
+    if (!noteAnchor) return;
+    const placement = placeCindyNote(...noteAnchor);
+    const x = Math.round(placement.x) - Math.round(drawnAt.x);
+    const y = Math.round(placement.y) - Math.round(drawnAt.y);
+    writeStyle(note, "transform", `translate3d(${x}px, ${y}px, 0)`);
+    if (note.dataset.tail !== placement.tail) note.dataset.tail = placement.tail;
+    writeVariable(note, "--cindy-tail", `${Math.round(placement.tailOffset)}px`);
+  }
+
+  function measureNote() {
+    noteSize.width = note.offsetWidth;
+    noteSize.height = note.offsetHeight;
+    positionNote();
   }
 
   function inWing(position: PixelOffset, side: Side) {
@@ -168,21 +187,29 @@ export function mountCindy({ overlay, dock, button, sprite, motion, onChapter, o
     const size = reduced ? 1 : arrival * (1 - landing * (route.large ? .60 : .33));
     poseStyle(drawnAt, bob, size);
     writeStyle(dock, "opacity", current.opacity.toFixed(3));
-    const swappingWings = drawnAt.x > route.left - spriteRadius(route) && drawnAt.x < route.right + spriteRadius(route);
-    dock.toggleAttribute("data-crossing", sample.crossed && swappingWings);
-    dock.toggleAttribute("data-note-below", drawnAt.y < route.nav + spriteRadius(route) + 112);
+    const crossing = sample.crossed && !drag && !flight;
+    const perched = sample.perched && !drag && !flight;
+    dock.toggleAttribute("data-crossing", crossing);
     dock.toggleAttribute("data-walking", walking);
     dock.toggleAttribute("data-hidden", current.opacity < .08);
     dock.toggleAttribute("data-sleeping", reaction === "sleep");
-    dock.toggleAttribute("data-perched", sample.perched && !drag && !flight);
-    dock.toggleAttribute("data-final", !reduced && landing > .84);
+    dock.toggleAttribute("data-perched", perched);
+    dock.toggleAttribute("data-final", !reduced && landing > .97);
     dock.toggleAttribute("data-music", chapter === "music" && !sample.crossed && reaction !== "sleep");
-    dock.toggleAttribute("data-skills", chapter === "skills" && !sample.crossed && reaction !== "sleep");
-    if (chapter === "skills") writeVariable(dock, "--cindy-orbit", `${(scroll / 8) % 360}deg`);
-    const noteSide: Side = drawnAt.x < route.width / 2 ? "left" : "right";
-    const width = noteSide === "left" ? route.left : route.width - route.right;
-    writeVariable(dock, "--cindy-note-width", `${Math.round(Math.max(48, Math.min(172, width - 12)))}px`);
-    writeVariable(dock, "--cindy-note-offset", `${Math.round(wingCenter(route, noteSide) - drawnAt.x)}px`);
+    const skillEdge = route.stops[sample.index].anchors[0]?.right ?? route.right;
+    // A 62px label needs room for its half-width and a clear edge on either side.
+    const orbitRoom = Math.min(drawnAt.x - skillEdge, route.width - drawnAt.x) - 36;
+    const showSkills = route.large && chapter === "skills" && !crossing && reaction !== "sleep" && orbitRoom >= 0;
+    dock.toggleAttribute("data-skills", showSkills);
+    if (showSkills) {
+      writeVariable(dock, "--cindy-orbit", `${(scroll / 8) % 360}deg`);
+      writeVariable(dock, "--cindy-orbit-x", `${Math.round(Math.min(32, orbitRoom))}px`);
+    }
+    const noteClearance = showSkills ? 90 : spriteRadius(route) * size;
+    noteAnchor = [route, scroll, { x: drawnAt.x, y: drawnAt.y + bob }, noteSize, noteClearance,
+      { perched, crossing, heading: sample.heading }];
+    if (typeof ResizeObserver === "undefined") measureNote();
+    else positionNote();
 
     const scene = CINDY_SCENES[chapter];
     const facing = walking ? sample.heading * direction : scene.side === "left" ? 1 : -1;
@@ -354,6 +381,8 @@ export function mountCindy({ overlay, dock, button, sprite, motion, onChapter, o
   wide.addEventListener("change", preference, { signal });
 
   const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(invalidate);
+  const noteObserver = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measureNote);
+  noteObserver?.observe(note);
   for (const target of home.querySelectorAll("main > section, [data-cindy-anchor], [data-cindy-perch], footer")) {
     observer?.observe(target);
   }
@@ -364,6 +393,7 @@ export function mountCindy({ overlay, dock, button, sprite, motion, onChapter, o
   return () => {
     events.abort();
     observer?.disconnect();
+    noteObserver?.disconnect();
     languageObserver.disconnect();
     animation?.cancel();
     cancelAnimationFrame(frame);

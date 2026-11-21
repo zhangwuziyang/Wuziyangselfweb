@@ -100,7 +100,7 @@ function BackdropLayerView({ layer, index, progress }: BackdropLayerViewProps) {
 interface ChapterOverlayProps {
   chapter: StoryChapter;
   index: number;
-  isLast: boolean;
+  holdAtEnd: boolean;
   progress: MotionValue<number>;
   lang: Lang;
   device: ProjectStoryConfig["device"];
@@ -109,7 +109,7 @@ interface ChapterOverlayProps {
 function ChapterOverlay({
   chapter,
   index,
-  isLast,
+  holdAtEnd,
   progress,
   lang,
   device,
@@ -119,24 +119,25 @@ function ChapterOverlay({
 
   const opacity = useTransform(
     progress,
-    isLast
+    holdAtEnd
       ? [0, enterStart, enterEnd, 1]
       : [0, enterStart, enterEnd, exitStart, exitEnd, 1],
-    isLast ? [0, 0, 1, 1] : [0, 0, 1, 1, 0, 0]
+    holdAtEnd ? [0, 0, 1, 1] : [0, 0, 1, 1, 0, 0]
   );
 
   const y = useTransform(
     progress,
-    isLast
+    holdAtEnd
       ? [0, enterStart, enterEnd, 1]
       : [0, enterStart, enterEnd, exitStart, exitEnd, 1],
-    isLast ? [40, 40, 0, 0] : [40, 40, 0, 0, -36, -36]
+    holdAtEnd ? [40, 40, 0, 0] : [40, 40, 0, 0, -36, -36]
   );
 
   const [visible, setVisible] = useState(false);
 
   useMotionValueEvent(progress, "change", (latest) => {
-    const active = latest >= enterStart - 0.005 && (isLast || latest <= exitEnd + 0.005);
+    const visibleEnd = exitEnd === 1 ? exitEnd : exitEnd + 0.005;
+    const active = latest >= enterStart - 0.005 && (holdAtEnd || latest < visibleEnd);
     setVisible((prev) => (prev === active ? prev : active));
   });
 
@@ -439,7 +440,7 @@ function PinnedStageContent({
               key={chapter.id}
               chapter={chapter}
               index={idx}
-              isLast={idx === story.chapters.length - 1}
+              holdAtEnd={idx === story.chapters.length - 1 && story.slug !== "offer-radar"}
               progress={progress}
               lang={lang}
               device={story.device}
@@ -812,6 +813,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
   );
 
   const isPhone = story.device === "iphone";
+  const offerWalkthrough = story.slug === "offer-radar";
 
   return (
     <div
@@ -872,9 +874,12 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
           className="relative z-10 text-[#f5f5f7]"
           style={{
             backgroundColor: story.endingBackground,
+            marginBlockStart: offerWalkthrough && pinnedMode
+              ? "calc(-1 * clamp(0px, (100svh - 42rem) * .55, 8rem))"
+              : undefined,
           }}
         >
-          <div className="mx-auto max-w-[1160px] px-5 pb-24 pt-20 md:px-8 md:pt-28">
+          <div className={`mx-auto max-w-[1160px] px-5 pb-24 md:px-8 ${offerWalkthrough ? "pt-10 md:pt-12" : "pt-20 md:pt-28"}`}>
             {/* Optional Product Walkthrough Film (Offer Radar) */}
             {story.video && (
               <section

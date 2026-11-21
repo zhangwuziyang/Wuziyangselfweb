@@ -247,8 +247,8 @@ export const offerRadarStory: ProjectStoryConfig = {
         en: "Built for late-night sprints.\nBacked by 832 tests.",
       },
       body: {
-        zh: "全站支持原生深色模式，深夜刷题改简历依然清晰柔和。基于 Next.js、FastAPI、LangGraph 与 PostgreSQL 构建，模型与数据全部留在境内阿里云百炼，配 718 项后端与 114 项前端自动化测试，静待备案手续完成。",
-        en: "Full native dark mode keeps late-night prep effortless. Engineered on Next.js, FastAPI, LangGraph, and PostgreSQL—running 100% onshore via Alibaba Bailian and verified by 718 backend plus 114 frontend tests as launch filings complete.",
+        zh: "全站支持原生深色模式，深夜刷题改简历依然清晰柔和。基于 Next.js、FastAPI、LangGraph 与 PostgreSQL 构建，模型与数据全部留在境内阿里云百炼，配 718 项后端与 114 项前端自动化测试。",
+        en: "Full native dark mode keeps late-night prep effortless. Engineered on Next.js, FastAPI, LangGraph, and PostgreSQL—running 100% onshore via Alibaba Bailian and verified by 718 backend plus 114 frontend tests.",
       },
       details: {
         zh: ["模型与数据全部留在境内", "718 后端 + 114 前端测试", "全工作台原生深色模式"],
