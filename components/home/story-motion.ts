@@ -40,12 +40,13 @@ export function frameWeights(cues: readonly FrameCue[], scroll: number, viewport
     const next = cues[index + 1];
     const previous = cues[index - 1];
     const windowFor = (left: FrameCue, right: FrameCue) =>
-      Math.min(viewportHeight * .25, (right.at - left.at) * .54);
+      Math.min(viewportHeight * .12, (right.at - left.at) * .30);
     const incoming = previous ? windowFor(previous, frame) : 0;
     const outgoing = next ? windowFor(frame, next) : 0;
-    const enter = previous ? smooth(frame.at - incoming, frame.at, scroll) : 1;
-    const exit = next ? smooth(next.at - outgoing, next.at, scroll) : 0;
-    return { id: frame.id, opacity: enter * (1 - exit), offset: (1 - enter - exit) * 26 };
+    // Sequential out-then-in so outgoing reaches opacity 0 before incoming appears (no text/image ghosting).
+    const enter = previous ? smooth(frame.at - incoming * .5, frame.at, scroll) : 1;
+    const exit = next ? smooth(next.at - outgoing, next.at - outgoing * .5, scroll) : 0;
+    return { id: frame.id, opacity: enter * (1 - exit), offset: (1 - enter - exit) * 18 };
   });
 }
 
@@ -80,26 +81,44 @@ export function buildStageTimeline(
     { id: "philosophy", at: starts.philosophy },
   ];
   const phoneFrames = projectPlayback(phoneArrival, playbackEnd, HEALTH_FRAMES, "health");
-  const laptopLanding: Pose = desktop ? [.224, .025, 1.02, 0, 0, 0] : [0, .205, 1, 0, 0, 0];
+  const laptopLanding: Pose = desktop ? [.255, .025, .96, 0, 0, 0] : [0, .205, 1, 0, 0, 0];
+  // Hold the laptop inside its side safe zone while each chapter is read; transition only near the next chapter boundary.
+  const holdUntil = (from: number, to: number) =>
+    Math.max(from + 1, to - Math.min(height * .26, Math.max(0, to - from) * .20));
+
+  const aboutPose: Pose = [-.262, .004, .90, 4, 15, -2];
+  const experiencePose: Pose = [.262, .02, .88, 7, -14, 2];
+  const globalPose: Pose = [-.262, -.02, .86, 6, 16, -3];
+  const globalMidPose: Pose = [-.270, -.05, .68, 9, 18, -4];
+  const musicPose: Pose = [.262, .005, .92, 0, -10, 2];
+  const skillsPose: Pose = [-.262, .006, .89, 8, 17, -2];
+  const philosophyPose: Pose = [.262, .013, .90, 3, -12, 1];
+  const contactPose: Pose = [-.262, .014, .87, 8, 14, -2];
 
   const desktopPoses: PoseCue[] = [
     { at: 0, pose: [.285, .042, .68, 17, -30, -8] },
     { at: landing, pose: laptopLanding },
-    { at: starts.about, pose: [-.238, .004, .94, 4, 16, -2] },
-    { at: starts.experience, pose: [.236, .02, .91, 7, -15, 2] },
-    { at: runway.top - fold, pose: [.205, .043, .91, 4, -9, 1] },
+    { at: starts.about, pose: aboutPose },
+    { at: holdUntil(starts.about, starts.experience), pose: aboutPose },
+    { at: starts.experience, pose: experiencePose },
+    { at: holdUntil(starts.experience, runway.top - fold), pose: experiencePose },
+    { at: runway.top - fold, pose: [.245, .043, .88, 4, -9, 1] },
     { at: playbackStart, pose: [-.123, .105, 1.07, 0, 7, -3] },
     { at: playbackStart + projectSpan * .32, pose: [-.139, .086, 1.13, 2, 0, 0] },
     { at: playbackStart + projectSpan * .68, pose: [-.131, .101, 1.10, 5, -6, 1] },
     { at: playbackEnd, pose: [-.125, .11, 1.045, 4, 4, -2] },
-    { at: gallery, pose: [.25, .02, .82, 6, -15, 4] },
-    { at: starts.global, pose: [-.234, -.03, .88, 6, 17, -3] },
-    { at: mix(starts.global, starts.music, .62), pose: [-.248, -.06, .67, 9, 20, -5] },
-    { at: starts.music, pose: [.236, .005, .97, 0, -10, 2] },
-    { at: starts.skills, pose: [-.236, .006, .91, 8, 19, -2] },
-    { at: starts.philosophy, pose: [.24, .013, .93, 3, -13, 1] },
-    { at: starts.contact, pose: [-.236, .014, .89, 8, 15, -2] },
-    { at: maxScroll, pose: [-.221, .14, .65, 6, 3, 0] },
+    { at: gallery, pose: [.262, .02, .82, 6, -15, 4] },
+    { at: starts.global, pose: globalPose },
+    { at: mix(starts.global, starts.music, .62), pose: globalMidPose },
+    { at: holdUntil(mix(starts.global, starts.music, .62), starts.music), pose: globalMidPose },
+    { at: starts.music, pose: musicPose },
+    { at: holdUntil(starts.music, starts.skills), pose: musicPose },
+    { at: starts.skills, pose: skillsPose },
+    { at: holdUntil(starts.skills, starts.philosophy), pose: skillsPose },
+    { at: starts.philosophy, pose: philosophyPose },
+    { at: holdUntil(starts.philosophy, starts.contact), pose: philosophyPose },
+    { at: starts.contact, pose: contactPose },
+    { at: maxScroll, pose: [-.255, .14, .65, 6, 3, 0] },
   ];
   const mobilePoses: PoseCue[] = [
     { at: 0, pose: [0, .213, .76, 14, -16, -4] },

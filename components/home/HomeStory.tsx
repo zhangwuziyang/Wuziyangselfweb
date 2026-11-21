@@ -20,7 +20,7 @@ function offsetFrom(element: HTMLElement, ancestor: HTMLElement) {
   return { x, y };
 }
 
-function write(element: HTMLElement, property: "transform" | "opacity" | "translate", value: string | number) {
+function write(element: HTMLElement, property: "transform" | "opacity" | "translate" | "visibility", value: string | number) {
   const next = String(value);
   if (element.style[property] !== next) element.style[property] = next;
 }
@@ -101,6 +101,7 @@ export default function HomeStory({ children }: { children: ReactNode }) {
           const frame = frames.get(id);
           if (frame) {
             write(frame, "opacity", opacity);
+            write(frame, "visibility", opacity > 0 ? "visible" : "hidden");
             write(frame, "transform", `translate3d(0, ${offset}px, 0)`);
           }
           if (visible && opacity > 0) loading.add(id);
@@ -254,6 +255,7 @@ export default function HomeStory({ children }: { children: ReactNode }) {
         element?.style.removeProperty("transform");
         element?.style.removeProperty("opacity");
         element?.style.removeProperty("translate");
+        element?.style.removeProperty("visibility");
       }
     }
 

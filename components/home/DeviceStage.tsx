@@ -5,7 +5,7 @@ import { i18n } from "@/lib/i18n";
 import StoryName from "./StoryName";
 import { COMPANY_FRAMES, HEALTH_FRAMES, OFFER_FRAMES, TRAVEL_PHOTOS } from "./story-media";
 
-const laptopSizes = "(max-width: 1119px) 87vw, (max-width: 1720px) 49vw, 850px";
+const laptopSizes = "(max-width: 1119px) 87vw, (max-width: 1720px) 42vw, 704px";
 const phoneSizes = "(max-width: 1119px) 53vw, (max-width: 1720px) 16vw, 285px";
 
 function ScreenFrame({ id, children }: { id: string; children: ReactNode }) {
