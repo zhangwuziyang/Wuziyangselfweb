@@ -34,6 +34,10 @@ export default function CindyGuide() {
   const scene = CINDY_SCENES[chapter];
   const reply = reaction === "sleep" ? "… zzz"
     : (reaction === "egg" ? CINDY_EGG : typeof reaction === "number" ? CINDY_REPLIES[reaction] : undefined)?.[lang];
+  const prompt = lang === "zh" ? "点我聊聊。" : "Tap to chat.";
+  const cue = reaction === "sleep" ? "zzz" : reaction === "egg" ? "✦"
+    : typeof reaction === "number" ? (lang === "zh" ? "嗨！" : "Hi!")
+      : scene.cue[lang];
 
   return (
     <aside ref={overlay} className="cindy-overlay" aria-label={lang === "zh" ? "Cindy 网站导览" : "Cindy’s site guide"}>
@@ -59,12 +63,23 @@ export default function CindyGuide() {
             </span>
           </button>
         </div>
-        <div ref={note} className="cindy-note">
-          <span className="cindy-note__name">Cindy</span>
-          <p className="cindy-note__full">{reply ?? scene.line[lang]}</p>
-          <p className="cindy-note__short">{reply ?? scene.short[lang]}</p>
-          <p className="cindy-note__transit">{reply ?? (lang === "zh" ? "这边走。" : "This way.")}</p>
-          <p className="cindy-note__docked">{lang === "zh" ? "点我聊聊。" : "Tap to chat."}</p>
+        <div ref={note} className="cindy-dialogue">
+          <div className="cindy-note-sample cindy-note--wide">
+            <span className="cindy-note__name">Cindy</span>
+            <p className="cindy-note__full">{reply ?? scene.line[lang]}</p>
+            <p className="cindy-note__short">{reply ?? scene.short[lang]}</p>
+          </div>
+          <div className="cindy-note-sample cindy-note--compact">
+            <span className="cindy-note__name">Cindy</span>
+            <p className="cindy-note__full">{reply ?? (isContact ? scene.line[lang] : scene.short[lang])}</p>
+            <p className="cindy-note__short">{reply ?? scene.short[lang]}</p>
+          </div>
+          <div className="cindy-note-sample cindy-note--edge">
+            <p>{cue}</p>
+          </div>
+          <div className="cindy-note-sample cindy-note--docked">
+            <p>{prompt}</p>
+          </div>
         </div>
         <span className="sr-only" role="status">{typeof reaction === "number" || reaction === "egg" ? reply : ""}</span>
       </div>

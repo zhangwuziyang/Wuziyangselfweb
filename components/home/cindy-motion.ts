@@ -1,6 +1,9 @@
 import { CINDY_REPLIES, CINDY_SCENES, type Chapter, type CindyReaction, type Side } from "./cindy-scenes";
-import { between, clamp, ease, finale, measureRoute, placeCindyNote, rgb, sampleRoute, spriteRadius, wingCenter } from "./cindy-route";
-import { paintCindy, type PixelOffset } from "./cindy-sprite";
+import {
+  actorBox, between, clamp, clears, ease, finale, measureRoute, placeCindyNote, positionCindy, rgb,
+  sampleRoute, spriteRadius, visibleContent, wingCenter, type Box,
+} from "./cindy-route";
+import { cindySpriteBounds, paintCindy, type PixelOffset } from "./cindy-sprite";
 
 const IDLE_MS = 20_000;
 const CLICK_WINDOW_MS = 1_300;
@@ -69,8 +72,17 @@ export function mountCindy({ overlay, dock, button, sprite, motion, note, onChap
   let flight: { from: PixelOffset; to: PixelOffset; side: Side; start: number } | null = null;
   let drawnAt = { x: 0, y: 0 };
   let animation: Animation | undefined;
-  const noteSize = { width: note.offsetWidth, height: note.offsetHeight };
-  let noteAnchor: Parameters<typeof placeCindyNote> | undefined;
+  const notes = Array.from(note.querySelectorAll<HTMLElement>(".cindy-note-sample"), element => ({
+    element, width: 0, height: 0,
+  }));
+  const [wideNote, compactNote, edgeNote] = notes;
+  const dockedNote = notes.find(({ element }) => element.classList.contains("cindy-note--docked"));
+  type NoteContext = {
+    actor: PixelOffset; bounds: Box; content: Box[]; options: Parameters<typeof placeCindyNote>[5];
+    landing: number; docked: boolean;
+  };
+  let noteContext: NoteContext | undefined;
+  let visibleNote: HTMLElement | undefined;
 
   function readTimeline() {
     const rect = timeline?.parentElement?.getBoundingClientRect();
@@ -89,18 +101,40 @@ export function mountCindy({ overlay, dock, button, sprite, motion, note, onChap
   }
 
   function positionNote() {
-    if (!noteAnchor) return;
-    const placement = placeCindyNote(...noteAnchor);
-    const x = Math.round(placement.x) - Math.round(drawnAt.x);
-    const y = Math.round(placement.y) - Math.round(drawnAt.y);
-    writeStyle(note, "transform", `translate3d(${x}px, ${y}px, 0)`);
-    if (note.dataset.tail !== placement.tail) note.dataset.tail = placement.tail;
-    writeVariable(note, "--cindy-tail", `${Math.round(placement.tailOffset)}px`);
+    let next: HTMLElement | undefined;
+    if (noteContext) {
+      const { actor, bounds, content, options, docked, landing } = noteContext;
+      const candidates = docked ? [dockedNote]
+        : landing > .38 ? [compactNote, wideNote, edgeNote] : [wideNote, compactNote, edgeNote];
+      for (const candidate of candidates) {
+        if (!candidate) continue;
+        const placement = placeCindyNote(route, content, actor, bounds, candidate, options);
+        if (!placement) continue;
+        next = candidate.element;
+        const x = placement.x - Math.round(drawnAt.x);
+        const y = placement.y - Math.round(drawnAt.y);
+        writeStyle(next, "transform", `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`);
+        if (next.dataset.tail !== placement.tail) next.dataset.tail = placement.tail;
+        writeVariable(next, "--cindy-tail", `${placement.tailOffset.toFixed(2)}px`);
+        break;
+      }
+    }
+    if (visibleNote !== next) {
+      if (visibleNote) {
+        delete visibleNote.dataset.tail;
+        visibleNote.classList.remove("cindy-note");
+      }
+      next?.classList.add("cindy-note");
+    }
+    visibleNote = next;
   }
 
   function measureNote() {
-    noteSize.width = note.offsetWidth;
-    noteSize.height = note.offsetHeight;
+    for (const candidate of notes) {
+      const { width, height } = candidate.element.getBoundingClientRect();
+      candidate.width = width;
+      candidate.height = height;
+    }
     positionNote();
   }
 
@@ -176,8 +210,8 @@ export function mountCindy({ overlay, dock, button, sprite, motion, note, onChap
     lightTimeline(scroll);
 
     const current = aimAtHome(time, sample);
-    drawnAt = current.point;
     const landing = chapter === "contact" && !drag && !flight ? finale(route, scroll) : 0;
+    const docked = !reduced && landing > .97;
     const walking = !reduced && !drag && !flight && landing < .2
       && (sample.path || (chapter === "hero" && scroll < 190));
     const traveling = walking || (chapter === "global" && !reduced && !drag && !flight);
@@ -185,34 +219,70 @@ export function mountCindy({ overlay, dock, button, sprite, motion, note, onChap
     const bob = traveling ? -Math.abs(Math.sin(scroll / 23)) * (chapter === "global" ? 10 : 5) : 0;
     const arrival = chapter === "hero" && route.large ? .84 + .16 * ease(clamp(scroll / 190)) : 1;
     const size = reduced ? 1 : arrival * (1 - landing * (route.large ? .60 : .33));
-    poseStyle(drawnAt, bob, size);
-    writeStyle(dock, "opacity", current.opacity.toFixed(3));
     const crossing = sample.crossed && !drag && !flight;
     const perched = sample.perched && !drag && !flight;
+    const scene = CINDY_SCENES[chapter];
+    const facing = walking ? sample.heading * direction : scene.side === "left" ? 1 : -1;
+    const pose = reduced || reaction === "sleep" || landing > .84 ? "rest" : walking ? "walk" : scene.pose;
+    const listening = chapter === "music" && !crossing && reaction !== "sleep";
+    const art = cindySpriteBounds(pose, reaction === "sleep", step, !route.large, facing);
+    const hit = route.large ? 66 : 32;
+    const preview = attention && chapter === "projects" && !reduced ? -3 : 0;
+    const sway = listening && !reduced ? 2 : 0;
+    const breathing = !reduced && !walking && !perched && !docked && reaction !== "sleep";
+    const lift = (breathing ? listening ? 3 : 2 : 0) + (animation?.playState === "running" ? 10 : 0);
+    const offset = Math.round(bob);
+    const extent = {
+      left: Math.max(hit, art.left + sway - preview) * size + 1,
+      right: Math.max(hit, art.right + sway + preview) * size + 1,
+      top: Math.max(hit, art.top + lift) * size - offset + 1,
+      bottom: Math.max(hit, art.bottom) * size + offset + 1,
+    };
+    const content = visibleContent(route, scroll, crossing);
+    const anchor = positionCindy(route, content, current.point, extent, crossing || perched);
+    drawnAt = anchor ?? current.point;
+    poseStyle(drawnAt, bob, size);
+    const opacity = anchor ? current.opacity : 0;
+    writeStyle(dock, "opacity", opacity.toFixed(3));
     dock.toggleAttribute("data-crossing", crossing);
     dock.toggleAttribute("data-walking", walking);
-    dock.toggleAttribute("data-hidden", current.opacity < .08);
+    dock.toggleAttribute("data-hidden", opacity < .08);
+    dock.toggleAttribute("data-obstructed", !anchor);
     dock.toggleAttribute("data-sleeping", reaction === "sleep");
     dock.toggleAttribute("data-perched", perched);
-    dock.toggleAttribute("data-final", !reduced && landing > .97);
-    dock.toggleAttribute("data-music", chapter === "music" && !sample.crossed && reaction !== "sleep");
-    const skillEdge = route.stops[sample.index].anchors[0]?.right ?? route.right;
-    // A 62px label needs room for its half-width and a clear edge on either side.
-    const orbitRoom = Math.min(drawnAt.x - skillEdge, route.width - drawnAt.x) - 36;
-    const showSkills = route.large && chapter === "skills" && !crossing && reaction !== "sleep" && orbitRoom >= 0;
+    dock.toggleAttribute("data-landing", chapter === "contact" && !crossing);
+    dock.toggleAttribute("data-final", docked);
+    const x = Math.round(drawnAt.x), y = Math.round(drawnAt.y);
+    const musicBox = { left: x - hit * .84, right: x + hit * .52 + 16, top: y - hit * 1.04 - 19, bottom: y - hit * 1.04 + 24 };
+    const showMusic = listening && !reduced && musicBox.top >= route.nav && clears(musicBox, content);
+    dock.toggleAttribute("data-music", listening);
+    dock.toggleAttribute("data-music-notes", showMusic);
+    const orbitRoom = Math.min(x - route.right, route.width - x) - 38;
+    const orbitX = Math.min(32, orbitRoom);
+    const orbitBox = { left: x - 31 - orbitX, right: x + 31 + orbitX, top: y - 89, bottom: y + 89 };
+    const showSkills = route.large && chapter === "skills" && !crossing && !reduced && reaction !== "sleep"
+      && orbitRoom >= 0 && orbitBox.top >= route.nav && orbitBox.bottom <= route.height && clears(orbitBox, content);
     dock.toggleAttribute("data-skills", showSkills);
     if (showSkills) {
       writeVariable(dock, "--cindy-orbit", `${(scroll / 8) % 360}deg`);
-      writeVariable(dock, "--cindy-orbit-x", `${Math.round(Math.min(32, orbitRoom))}px`);
+      writeVariable(dock, "--cindy-orbit-x", `${Math.round(orbitX)}px`);
     }
-    const noteClearance = showSkills ? 90 : spriteRadius(route) * size;
-    noteAnchor = [route, scroll, { x: drawnAt.x, y: drawnAt.y + bob }, noteSize, noteClearance,
-      { perched, crossing, heading: sample.heading }];
+    const noteBounds = actorBox({ x, y }, extent);
+    noteBounds.bottom = Math.max(noteBounds.bottom, y + hit * 1.12 * size);
+    // Decorations travel with Cindy, so a stacked bubble starts just outside their envelope.
+    if (showSkills) {
+      noteBounds.top = Math.min(noteBounds.top, orbitBox.top);
+      noteBounds.bottom = Math.max(noteBounds.bottom, orbitBox.bottom);
+    }
+    if (showMusic) noteBounds.top = Math.min(noteBounds.top, musicBox.top);
+    noteContext = anchor ? {
+      actor: { x, y: y + offset }, bounds: noteBounds, content,
+      options: { heading: sample.heading, landing: chapter === "contact" && !crossing },
+      docked, landing,
+    } : undefined;
     if (typeof ResizeObserver === "undefined") measureNote();
     else positionNote();
 
-    const scene = CINDY_SCENES[chapter];
-    const facing = walking ? sample.heading * direction : scene.side === "left" ? 1 : -1;
     const gaze = !reduced && reaction !== "sleep" && !drag?.moved
       ? attention && chapter === "projects" ? { x: 2, y: -1 }
         : pointer ? {
@@ -220,7 +290,6 @@ export function mountCindy({ overlay, dock, button, sprite, motion, note, onChap
           y: Math.round(clamp((pointer.y - drawnAt.y) / 88, -1, 1)),
         } : { x: 0, y: 0 }
       : { x: 0, y: 0 };
-    const pose = reduced || reaction === "sleep" || landing > .84 ? "rest" : walking ? "walk" : scene.pose;
     const expression = reaction === "sleep" ? "sleep" : drag?.moved ? "surprise" : reaction === "egg" ? "wink"
       : typeof reaction === "number" || hovered ? "happy" : scene.expression;
     const alternate = reaction === "egg" && !reduced;
@@ -230,7 +299,7 @@ export function mountCindy({ overlay, dock, button, sprite, motion, note, onChap
       spriteKey = nextKey;
       button.dataset.sprite = "ready";
     }
-    writeStyle(sprite, "transform", `translateX(-50%) translateX(${attention && chapter === "projects" && !reduced ? -3 : 0}px) scaleX(${facing})`);
+    writeStyle(sprite, "transform", `translateX(-50%) translateX(${preview}px) scaleX(${facing})`);
     if (flight) schedule();
   }
 
@@ -382,7 +451,8 @@ export function mountCindy({ overlay, dock, button, sprite, motion, note, onChap
 
   const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(invalidate);
   const noteObserver = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measureNote);
-  noteObserver?.observe(note);
+  for (const { element } of notes) noteObserver?.observe(element);
+  measureNote();
   for (const target of home.querySelectorAll("main > section, [data-cindy-anchor], [data-cindy-perch], footer")) {
     observer?.observe(target);
   }

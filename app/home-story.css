@@ -12,7 +12,7 @@
   --story-media: #e8dfd1;
   --story-button: #493429;
   --story-button-ink: #fffaf1;
-  --story-wing: clamp(3.75rem, 17vw, 5.125rem);
+  --story-wing: clamp(4.75rem, 17vw, 5.125rem);
   position: relative;
   isolation: isolate;
   background: var(--story-base);

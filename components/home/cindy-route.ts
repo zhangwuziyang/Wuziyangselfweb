@@ -10,7 +10,13 @@ export const between = (a: PixelOffset, b: PixelOffset, t: number): PixelOffset 
 
 export type Anchor = { y: number; left: number; right: number; top: number };
 type Stop = { chapter: Chapter; top: number; at: number; anchors: Anchor[] };
-type Box = { left: number; top: number; right: number; bottom: number };
+export type Box = { left: number; top: number; right: number; bottom: number };
+export type NoteSize = { width: number; height: number };
+type Tail = "left" | "right" | "top" | "bottom";
+type NoteSpot = PixelOffset & { tail: Tail; tailOffset: number };
+const VIEW_INSET = 6;
+const CONTENT_GAP = 6;
+const NOTE_GAP = 9;
 
 export type Route = {
   stops: Stop[];
@@ -24,8 +30,7 @@ export type Route = {
   perch?: Anchor;
   finish?: Anchor;
   nodes: HTMLElement[];
-  protectedMedia: Box[];
-  copy: Box[];
+  content: Box[];
 };
 
 function readAnchor(element: Element, scroll: number): Anchor {
@@ -54,16 +59,18 @@ export function measureRoute(home: HTMLElement, large: boolean): Route {
   const perch = home.querySelector("[data-cindy-perch]");
   const finish = home.querySelector("[data-cindy-finish]");
   const nodes = Array.from(home.querySelectorAll<HTMLElement>("[data-cindy-node]"));
-  const boxes = (selector: string) => Array.from(home.querySelectorAll(selector), element => {
-    const { left, top, right, bottom } = element.getBoundingClientRect();
+  const content = Array.from(home.querySelectorAll(
+    ".story-shell :is(img, .project-browser, .project-phone, .story-project, .story-panel, h1, h2, h3, p, blockquote, a, button, figcaption), #skills [data-cindy-anchor], [data-cindy-node]",
+  ), element => {
+    // The city image can enlarge on hover, but its rounded frame clips it.
+    const frame = element.closest(".overflow-hidden");
+    const { left, top, right, bottom } = (element.matches("img") && frame ? frame : element).getBoundingClientRect();
     return { left, right, top: top + scroll, bottom: bottom + scroll };
-  });
+  }).filter(box => box.right > box.left && box.bottom > box.top);
   return {
     stops, width, height, nav, left: shell?.left ?? 60, right: shell?.right ?? width - 60, maxScroll, large,
     perch: perch ? readAnchor(perch, scroll) : undefined,
-    finish: finish ? readAnchor(finish, scroll) : undefined, nodes,
-    protectedMedia: boxes(".story-shell :is(img, .project-browser, .project-phone), #skills [data-cindy-anchor]"),
-    copy: boxes(".story-shell :is(h1, h2, h3, blockquote, p, a, button, figcaption)"),
+    finish: finish ? readAnchor(finish, scroll) : undefined, nodes, content,
   };
 }
 
@@ -71,67 +78,98 @@ export const wingCenter = (route: Route, side: Side) => (side === "left" ? route
 export const spriteRadius = (route: Route) => route.large ? 71 : 35;
 const clampY = (route: Route, y: number) => clamp(y, route.nav + spriteRadius(route) + 8, route.height - spriteRadius(route) - 8);
 
-export function placeCindyNote(
-  route: Route,
-  scroll: number,
-  actor: PixelOffset,
-  note: { width: number; height: number },
-  radius: number,
-  { perched, crossing, heading }: { perched: boolean; crossing: boolean; heading: number },
-) {
-  const margin = 12;
-  const gap = 8;
-  const { width, height } = note;
-  const maxX = Math.max(margin, route.width - margin - width);
-  const minY = Math.min(route.nav + 8, Math.max(margin, route.height - height - margin));
-  const maxY = Math.max(minY, route.height - margin - height);
-  const left = actor.x - radius - width - gap;
-  const right = actor.x + radius + gap;
-  const sideY = actor.y - height / 2;
-  const above = actor.y - radius - height - gap;
-  const below = actor.y + radius + gap;
-  const centered = actor.x - width / 2;
-  const sideX = perched || (heading > 0 && right <= maxX) || left < margin ? right : left;
-  const beside = perched || crossing;
-  const preferred = beside ? { x: sideX, y: sideY }
-    : { x: centered, y: above >= minY ? above : below };
-  const xs = [...new Set([preferred.x, left, right, centered, margin, maxX].map(x => clamp(x, margin, maxX)))];
-  const actorBox = { left: actor.x - radius, right: actor.x + radius, top: actor.y - radius, bottom: actor.y + radius };
-  const visible = (boxes: Box[]) => boxes
-    .filter(box => box.right > box.left && box.bottom > scroll + minY && box.top < scroll + maxY + height)
-    .map(box => ({ ...box, top: box.top - scroll, bottom: box.bottom - scroll }));
-  const hard = visible(route.protectedMedia);
-  const soft = visible(route.copy);
+const contentGap = (route: Route) => route.large ? CONTENT_GAP : 4;
 
-  function find(blocks: Box[]) {
-    let best: (PixelOffset & { score: number }) | undefined;
-    const sorted = blocks.sort((a, b) => a.top - b.top);
-    for (const x of xs) {
-      let start = minY;
-      function test(end: number) {
-        if (end - start < height) return;
-        const y = clamp(preferred.y, start, end - height);
-        const score = Math.hypot(x - preferred.x, y - preferred.y);
-        if (!best || score < best.score) best = { x, y, score };
-      }
-      for (const box of sorted) {
-        if (x >= box.right + gap || x + width <= box.left - gap) continue;
-        test(Math.min(maxY + height, box.top - gap));
-        start = Math.max(start, box.bottom + gap);
-        if (start > maxY) break;
-      }
-      test(maxY + height);
-    }
-    return best;
+export function visibleContent(route: Route, scroll: number, crossing: boolean): Box[] {
+  const gap = crossing ? 3 : contentGap(route);
+  return route.content
+    .filter(box => box.bottom + gap > scroll + route.nav && box.top - gap < scroll + route.height)
+    .map(box => ({
+      left: box.left - gap, right: box.right + gap,
+      top: box.top - scroll - gap, bottom: box.bottom - scroll + gap,
+    }));
+}
+
+export function actorBox({ x, y }: PixelOffset, extent: Box): Box {
+  return { left: x - extent.left, right: x + extent.right, top: y - extent.top, bottom: y + extent.bottom };
+}
+
+const overlaps = (a: Box, b: Box) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+
+export function clears(box: Box, content: Box[]) {
+  return !content.some(item => overlaps(box, item));
+}
+
+export function positionCindy(route: Route, content: Box[], point: PixelOffset, extent: Box, nearContent: boolean) {
+  const inset = route.large ? VIEW_INSET : 4;
+  const minX = inset + extent.left;
+  const maxX = route.width - inset - extent.right;
+  const minY = route.nav + VIEW_INSET + extent.top;
+  const maxY = route.height - VIEW_INSET - extent.bottom;
+  const side = point.x < route.width / 2 ? "left" : "right";
+  const wingX = side === "left" ? Math.min(point.x, route.left - contentGap(route) - extent.right)
+    : Math.max(point.x, route.right + contentGap(route) + extent.left);
+  const x = clamp(nearContent ? point.x : wingX, minX, maxX);
+  const y = clamp(point.y, minY, maxY);
+  const base = { x, y };
+  const box = actorBox(base, extent);
+  if (clears(box, content)) return base;
+
+  // Leave the measured edge by the shortest step. Most frames stay on the original route.
+  const nearby: PixelOffset[] = [{ x: clamp(wingX, minX, maxX), y }];
+  for (const item of content) {
+    if (!overlaps(box, item)) continue;
+    nearby.push({ x, y: item.top - extent.bottom }, { x, y: item.bottom + extent.top },
+      { x: item.left - extent.right, y }, { x: item.right + extent.left, y });
   }
+  nearby.sort((a, b) => Math.hypot(a.x - x, a.y - y) - Math.hypot(b.x - x, b.y - y));
+  return nearby.find(next => next.x >= minX && next.x <= maxX && next.y >= minY && next.y <= maxY
+    && Math.hypot(next.x - x, next.y - y) <= 32
+    && clears(actorBox(next, extent), content));
+}
 
-  const point = find([...hard, ...soft, actorBox]) ?? find([...hard, actorBox]) ?? find([actorBox])
-    ?? { x: clamp(preferred.x, margin, maxX), y: clamp(preferred.y, minY, maxY) };
-  const tail = point.y + height <= actorBox.top ? "bottom" : point.y >= actorBox.bottom ? "top"
-    : point.x >= actor.x ? "left" : "right";
-  const tailOffset = tail === "top" || tail === "bottom"
-    ? clamp(actor.x - point.x, 12, width - 12) : clamp(actor.y - point.y, 12, height - 12);
-  return { x: point.x, y: point.y, tail, tailOffset };
+function alongEdge(target: number, length: number, low: number, high: number, obstacles: [number, number][]) {
+  // The tail must stay aligned with Cindy, even when sliding the bubble to a nearby edge.
+  const min = Math.max(low, target - length + 12);
+  const max = Math.min(high - length, target - 12);
+  if (min > max) return;
+  const center = target - length / 2;
+  const candidates = [clamp(center, min, max)];
+  for (const [start, end] of obstacles) {
+    if (start - length >= min && start - length <= max) candidates.push(start - length);
+    if (end >= min && end <= max) candidates.push(end);
+  }
+  return candidates
+    .filter(position => obstacles.every(([start, end]) => position + length <= start || position >= end))
+    .sort((a, b) => Math.abs(a - center) - Math.abs(b - center))[0];
+}
+
+export function placeCindyNote(
+  route: Route, content: Box[], actor: PixelOffset, bounds: Box, note: NoteSize,
+  { heading, landing }: { heading: number; landing: boolean },
+): NoteSpot | undefined {
+  const { width, height } = note;
+  if (!width || !height) return;
+  const left = 12, top = route.nav + 8, right = route.width - 12, bottom = route.height - 12;
+  const sideways: Tail[] = heading > 0 ? ["left", "right"] : ["right", "left"];
+  const order: Tail[] = landing ? ["bottom", ...sideways, "top"] : [...sideways, "bottom", "top"];
+  for (const tail of order) {
+    if (tail === "bottom" || tail === "top") {
+      const y = tail === "bottom" ? bounds.top - NOTE_GAP - height : bounds.bottom + NOTE_GAP;
+      if (y < top || y + height > bottom) continue;
+      const obstacles = content.filter(box => box.top < y + height && box.bottom > y)
+        .map(({ left, right }): [number, number] => [left, right]);
+      const x = alongEdge(actor.x, width, left, right, obstacles);
+      if (x !== undefined) return { x, y, tail, tailOffset: actor.x - x };
+    } else {
+      const x = tail === "left" ? bounds.right + NOTE_GAP : bounds.left - NOTE_GAP - width;
+      if (x < left || x + width > right) continue;
+      const obstacles = content.filter(box => box.left < x + width && box.right > x)
+        .map(({ top, bottom }): [number, number] => [top, bottom]);
+      const y = alongEdge(actor.y, height, top, bottom, obstacles);
+      if (y !== undefined) return { x, y, tail, tailOffset: actor.y - y };
+    }
+  }
 }
 
 function destination(route: Route, index: number, scroll: number, reduced: boolean) {
@@ -177,7 +215,7 @@ function destination(route: Route, index: number, scroll: number, reduced: boole
     y = clampY(route, mix(height * .76, alignedY, arrival));
   }
   if (stop.chapter === "about" && large && route.perch) {
-    const perchY = route.perch.top - scroll - 63;
+    const perchY = route.perch.top - scroll - 80;
     const visible = ease(clamp((perchY - route.nav - 78) / 72))
       * ease(clamp((height - 84 - perchY) / 80))
       * ease(clamp((scroll - stop.at - transitionRadius(route, index) - 16) / 110))

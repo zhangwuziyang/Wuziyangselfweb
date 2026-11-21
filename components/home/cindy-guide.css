@@ -72,15 +72,16 @@
 
 .cindy-shadow {
   position: absolute;
-  inset: calc(var(--cindy-hit) * .44) auto auto 0;
+  inset: 0 auto auto 0;
   inline-size: calc(var(--cindy-hit) * .56);
   block-size: calc(var(--cindy-hit) * .12);
   border-radius: 50%;
   background: radial-gradient(ellipse, rgb(39 25 26 / 24%), transparent 73%);
-  transform: translateX(-50%) scale(var(--cindy-scale));
+  transform: translate(-50%, calc(var(--cindy-hit) * .44 * var(--cindy-scale))) scale(var(--cindy-scale));
+  transform-origin: center top;
 }
 
-.cindy-note {
+.cindy-note-sample {
   --cindy-tail: 50%;
   position: absolute;
   inset: 0 auto auto 0;
@@ -133,9 +134,18 @@
   font-weight: 700;
 }
 
-.cindy-note__full,
-.cindy-note__transit,
-.cindy-note__docked { display: none; }
+.cindy-note__full { display: none; }
+.cindy-note--compact {
+  inline-size: min(8.5rem, calc(var(--story-wing) - 20px));
+  padding: .35rem .3rem;
+}
+.cindy-note--compact .cindy-note__name { display: none; }
+.cindy-note--edge,
+.cindy-note--docked {
+  padding: .28rem .32rem;
+  inline-size: min(8rem, calc(var(--story-wing) - 24px));
+}
+.cindy-note--edge { inline-size: min(5.5rem, calc(var(--story-wing) - 24px)); }
 .cindy-dock[data-crossing] .cindy-note { opacity: .96; }
 .cindy-dock[data-final] .cindy-sprite {
   border: 2px solid var(--story-edge);
@@ -145,7 +155,7 @@
 }
 
 .cindy-orbit, .cindy-notes { display: none; }
-.cindy-dock[data-music] .cindy-notes { display: block; }
+.cindy-dock[data-music-notes] .cindy-notes { display: block; }
 
 .cindy-notes span {
   position: absolute;
@@ -178,12 +188,16 @@
 
 @media (min-width: 70rem) and (min-height: 34rem) {
   .cindy-overlay { --cindy-art: 192px; --cindy-hit: 132px; }
-  .cindy-note { inline-size: clamp(13.75rem, 16.7vw, 16.25rem); padding: .65rem .8rem; }
-  .cindy-note__name { font-size: .72rem; }
+  .cindy-note--wide { inline-size: clamp(13.75rem, 16.7vw, 16.25rem); padding: .65rem .8rem; }
+  .cindy-note--compact {
+    inline-size: min(8.5rem, calc(var(--story-wing) - 24px));
+    padding: .5rem .65rem;
+  }
+  .cindy-note--compact .cindy-note__name { display: block; }
   .cindy-note__full { display: block; }
   .cindy-note__short,
-  .cindy-dock[data-crossing] .cindy-note__full { display: none; }
-  .cindy-dock[data-crossing] .cindy-note__short { display: block; }
+  .cindy-dock[data-crossing]:not([data-landing]) .cindy-note__full { display: none; }
+  .cindy-dock[data-crossing]:not([data-landing]) .cindy-note__short { display: block; }
   .cindy-dock[data-skills] .cindy-orbit { display: block; }
   .cindy-orbit span {
     --angle: var(--cindy-orbit, 0deg);
@@ -208,18 +222,6 @@
   .cindy-orbit span:nth-child(4) { --angle: calc(var(--cindy-orbit, 0deg) + 270deg); }
 }
 
-@media (max-width: 69.999rem), (max-height: 33.999rem) {
-  .cindy-dock[data-crossing] .cindy-note {
-    inline-size: min(8.5rem, calc(50vw - 62px));
-    padding: .3rem .45rem;
-  }
-  .cindy-dock[data-crossing] :is(.cindy-note__name, .cindy-note__short) { display: none; }
-  .cindy-dock[data-crossing] .cindy-note__transit { display: block; }
-}
-
-.cindy-dock[data-final] :is(.cindy-note__full, .cindy-note__short, .cindy-note__transit) { display: none; }
-.cindy-dock[data-final] .cindy-note__docked { display: block; }
-
 @media (prefers-reduced-motion: reduce) {
   .cindy-sprite { touch-action: auto; }
   .cindy-dock[data-music] .cindy-notes,
@@ -227,5 +229,5 @@
 }
 
 .cindy-dock[data-hidden] .cindy-sprite { pointer-events: none; }
-.cindy-dock:focus-within { opacity: 1 !important; }
+.cindy-dock:focus-within:not([data-obstructed]) { opacity: 1 !important; }
 .home-story:has(.mobile-nav) .cindy-overlay { visibility: hidden; }

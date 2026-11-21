@@ -129,10 +129,37 @@ export function paintCindy(
   compact = false,
 ) {
   canvas.clearRect(0, 0, CINDY_BITMAP, CINDY_BITMAP);
-  const rect: Rect = (x, y, w, h, color) => {
+  drawCindy((x, y, w, h, color) => {
     canvas.fillStyle = color;
     canvas.fillRect(pixel(x), pixel(y), pixel(x + w) - pixel(x), pixel(y + h) - pixel(y));
-  };
+  }, pose, expression, gaze, alternate, step, compact);
+}
+
+const spriteBounds = new Map<string, { left: number; right: number; top: number; bottom: number }>();
+
+export function cindySpriteBounds(pose: CindyPose, sleeping: boolean, step: number, compact: boolean, facing: number) {
+  const key = [pose, sleeping, step, compact].join(":");
+  let bounds = spriteBounds.get(key);
+  if (!bounds) {
+    const center = CINDY_BITMAP / 2;
+    const scale = compact ? 1 : 2;
+    bounds = { left: 0, right: 0, top: 0, bottom: 0 };
+    const box = bounds;
+    drawCindy((x, y, w, h) => {
+      box.left = Math.max(box.left, (center - pixel(x)) * scale);
+      box.right = Math.max(box.right, (pixel(x + w) - center) * scale);
+      box.top = Math.max(box.top, (center - pixel(y)) * scale);
+      box.bottom = Math.max(box.bottom, (pixel(y + h) - center) * scale);
+    }, pose, sleeping ? "sleep" : "neutral", { x: 0, y: 0 }, false, step, compact);
+    spriteBounds.set(key, bounds);
+  }
+  return facing === 1 ? bounds : { ...bounds, left: bounds.right, right: bounds.left };
+}
+
+function drawCindy(
+  rect: Rect, pose: CindyPose, expression: CindyExpression, gaze: PixelOffset,
+  alternate: boolean, step: number, compact: boolean,
+) {
   const hand = (x: number, y: number, flip = false) => drawRows(rect, x, y, paw, CINDY_COLORS, flip);
 
   drawRows(rect, 12, 12, rows, alternate ? alternateColors : CINDY_COLORS);
