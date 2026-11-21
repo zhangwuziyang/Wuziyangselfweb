@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import Image from "next/image";
 import { useLang } from "@/context/LangContext";
 
@@ -26,8 +26,9 @@ export default function ProjectPreview({ frames, phone, name }: {
       className="block h-auto w-full"
     />
   );
-  function step(direction: number) {
+  function step(event: MouseEvent<HTMLButtonElement>, direction: number) {
     setIndex(current => (current + direction + frames.length) % frames.length);
+    event.currentTarget.dispatchEvent(new CustomEvent("cindy:preview", { bubbles: true }));
   }
 
   return (
@@ -43,9 +44,9 @@ export default function ProjectPreview({ frames, phone, name }: {
         )}
       </div>
       <div className="story-project__controls">
-        <button type="button" aria-label={lang === "zh" ? `${app} 上一张截图` : `Previous ${app} screenshot`} onClick={() => step(-1)}>←</button>
+        <button type="button" aria-label={lang === "zh" ? `${app} 上一张截图` : `Previous ${app} screenshot`} onClick={event => step(event, -1)}>←</button>
         <span role="status" aria-label={title}>{index + 1} / {frames.length}</span>
-        <button type="button" aria-label={lang === "zh" ? `${app} 下一张截图` : `Next ${app} screenshot`} onClick={() => step(1)}>→</button>
+        <button type="button" aria-label={lang === "zh" ? `${app} 下一张截图` : `Next ${app} screenshot`} onClick={event => step(event, 1)}>→</button>
       </div>
     </>
   );

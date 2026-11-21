@@ -14,8 +14,9 @@ export default function Philosophy() {
           <Localized {...ph.headline} />
         </StoryHeading>
 
-        <ScrollReveal className="max-w-3xl border-l border-white/20 pl-5 sm:pl-8">
+        <ScrollReveal className="max-w-3xl border-l border-[var(--story-edge)] pl-5 sm:pl-8">
           <blockquote
+            data-cindy-anchor=""
             className="mb-8 text-[clamp(1.7rem,3.5vw,3.65rem)] font-medium leading-[1.12] tracking-tight"
           >
             <Localized en={
@@ -27,13 +28,13 @@ export default function Philosophy() {
             } />
           </blockquote>
 
-          <div className="space-y-4 font-light leading-[1.8] max-w-lg mx-auto" style={{ fontSize: "clamp(1rem, 1.4vw, 1.125rem)", color: "#6e6e73" }}>
+          <div className="space-y-4 font-light leading-[1.8] max-w-lg mx-auto" style={{ fontSize: "clamp(1rem, 1.4vw, 1.125rem)", color: "var(--story-muted)" }}>
             <p><Localized {...ph.p1} /></p>
             <p><Localized {...ph.p2} /></p>
           </div>
 
           <div className="mt-9 flex items-center gap-4">
-            <div className="h-px w-10 bg-white/20" />
+            <div className="h-px w-10 bg-[var(--story-edge)]" />
             <span className="text-xs font-medium tracking-[0.22em]" style={{ color: "var(--story-dim)" }}>
               <Localized {...ph.signature} />
             </span>

@@ -100,14 +100,14 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
           role="dialog"
           aria-modal="true"
           className="mobile-nav fixed inset-0 z-40 flex flex-col items-center justify-center gap-7"
-          style={{ background: "rgba(0,0,0,0.96)", backdropFilter: "blur(24px)" }}
+          style={{ background: "var(--story-nav)", color: "var(--story-ink)" }}
         >
           {NAV_KEYS.map(({ key, href }) => (
             <a
               key={href}
               href={href}
               onClick={() => setOpen(false)}
-              className="text-white text-[28px] font-light tracking-tight hover:text-white/60 transition-colors"
+              className="text-[28px] font-light tracking-tight hover:text-[var(--story-tint)] transition-colors"
             >
               {copy[key][lang]}
             </a>
@@ -115,13 +115,13 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
           <div className="flex items-center gap-4 mt-4">
             <button
               onClick={toggle}
-              className="text-white/50 text-sm border border-white/15 px-5 py-2 rounded-full hover:border-white/30 hover:text-white/80 transition-all"
+              className="text-[var(--story-muted)] text-sm border border-[var(--story-control)] px-5 py-2 rounded-full hover:text-[var(--story-ink)] transition-all"
             >
               {copy.lang[lang]}
             </button>
             <a
               href={lang === "zh" ? "mailto:3168661545@qq.com" : "mailto:zhangwuziyang@gmail.com"}
-              className="text-white/50 text-sm font-mono"
+              className="text-[var(--story-muted)] text-sm font-mono"
             >
               {lang === "zh" ? "3168661545@qq.com" : "zhangwuziyang@gmail.com"}
             </a>

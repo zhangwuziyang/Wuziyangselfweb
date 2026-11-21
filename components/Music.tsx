@@ -22,7 +22,7 @@ export default function Music() {
               <p><Localized {...m.p2} /></p>
               <p><Localized {...m.p3} /></p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {m.credentials.map((item) => (
                 <div key={item.key} className="story-panel rounded-2xl p-4"
                 >
@@ -34,7 +34,7 @@ export default function Music() {
             </div>
           </div>
 
-          <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
+          <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden story-photo-shadow" data-cindy-anchor="">
             <Image
               src="/photos/music-piano.jpg"
               alt="Playing piano"

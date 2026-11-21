@@ -13,21 +13,21 @@ export default async function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-white/10 text-[var(--story-dim)]">
+    <footer className="border-t border-[var(--story-edge)] text-[var(--story-dim)]" data-cindy-finish="">
       <div className="story-shell py-10 flex flex-col md:flex-row items-center justify-between gap-5">
 
         <p className="text-sm">
           © {year} <Localized {...f.copy} />
         </p>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6">
           {FOOTER_LINKS.map((link) => (
             <a
               key={link.key}
               href={link.href}
               target={link.external ? "_blank" : undefined}
               rel={link.external ? "noopener noreferrer" : undefined}
-              className="text-sm hover:text-white"
+              className="text-sm hover:underline"
             >
               <Localized {...link.label} />
             </a>

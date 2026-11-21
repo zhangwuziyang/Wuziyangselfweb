@@ -1,30 +1,19 @@
-import { CHAPTERS, CINDY_REPLIES, CINDY_SCENES, type Chapter, type CindyReaction } from "./cindy-scenes";
+import { CINDY_REPLIES, CINDY_SCENES, type Chapter, type CindyReaction, type Side } from "./cindy-scenes";
+import { between, clamp, ease, finale, measureRoute, rgb, sampleRoute, spriteRadius, wingCenter } from "./cindy-route";
 import { paintCindy, type PixelOffset } from "./cindy-sprite";
 
 const IDLE_MS = 20_000;
 const CLICK_WINDOW_MS = 1_300;
-const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
-const mix = (from: number, to: number, t: number) => from + (to - from) * t;
-const ease = (t: number) => t * t * (3 - 2 * t);
-const between = (from: PixelOffset, to: PixelOffset, t: number) => ({
-  x: mix(from.x, to.x, t),
-  y: mix(from.y, to.y, t),
-});
+const STORY_WIDE = "(min-width: 70rem) and (min-height: 34rem)";
 
 type Drag = {
-  id: number;
-  origin: PixelOffset;
-  offset: PixelOffset;
-  position: PixelOffset;
-  velocity: PixelOffset;
-  time: number;
-  moved: boolean;
+  id: number; side: Side; origin: PixelOffset; offset: PixelOffset;
+  position: PixelOffset; velocity: PixelOffset; time: number; moved: boolean;
 };
 
 type Guide = {
-  rail: HTMLElement;
+  overlay: HTMLElement;
   dock: HTMLDivElement;
-  actor: HTMLDivElement;
   button: HTMLButtonElement;
   sprite: HTMLCanvasElement;
   motion: HTMLSpanElement;
@@ -33,71 +22,56 @@ type Guide = {
   openChat: (trigger: HTMLButtonElement) => void;
 };
 
-function translate(node: HTMLElement, { x, y }: PixelOffset) {
-  const transform = `translate3d(${Math.round(x * 10) / 10}px, ${Math.round(y * 10) / 10}px, 0)`;
-  if (node.style.transform !== transform) node.style.transform = transform;
+function writeStyle(element: HTMLElement, property: "transform" | "opacity" | "backgroundColor", value: string) {
+  if (element.style[property] !== value) element.style[property] = value;
 }
 
-export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapter, onReaction, openChat }: Guide) {
-  const home = rail.closest(".home-story");
-  if (!home) return;
+function writeVariable(element: HTMLElement, name: string, value: string) {
+  if (element.style.getPropertyValue(name) !== value) element.style.setProperty(name, value);
+}
 
-  const chapters = CHAPTERS.map(id => home.querySelector<HTMLElement>(`#${id}`));
+export function mountCindy({ overlay, dock, button, sprite, motion, onChapter, onReaction, openChat }: Guide) {
+  const story = overlay.closest<HTMLElement>(".home-story");
+  if (!story) return;
+  const home = story;
+  const base = home.querySelector<HTMLElement>("[data-story-base]");
+  const blend = home.querySelector<HTMLElement>("[data-story-blend]");
   const timeline = home.querySelector<HTMLElement>("[data-timeline-fill]");
   const context = sprite.getContext("2d");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const desktop = window.matchMedia("(min-width: 64rem) and (min-height: 32rem)");
+  const wide = window.matchMedia(STORY_WIDE);
   const hover = window.matchMedia("(hover: hover) and (pointer: fine)");
   const events = new AbortController();
   const { signal } = events;
 
-  let bounds = rail.getBoundingClientRect();
-  let starts: number[] = [];
-  let railTravel = 0;
-  let actorAnchor = { x: 0, y: 0 };
-  let half = 0;
-  let timelineStart = 0;
-  let timelineEnd = 0;
-  let resize = true;
+  let route = measureRoute(home, wide.matches);
+  let timelineTrack = readTimeline();
+  let resize = false;
+  let frame = 0;
   let chapter: Chapter = "hero";
   let reaction: CindyReaction = null;
   let spriteKey = "";
+  let paletteKey = "";
+  let previousScroll = window.scrollY;
+  let direction = 1;
   let pointer: PixelOffset | null = null;
   let hovered = false;
   let idleAt = performance.now();
   let idleTimer = 0;
   let resetTimer = 0;
+  let attentionTimer = 0;
+  let attention = false;
   let clickTimes: number[] = [];
   let lastReply = -1;
-  let drag: Drag | null = null;
-  let flight: { from: PixelOffset; to: PixelOffset; start: number } | null = null;
-  let drawnAt = { x: 0, y: 0 };
   let suppressClickUntil = 0;
+  let drag: Drag | null = null;
+  let flight: { from: PixelOffset; to: PixelOffset; side: Side; start: number } | null = null;
+  let drawnAt = { x: 0, y: 0 };
   let animation: Animation | undefined;
-  let frame = 0;
 
-  function measure() {
-    resize = false;
-    bounds = rail.getBoundingClientRect();
-    railTravel = Math.max(0, bounds.height - dock.offsetHeight - 32);
-    half = actor.offsetWidth / 2;
-    actorAnchor = {
-      x: bounds.left + dock.offsetLeft + actor.offsetLeft + half,
-      y: bounds.top + dock.offsetTop + actor.offsetTop + half,
-    };
-    const viewport = document.documentElement;
-    const cue = desktop.matches ? viewport.clientHeight * .46 : bounds.bottom + viewport.clientHeight * .16;
-    const bottom = Math.max(1, viewport.scrollHeight - viewport.clientHeight);
-    starts = chapters.map((section, index) => {
-      if (!index) return 0;
-      const top = section ? section.getBoundingClientRect().top + window.scrollY : bottom;
-      return clamp(top - cue, 0, bottom);
-    });
-    if (timeline?.parentElement) {
-      const track = timeline.parentElement.getBoundingClientRect();
-      timelineStart = track.top + window.scrollY - viewport.clientHeight * .72;
-      timelineEnd = track.bottom + window.scrollY - viewport.clientHeight * .56;
-    }
+  function readTimeline() {
+    const rect = timeline?.parentElement?.getBoundingClientRect();
+    return rect ? { top: rect.top + window.scrollY, height: rect.height } : null;
   }
 
   function invalidate() {
@@ -105,78 +79,131 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
     schedule();
   }
 
-  function inRail(position: PixelOffset) {
+  function poseStyle(point: PixelOffset, jump: number, size: number) {
+    writeStyle(dock, "transform", `translate3d(${Math.round(point.x)}px, ${Math.round(point.y)}px, 0)`);
+    writeVariable(dock, "--cindy-lift", `${Math.round(jump)}px`);
+    writeVariable(dock, "--cindy-scale", size.toFixed(3));
+  }
+
+  function inWing(position: PixelOffset, side: Side) {
+    const inset = Math.max(0, (side === "left" ? route.left : route.width - route.right) / 2 - spriteRadius(route) - 4);
+    const x = wingCenter(route, side);
+    const radius = spriteRadius(route);
     return {
-      x: clamp(position.x, bounds.left + half, bounds.right - half),
-      y: clamp(position.y, bounds.top + half, bounds.bottom - half),
+      x: clamp(position.x, x - inset, x + inset),
+      y: clamp(position.y, route.nav + radius + 4, route.height - radius - 5),
     };
   }
 
-  function routePosition(scroll: number) {
-    let index = 0;
-    while (index < CHAPTERS.length - 1 && scroll >= starts[index + 1]) index++;
-    const current = CHAPTERS[index];
-    if (chapter !== current) {
-      chapter = current;
-      onChapter(current);
+  function aimAtHome(time: number, sample: ReturnType<typeof sampleRoute>) {
+    if (drag?.moved) return { point: drag.position, opacity: 1 };
+    if (drag) return { point: drag.origin, opacity: 1 };
+    if (!flight) return { point: sample.point, opacity: sample.opacity };
+    const elapsed = Math.max(0, time - flight.start);
+    if (elapsed < 245) return { point: between(flight.from, flight.to, 1 - (1 - elapsed / 245) ** 3), opacity: 1 };
+    if (elapsed >= 945) {
+      flight = null;
+      return { point: sample.point, opacity: sample.opacity };
     }
-
-    if (!desktop.matches) return { x: 0, y: 0 };
-    if (reduce.matches) return { x: 0, y: 16 + railTravel * .43 };
-    const next = Math.min(index + 1, CHAPTERS.length - 1);
-    const [x, y] = CINDY_SCENES[current].position;
-    const [nextX, nextY] = CINDY_SCENES[CHAPTERS[next]].position;
-    const interval = Math.max(1, starts[next] - starts[index]);
-    const progress = clamp((scroll - starts[index]) / interval);
-    const phase = ease(clamp((progress - .69) / .31));
-    return { x: mix(x, nextX, phase), y: 16 + railTravel * mix(y, nextY, phase) };
+    const progress = (elapsed - 245) / 700;
+    if (flight.side === sample.side && !sample.crossed && !sample.perched) {
+      return { point: between(flight.to, sample.point, ease(progress)), opacity: 1 };
+    }
+    return progress < .5 ? { point: flight.to, opacity: 1 - progress * 2 }
+      : { point: sample.point, opacity: (progress - .5) * 2 };
   }
 
-  function throwPosition(time: number, rest: PixelOffset) {
-    if (drag) return drag.position;
-    if (!flight) return rest;
-    const elapsed = Math.max(0, time - flight.start);
-    if (elapsed < 240) return between(flight.from, flight.to, 1 - (1 - elapsed / 240) ** 3);
-    if (elapsed < 940) return between(flight.to, rest, ease((elapsed - 240) / 700));
-    flight = null;
-    return rest;
+  function backdrop({ from, to, mix }: ReturnType<typeof sampleRoute>["palette"]) {
+    const a = CINDY_SCENES[from], b = CINDY_SCENES[to];
+    const colors = `${from}:${to}`;
+    if (paletteKey !== colors) {
+      if (base) base.style.backgroundColor = rgb(a.color);
+      if (blend) blend.style.backgroundColor = rgb(b.color);
+      paletteKey = colors;
+    }
+    if (blend) writeStyle(blend, "opacity", mix.toFixed(4));
+  }
+
+  function lightTimeline(scroll: number) {
+    if (!timeline || !timelineTrack?.height) return;
+    const passed = scroll + route.height * .60;
+    const { top, height } = timelineTrack;
+    const scale = reduce.matches ? 1 : clamp((passed - top) / height);
+    writeStyle(timeline, "transform", `scaleY(${scale.toFixed(3)})`);
+    for (const [index, target] of route.nodes.entries()) {
+      const node = route.stops[2].anchors[index];
+      const reached = Boolean(node && passed >= node.y);
+      if (target.hasAttribute("data-lit") !== reached) target.toggleAttribute("data-lit", reached);
+    }
   }
 
   function render(time: number) {
     frame = 0;
-    if (resize) measure();
-    const scroll = window.scrollY;
-    const position = routePosition(scroll);
-    const rest = { x: actorAnchor.x + position.x, y: actorAnchor.y + position.y };
-    drawnAt = throwPosition(time, rest);
-    translate(dock, position);
-    translate(actor, { x: drawnAt.x - rest.x, y: drawnAt.y - rest.y });
-    if (timeline && timelineEnd > timelineStart) {
-      const progress = clamp((scroll - timelineStart) / (timelineEnd - timelineStart));
-      const transform = reduce.matches ? "none" : `scaleY(${progress.toFixed(3)})`;
-      if (timeline.style.transform !== transform) timeline.style.transform = transform;
+    if (resize) {
+      route = measureRoute(home, wide.matches);
+      timelineTrack = readTimeline();
+      resize = false;
     }
+    const scroll = window.scrollY;
+    if (scroll !== previousScroll) direction = Math.sign(scroll - previousScroll);
+    previousScroll = scroll;
+    const reduced = reduce.matches;
+    const sample = sampleRoute(route, scroll, reduced);
+    if (chapter !== sample.chapter) {
+      chapter = sample.chapter;
+      onChapter(chapter);
+    }
+    backdrop(sample.palette);
+    lightTimeline(scroll);
+
+    const current = aimAtHome(time, sample);
+    drawnAt = current.point;
+    const landing = chapter === "contact" && !drag && !flight ? finale(route, scroll) : 0;
+    const walking = !reduced && !drag && !flight && landing < .2
+      && (sample.path || (chapter === "hero" && scroll < 190));
+    const traveling = walking || (chapter === "global" && !reduced && !drag && !flight);
+    const step = traveling ? Math.floor(scroll / (route.large ? 23 : 27)) % 3 : 0;
+    const bob = traveling ? -Math.abs(Math.sin(scroll / 23)) * (chapter === "global" ? 10 : 5) : 0;
+    const arrival = chapter === "hero" && route.large ? .84 + .16 * ease(clamp(scroll / 190)) : 1;
+    const size = reduced ? 1 : arrival * (1 - landing * (route.large ? .60 : .33));
+    poseStyle(drawnAt, bob, size);
+    writeStyle(dock, "opacity", current.opacity.toFixed(3));
+    const swappingWings = drawnAt.x > route.left - spriteRadius(route) && drawnAt.x < route.right + spriteRadius(route);
+    dock.toggleAttribute("data-crossing", sample.crossed && swappingWings);
+    dock.toggleAttribute("data-note-below", drawnAt.y < route.nav + spriteRadius(route) + 112);
+    dock.toggleAttribute("data-walking", walking);
+    dock.toggleAttribute("data-hidden", current.opacity < .08);
+    dock.toggleAttribute("data-sleeping", reaction === "sleep");
+    dock.toggleAttribute("data-perched", sample.perched && !drag && !flight);
+    dock.toggleAttribute("data-final", !reduced && landing > .84);
+    dock.toggleAttribute("data-music", chapter === "music" && !sample.crossed && reaction !== "sleep");
+    dock.toggleAttribute("data-skills", chapter === "skills" && !sample.crossed && reaction !== "sleep");
+    if (chapter === "skills") writeVariable(dock, "--cindy-orbit", `${(scroll / 8) % 360}deg`);
+    const noteSide: Side = drawnAt.x < route.width / 2 ? "left" : "right";
+    const width = noteSide === "left" ? route.left : route.width - route.right;
+    writeVariable(dock, "--cindy-note-width", `${Math.round(Math.max(48, Math.min(172, width - 12)))}px`);
+    writeVariable(dock, "--cindy-note-offset", `${Math.round(wingCenter(route, noteSide) - drawnAt.x)}px`);
 
     const scene = CINDY_SCENES[chapter];
-    const gaze = pointer && !reduce.matches && reaction !== "sleep" && !drag?.moved ? {
-      x: Math.round(clamp((pointer.x - drawnAt.x) / 92, -1, 1)),
-      y: Math.round(clamp((pointer.y - drawnAt.y) / 92, -1, 1)),
-    } : { x: 0, y: 0 };
-    const tilt = gaze.x === 0 ? "" : `translateX(${gaze.x}px) rotate(${gaze.x * 3}deg)`;
-    if (sprite.style.transform !== tilt) sprite.style.transform = tilt;
-    let expression = hovered ? "happy" : scene.expression;
-    if (typeof reaction === "number") expression = "happy";
-    if (reaction === "egg") expression = "wink";
-    if (drag?.moved) expression = "surprise";
-    if (reaction === "sleep") expression = "sleep";
-    const pose = reduce.matches || reaction === "sleep" ? "rest" : scene.pose;
-    const alternate = reaction === "egg" && !reduce.matches;
-    const nextKey = [pose, expression, gaze.x, gaze.y, alternate].join(":");
-    if (context && spriteKey !== nextKey) {
-      paintCindy(context, pose, expression, gaze, alternate);
+    const facing = walking ? sample.heading * direction : scene.side === "left" ? 1 : -1;
+    const gaze = !reduced && reaction !== "sleep" && !drag?.moved
+      ? attention && chapter === "projects" ? { x: 2, y: -1 }
+        : pointer ? {
+          x: Math.round(clamp((pointer.x - drawnAt.x) / 88, -1, 1)) * facing,
+          y: Math.round(clamp((pointer.y - drawnAt.y) / 88, -1, 1)),
+        } : { x: 0, y: 0 }
+      : { x: 0, y: 0 };
+    const pose = reduced || reaction === "sleep" || landing > .84 ? "rest" : walking ? "walk" : scene.pose;
+    const expression = reaction === "sleep" ? "sleep" : drag?.moved ? "surprise" : reaction === "egg" ? "wink"
+      : typeof reaction === "number" || hovered ? "happy" : scene.expression;
+    const alternate = reaction === "egg" && !reduced;
+    const nextKey = [pose, expression, gaze.x, gaze.y, alternate, step, route.large].join(":");
+    if (context && nextKey !== spriteKey) {
+      paintCindy(context, pose, expression, gaze, alternate, step, !route.large);
       spriteKey = nextKey;
       button.dataset.sprite = "ready";
     }
+    writeStyle(sprite, "transform", `translateX(-50%) translateX(${attention && chapter === "projects" && !reduced ? -3 : 0}px) scaleX(${facing})`);
     if (flight) schedule();
   }
 
@@ -194,11 +221,8 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
     idleTimer = 0;
     if (document.hidden || drag || document.querySelector("#profile-chat-dialog[open]")) return;
     const remaining = IDLE_MS - (performance.now() - idleAt);
-    if (remaining > 0) {
-      idleTimer = window.setTimeout(checkIdle, remaining);
-      return;
-    }
-    setReaction("sleep");
+    if (remaining > 0) idleTimer = window.setTimeout(checkIdle, remaining);
+    else setReaction("sleep");
   }
 
   function activity() {
@@ -213,12 +237,11 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
     if (event.pointerType === "mouse") pointer = { x: event.clientX, y: event.clientY };
     schedule();
     if (!drag || event.pointerId !== drag.id) return;
-    if (!drag.moved && Math.hypot(event.clientX - drag.origin.x, event.clientY - drag.origin.y) < 7) return;
-
+    if (!drag.moved && Math.hypot(event.clientX + drag.offset.x - drag.origin.x, event.clientY + drag.offset.y - drag.origin.y) < 7) return;
     drag.moved = true;
     button.dataset.dragging = "";
     const now = performance.now();
-    const position = inRail({ x: event.clientX + drag.offset.x, y: event.clientY + drag.offset.y });
+    const position = inWing({ x: event.clientX + drag.offset.x, y: event.clientY + drag.offset.y }, drag.side);
     const dt = Math.max(10, now - drag.time);
     drag.velocity = { x: (position.x - drag.position.x) / dt, y: (position.y - drag.position.y) / dt };
     drag.position = position;
@@ -228,14 +251,13 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
   function pointerDown(event: PointerEvent) {
     if (reduce.matches || !event.isPrimary || event.button !== 0) return;
     activity();
-    pointer = event.pointerType === "mouse" ? pointer : null;
-    animation?.cancel();
-    const origin = { x: event.clientX, y: event.clientY };
+    if (event.pointerType !== "mouse") pointer = null;
+    const side: Side = drawnAt.x < route.width / 2 ? "left" : "right";
     drag = {
-      id: event.pointerId, origin, position: drawnAt, time: performance.now(), moved: false,
-      offset: { x: drawnAt.x - origin.x, y: drawnAt.y - origin.y },
-      velocity: { x: 0, y: 0 },
+      id: event.pointerId, side, origin: drawnAt, position: inWing(drawnAt, side), time: performance.now(), moved: false,
+      offset: { x: drawnAt.x - event.clientX, y: drawnAt.y - event.clientY }, velocity: { x: 0, y: 0 },
     };
+    animation?.cancel();
     flight = null;
     button.setPointerCapture(event.pointerId);
   }
@@ -244,14 +266,14 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
     if (!drag || event.pointerId !== drag.id) return;
     if (drag.moved) {
       const now = performance.now();
-      const boost = event.type === "pointerup" && now - drag.time < 130 ? 82 : 0;
+      const boost = event.type === "pointerup" && now - drag.time < 130 ? 75 : 0;
       const from = drag.position;
-      const to = inRail({
-        x: from.x + clamp(drag.velocity.x * boost, -102, 102),
-        y: from.y + clamp(drag.velocity.y * boost, -120, 120),
-      });
-      flight = { from, to, start: now };
-      suppressClickUntil = now + 300;
+      const to = inWing({
+        x: from.x + clamp(drag.velocity.x * boost, -95, 95),
+        y: from.y + clamp(drag.velocity.y * boost, -125, 125),
+      }, drag.side);
+      flight = { from, to, side: drag.side, start: now };
+      suppressClickUntil = now + 280;
     }
     drag = null;
     delete button.dataset.dragging;
@@ -267,7 +289,6 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
       openChat(button);
       return;
     }
-
     clickTimes = clickTimes.filter(time => now - time < CLICK_WINDOW_MS);
     clickTimes.push(now);
     const egg = clickTimes.length >= 4;
@@ -278,15 +299,13 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
       lastReply = (lastReply + 1 + Math.floor(Math.random() * (CINDY_REPLIES.length - 1))) % CINDY_REPLIES.length;
       setReaction(lastReply);
     }
-
     window.clearTimeout(resetTimer);
     resetTimer = window.setTimeout(() => setReaction(null), egg ? 2_300 : 1_800);
     if (!reduce.matches) {
       animation?.cancel();
       animation = motion.animate(
-        egg
-          ? [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }]
-          : [{ transform: "translateY(0)" }, { transform: "translateY(-9px)", offset: .38 }, { transform: "translateY(0)" }],
+        egg ? [{ transform: "translateY(0)" }, { transform: "translateY(-9px)", offset: .24 }, { transform: "translateY(0)", offset: .43 }, { transform: "translateY(-5px)", offset: .67 }, { transform: "translateY(0)" }]
+          : [{ transform: "translateY(0)" }, { transform: "translateY(-10px)", offset: .38 }, { transform: "translateY(0)" }],
         { duration: egg ? 530 : 310, easing: "cubic-bezier(.2,.65,.4,1)" },
       );
     }
@@ -315,8 +334,13 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
   window.addEventListener("pageshow", invalidate, { signal });
   window.addEventListener("keydown", activity, { signal });
   document.addEventListener("focusin", activity, { signal });
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) activity();
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) activity(); }, { signal });
+  home.addEventListener("cindy:preview", () => {
+    attention = true;
+    activity();
+    schedule();
+    window.clearTimeout(attentionTimer);
+    attentionTimer = window.setTimeout(() => { attention = false; schedule(); }, 950);
   }, { signal });
   const preference = () => {
     if (drag && button.hasPointerCapture(drag.id)) button.releasePointerCapture(drag.id);
@@ -327,21 +351,22 @@ export function mountCindy({ rail, dock, actor, button, sprite, motion, onChapte
     invalidate();
   };
   reduce.addEventListener("change", preference, { signal });
-  desktop.addEventListener("change", preference, { signal });
+  wide.addEventListener("change", preference, { signal });
 
   const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(invalidate);
-  for (const element of [rail, dock, ...chapters]) {
-    if (element) observer?.observe(element);
+  for (const target of home.querySelectorAll("main > section, [data-cindy-anchor], [data-cindy-perch], footer")) {
+    observer?.observe(target);
   }
+  const languageObserver = new MutationObserver(invalidate);
+  languageObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   activity();
   schedule();
-
   return () => {
     events.abort();
     observer?.disconnect();
+    languageObserver.disconnect();
     animation?.cancel();
     cancelAnimationFrame(frame);
-    window.clearTimeout(idleTimer);
-    window.clearTimeout(resetTimer);
+    for (const timer of [idleTimer, resetTimer, attentionTimer]) window.clearTimeout(timer);
   };
 }

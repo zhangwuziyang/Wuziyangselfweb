@@ -34,14 +34,16 @@ export default function About() {
         <ScrollReveal className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,.78fr)_minmax(0,1fr)] md:gap-9 xl:gap-14 items-start">
 
           {/* Portrait */}
-          <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
-            <Image
-              src="/photos/portrait.jpg"
-              alt="Wuziyang Zhang"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 424px) calc(100vw - 40px), 384px"
-            />
+          <div className="story-about-perch">
+            <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden story-photo-shadow" data-cindy-anchor="" data-cindy-perch="">
+              <Image
+                src="/photos/portrait.jpg"
+                alt="Wuziyang Zhang"
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 767px) 67vw, 384px"
+              />
+            </div>
           </div>
 
           {/* Copy */}
@@ -91,7 +93,7 @@ export default function About() {
             <div className="mt-6">
               <Link
                 href="/university"
-                className="story-panel group flex flex-wrap items-center justify-between gap-4 rounded-2xl px-4 py-3 hover:border-white/30"
+                className="story-panel group flex flex-wrap items-center justify-between gap-4 rounded-2xl px-4 py-3 story-interactive"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="shrink-0 w-9 h-9 rounded-xl overflow-hidden bg-white shadow-sm flex items-center justify-center p-0.5">

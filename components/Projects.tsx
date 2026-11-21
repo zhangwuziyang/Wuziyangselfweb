@@ -23,7 +23,7 @@ function renderPoints(points: readonly string[]) {
 
 function renderTechTags(tags: readonly string[]) {
   return tags.map((tag) => (
-    <span key={tag} className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-[var(--story-muted)]">
+    <span key={tag} className="rounded-full border border-[var(--story-edge)] px-2.5 py-1 text-xs text-[var(--story-muted)]">
       {tag}
     </span>
   ));
@@ -45,17 +45,13 @@ export default function Projects() {
       <div id="project-gallery" className="story-projects__gallery story-shell">
         {projects.map(({ slug, card: { en, zh }, frames, device }) => (
           <ScrollReveal key={slug}>
-            <article className={device === "phone" ? "story-project story-project--health story-panel" : "story-project story-panel"}>
-              <div className={`story-project__media story-project__media--${slug}`}>
-                <ProjectPreview frames={frames} phone={device === "phone"} name={{ en: en.title, zh: zh.title }} />
-              </div>
-
-              <div className="flex min-w-0 flex-col justify-center p-5 sm:p-7 xl:p-8">
+            <article className="story-project story-panel">
+              <div className="flex min-w-0 flex-col justify-center p-3.5 sm:p-7 xl:p-8">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-[#9cbbff]/25 bg-[#9cbbff]/10 px-2.5 py-1 text-xs font-semibold text-[#c4d8ff]">
+                  <span className="rounded-full border border-[var(--story-edge)] bg-[var(--story-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--story-tint)]">
                     <Localized en={en.tag1} zh={zh.tag1} />
                   </span>
-                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-[var(--story-muted)]">
+                  <span className="rounded-full border border-[var(--story-edge)] px-2.5 py-1 text-xs text-[var(--story-muted)]">
                     <Localized en={en.tag2} zh={zh.tag2} />
                   </span>
                 </div>
@@ -69,11 +65,14 @@ export default function Projects() {
                 <div className="mb-5 flex flex-wrap gap-2">
                   <Localized en={renderTechTags(en.techTags)} zh={renderTechTags(zh.techTags)} />
                 </div>
-                <Link href={`/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:text-white">
+                <Link href={`/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:underline">
                   <Localized en={en.cta} zh={zh.cta} />
                   <span className="sr-only"><Localized en={` ${en.title}`} zh={` ${zh.title}`} /></span>
                   <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
+              </div>
+              <div className="story-project__media" data-cindy-anchor="">
+                <ProjectPreview frames={frames} phone={device === "phone"} name={{ en: en.title, zh: zh.title }} />
               </div>
             </article>
           </ScrollReveal>

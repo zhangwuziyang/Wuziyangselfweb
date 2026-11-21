@@ -27,7 +27,7 @@ export default function GlobalLens() {
           <div className="mb-10 flex flex-wrap gap-x-8 gap-y-4 sm:gap-x-14">
             {STATS.map((s) => (
               <div key={s.labelKey}>
-                <p className="font-semibold leading-none tracking-tight" style={{ fontSize: "clamp(2.8rem, 5.5vw, 5rem)", color: "#f5f5f7", letterSpacing: "-0.03em" }}>
+                <p className="font-semibold leading-none tracking-tight" style={{ fontSize: "clamp(2.8rem, 5.5vw, 5rem)", color: "var(--story-ink)", letterSpacing: "-0.03em" }}>
                   {s.end}{s.suffix}
                 </p>
                 <p className="text-xs mt-2 tracking-[0.15em] uppercase font-medium" style={{ color: "var(--story-dim)" }}>
@@ -40,10 +40,10 @@ export default function GlobalLens() {
 
         {/* Cinematic image */}
         <ScrollReveal>
-          <div className="relative mb-9 aspect-[3/2] w-full overflow-hidden rounded-3xl md:aspect-[2/1]">
+          <div className="relative mb-9 aspect-[3/2] w-full overflow-hidden rounded-3xl md:aspect-[2/1]" data-cindy-anchor="">
             <Image src="/photos/travel-machu-picchu.jpg" alt="Machu Picchu, Peru" fill className="object-cover object-center" sizes="(max-width: 1100px) calc(100vw - 40px), 1060px" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)" }} />
-            <p className="absolute bottom-4 right-5 text-[11px] tracking-[0.2em] uppercase font-medium" style={{ color: "rgba(255,255,255,0.85)" }}>
+            <p className="story-photo-label absolute bottom-3 right-3 text-[11px] font-medium">
               <Localized en="Machu Picchu, Peru" zh="秘鲁 · 马丘比丘" />
             </p>
           </div>
@@ -52,37 +52,39 @@ export default function GlobalLens() {
         {/* Copy */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-20 mb-14">
           <ScrollReveal>
-            <p className="font-light leading-[1.8]" style={{ fontSize: "clamp(1rem, 1.6vw, 1.1rem)", color: "#d1d1d6" }}>
+            <p className="font-light leading-[1.8]" style={{ fontSize: "clamp(1rem, 1.6vw, 1.1rem)", color: "var(--story-muted)" }}>
               <Localized {...g.p1} />
             </p>
           </ScrollReveal>
           <ScrollReveal>
-            <p className="font-light leading-[1.8]" style={{ fontSize: "clamp(1rem, 1.6vw, 1.125rem)", color: "#6e6e73" }}>
+            <p className="font-light leading-[1.8]" style={{ fontSize: "clamp(1rem, 1.6vw, 1.125rem)", color: "var(--story-muted)" }}>
               <Localized {...g.p2} />
             </p>
           </ScrollReveal>
         </div>
 
         {/* City photo grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          {g.cityPhotos.map((item) => {
+        <div className="grid grid-cols-2 gap-3 mb-5 sm:gap-5">
+          {g.cityPhotos.map((item, index) => {
             const image = (alt: string) => (
               <Image
                 src={item.src}
                 alt={alt}
                 fill
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-[600ms]"
-                sizes="(max-width: 639px) calc(50vw - 26px), (max-width: 1100px) calc(25vw - 19px), 256px"
+                sizes="(max-width: 767px) 31vw, (max-width: 1440px) 39vw, 576px"
               />
             );
 
             return (
-              <ScrollReveal key={item.src} className="group relative aspect-[3/4] rounded-2xl overflow-hidden">
-                <Localized en={image(item.city.en)} zh={image(item.city.zh)} />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)" }} />
-                <div className="absolute bottom-3 left-3">
-                  <p className="text-white text-sm font-medium leading-none mb-0.5"><Localized {...item.city} /></p>
-                  <p className="text-[11px]" style={{ color: "var(--story-muted)" }}><Localized {...item.note} /></p>
+              <ScrollReveal key={item.src}>
+                <div className="group relative aspect-[3/4] overflow-hidden rounded-2xl sm:aspect-[7/5]" data-cindy-anchor={index % 2 === 1 ? "" : undefined}>
+                  <Localized en={image(item.city.en)} zh={image(item.city.zh)} />
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)" }} />
+                  <div className="story-photo-label absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
+                    <p className="text-white text-sm font-medium leading-none mb-0.5"><Localized {...item.city} /></p>
+                    <p className="text-[11px] text-white/90"><Localized {...item.note} /></p>
+                  </div>
                 </div>
               </ScrollReveal>
             );
@@ -93,8 +95,8 @@ export default function GlobalLens() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {g.cityGrid.map((item) => (
             <ScrollReveal key={item.city.en}>
-              <div className="story-panel h-full rounded-xl p-4">
-                <p className="font-medium text-sm mb-0.5" style={{ color: "#f5f5f7" }}><Localized {...item.city} /></p>
+              <div className="story-panel h-full rounded-xl p-2.5 sm:p-4">
+                <p className="font-medium text-sm mb-0.5" style={{ color: "var(--story-ink)" }}><Localized {...item.city} /></p>
                 <p className="text-xs" style={{ color: "var(--story-dim)" }}><Localized {...item.note} /></p>
               </div>
             </ScrollReveal>

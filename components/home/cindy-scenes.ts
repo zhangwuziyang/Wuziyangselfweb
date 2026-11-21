@@ -3,59 +3,76 @@ import type { CindyExpression, CindyPose } from "./cindy-sprite";
 export const CHAPTERS = ["hero", "about", "experience", "projects", "global", "music", "skills", "philosophy", "contact"] as const;
 export type Chapter = typeof CHAPTERS[number];
 type Line = { en: string; zh: string };
+export type RGB = readonly [number, number, number];
+export type Side = "left" | "right";
 type Scene = {
   pose: CindyPose;
   expression: CindyExpression;
-  position: readonly [x: number, y: number];
+  side: Side;
+  color: RGB;
   line: Line;
+  short: Line;
 };
 
 export const CINDY_SCENES: Record<Chapter, Scene> = {
   hero: {
-    pose: "hello", expression: "happy", position: [0, .34],
-    line: { en: "Hi, I’m Cindy. I’ll show you around.", zh: "你好，我是 Cindy。我带你逛逛这里。" },
+    pose: "hello", expression: "happy", side: "left", color: [249, 244, 235],
+    line: { en: "Hi, I’m Cindy. I’ll show you around Wuziyang’s portfolio.", zh: "嗨，我是 Cindy。我来带你逛逛梓洋的作品集。" },
+    short: { en: "Hi, I’m Cindy.", zh: "嗨，我是 Cindy。" },
   },
   about: {
-    pose: "point", expression: "neutral", position: [-6, .46],
-    line: { en: "Economics and information science at UW–Madison.", zh: "梓洋在威斯康星大学麦迪逊分校读经济学和信息科学。" },
+    pose: "perch", expression: "neutral", side: "left", color: [248, 242, 232],
+    line: { en: "Let me show you what Wuziyang studies at UW–Madison.", zh: "我先带你看看梓洋在威斯康星大学麦迪逊分校学什么。" },
+    short: { en: "I’ll show you UW–Madison.", zh: "我带你看校园。" },
   },
   experience: {
-    pose: "timeline", expression: "think", position: [5, .59],
-    line: { en: "From strategy and research to finance.", zh: "沿时间线看看他做过的战略、研究和金融工作。" },
+    pose: "timeline", expression: "wink", side: "left", color: [246, 241, 233],
+    line: { en: "I’ll follow his work across strategy, research, and finance.", zh: "我沿时间线带你看他的战略、研究和金融经历。" },
+    short: { en: "I’ll light the timeline.", zh: "我来点亮时间线。" },
   },
   projects: {
-    pose: "laptop", expression: "neutral", position: [-5, .43],
-    line: { en: "Two things he built: Offer Radar and My Health Agent.", zh: "来看看他做的两个产品，Offer 雷达和健康助理。" },
+    pose: "flag", expression: "neutral", side: "right", color: [245, 240, 232],
+    line: { en: "I picked two stops here, Offer Radar and My Health Agent.", zh: "我在这里安排了两站，Offer 雷达和健康助理。" },
+    short: { en: "I’ve got two demos.", zh: "我带你看两个项目。" },
   },
   global: {
-    pose: "earth", expression: "surprise", position: [5, .61],
-    line: { en: "20+ countries, 100+ cities. Each taught him something.", zh: "他走过 20 多个国家、100 多座城市，每一站都有新发现。" },
+    pose: "earth", expression: "surprise", side: "right", color: [244, 237, 226],
+    line: { en: "I’ve got stories to share from his travels across more than 20 countries.", zh: "我想跟你分享他走过二十多个国家的故事。" },
+    short: { en: "I’ll take you traveling.", zh: "我带你去旅行。" },
   },
   music: {
-    pose: "music", expression: "happy", position: [-6, .48],
-    line: { en: "Years at the piano taught him to work with rhythm.", zh: "多年练琴，教会了他怎么把握节奏。" },
+    pose: "music", expression: "happy", side: "right", color: [235, 226, 213],
+    line: { en: "I hear the years he spent at the piano in how he thinks about rhythm.", zh: "我听得出，多年练琴塑造了他对节奏的感觉。" },
+    short: { en: "I’m listening to piano.", zh: "我在听钢琴。" },
   },
   skills: {
-    pose: "skills", expression: "wink", position: [5, .58],
-    line: { en: "Strategy, product, data, and design.", zh: "这是他的四组工具，涵盖战略、产品、数据和设计。" },
+    pose: "skills", expression: "wink", side: "right", color: [242, 234, 223],
+    line: { en: "I’ve gathered his tools for strategy, product, data, and design.", zh: "我把他的战略、产品、数据和设计工具都找来了。" },
+    short: { en: "I found his toolkit.", zh: "我找齐了他的工具。" },
   },
   philosophy: {
-    pose: "think", expression: "think", position: [-4, .39],
-    line: { en: "Useful, elegant things that stay with you.", zh: "他想做实用、优雅、让人记得住的东西。" },
+    pose: "think", expression: "think", side: "left", color: [245, 239, 230],
+    line: { en: "I like his test for good work. Make it useful, elegant, and memorable.", zh: "我喜欢他的标准。做得实用、优雅，也让人记得住。" },
+    short: { en: "I’ll pause and think.", zh: "我也停下来想想。" },
   },
   contact: {
-    pose: "bye", expression: "shy", position: [0, .68],
-    line: { en: "Thanks for stopping by. Tap me to chat.", zh: "谢谢你逛到这里。想聊的话，点我就好。" },
+    pose: "bye", expression: "shy", side: "right", color: [248, 241, 231],
+    line: { en: "I enjoyed showing you around. I’m here if you’d like to chat.", zh: "我很高兴带你逛完这一路。还想聊的话，点我就好。" },
+    short: { en: "I’m here to chat.", zh: "我还在，点我聊聊。" },
   },
 };
 
 export const CINDY_REPLIES: readonly Line[] = [
-  { en: "Shall we keep going?", zh: "要继续往下看看吗？" },
+  { en: "I can show you more.", zh: "我还有更多想给你看。" },
   { en: "I’m glad you stopped by.", zh: "很高兴你来逛逛。" },
-  { en: "I picked the stripes myself.", zh: "这件条纹衫是我自己挑的。" },
-  { en: "I know a shortcut. Try the links up top.", zh: "我知道一条近路，试试顶部的导航。" },
+  { en: "I picked my own stripes.", zh: "条纹衫是我自己挑的。" },
+  { en: "I know a shortcut!", zh: "我知道一条近路！" },
 ];
 
 export type CindyReaction = number | "egg" | "sleep" | null;
+export const CINDY_EGG = { en: "You found my secret!", zh: "你找到彩蛋啦！" };
 
-export const CINDY_EGG = { en: "You found my little secret.", zh: "你找到我的小彩蛋了。" };
+export const CINDY_SKILLS: readonly Line[] = [
+  { en: "Strategy", zh: "战略" }, { en: "Product", zh: "产品" },
+  { en: "Data", zh: "数据" }, { en: "Design", zh: "设计" },
+];

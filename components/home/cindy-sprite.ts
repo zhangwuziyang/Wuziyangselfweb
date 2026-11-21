@@ -42,7 +42,10 @@ const rows = [
 ];
 const CINDY_COLORS: Record<string, string> = { k:"#16110d", a:"#bb723e", b:"#884a1b", c:"#f5eedc", s:"#e0d1bb", r:"#da3628", d:"#b73120", p:"#ed9c80", g:"#858183", l:"#bababf" };
 
-export type CindyPose = "rest" | "hello" | "point" | "timeline" | "laptop" | "earth" | "music" | "skills" | "think" | "bye";
+// Author once on a snapped grid, then display at exactly 1× or 2×.
+export const CINDY_BITMAP = 96;
+const pixel = (value: number) => Math.round(value * CINDY_BITMAP / 64);
+export type CindyPose = "rest" | "walk" | "hello" | "perch" | "timeline" | "flag" | "earth" | "music" | "skills" | "think" | "bye";
 export type CindyExpression = "neutral" | "happy" | "wink" | "surprise" | "think" | "shy" | "sleep";
 export type PixelOffset = { x: number; y: number };
 
@@ -91,9 +94,9 @@ function eyes(rect: Rect, expression: CindyExpression, gaze: PixelOffset) {
     rect(30, 36, 4, 1, CINDY_COLORS.g);
     const glyph = ["zzz", "..z", ".z.", "z..", "zzz"];
     const colors = { z: "#c1cbe0" };
-    drawRows(rect, 51, 10, glyph, colors);
-    drawRows(rect, 56, 6, glyph, colors);
-    drawRows(rect, 61, 2, glyph, colors);
+    drawRows(rect, 43, 14, glyph, colors);
+    drawRows(rect, 47, 10, glyph, colors);
+    drawRows(rect, 49, 6, glyph, colors);
   }
 }
 
@@ -122,44 +125,58 @@ export function paintCindy(
   expression: CindyExpression,
   gaze: PixelOffset,
   alternate: boolean,
+  step = 0,
+  compact = false,
 ) {
-  canvas.clearRect(0, 0, 64, 64);
+  canvas.clearRect(0, 0, CINDY_BITMAP, CINDY_BITMAP);
   const rect: Rect = (x, y, w, h, color) => {
     canvas.fillStyle = color;
-    canvas.fillRect(x, y, w, h);
+    canvas.fillRect(pixel(x), pixel(y), pixel(x + w) - pixel(x), pixel(y + h) - pixel(y));
   };
   const hand = (x: number, y: number, flip = false) => drawRows(rect, x, y, paw, CINDY_COLORS, flip);
 
   drawRows(rect, 12, 12, rows, alternate ? alternateColors : CINDY_COLORS);
   eyes(rect, expression, gaze);
 
+  const flag = (x: number, y: number) => {
+    rect(x, y, 2, 17, ink);
+    rect(x + 2, y, 7, 5, "#ad4236");
+    rect(x + 2, y + 3, 4, 2, "#dd6554");
+  };
+
+  const seated = () => {
+    for (const x of [18, 37]) {
+      rect(x, 49, 8, 3, ink);
+      rect(x + 1, 49, 6, 2, cream);
+    }
+  };
+
   switch (pose) {
-    case "hello":
-      hand(5, 32);
-      rect(3, 28, 2, 3, brown);
-      rect(7, 25, 3, 1, brown);
+    case "walk": {
+      const stride = [0, 2, -2][step] ?? 0;
+      rect(20 - stride, 50, 8, 3 + Math.max(0, stride), ink);
+      rect(36 + stride, 50, 8, 3 + Math.max(0, -stride), ink);
+      rect(21 - stride, 50, 6, 2, cream);
+      rect(37 + stride, 50, 6, 2, cream);
+      flag(compact ? 42 : 46, 30);
       break;
-    case "point":
-      hand(9, 37);
-      rect(5, 37, 5, 4, ink);
-      rect(6, 38, 4, 2, cream);
+    }
+    case "perch":
+      seated();
+      hand(15, 44);
+      hand(41, 44, true);
+      break;
+    case "hello":
+      hand(compact ? 12 : 8, 32);
+      flag(42, 27);
       break;
     case "timeline":
-      hand(48, 32, true);
-      rect(59, 21, 1, 23, "#8191aa");
-      rect(57, 21, 5, 5, "#aac5ea");
-      rect(57, 30, 5, 5, "#aac5ea");
-      rect(57, 39, 5, 5, "#62748c");
+      if (!compact) hand(46, 34, true);
+      flag(compact ? 40 : 46, 23);
       break;
-    case "laptop":
-      rect(23, 40, 20, 12, ink);
-      rect(24, 41, 18, 10, "#62687b");
-      rect(25, 42, 16, 1, "#a4a8b0");
-      rect(30, 46, 5, 2, "#d7dadb");
-      rect(20, 52, 26, 3, ink);
-      rect(21, 52, 24, 1, "#abb0bb");
-      hand(17, 46);
-      hand(42, 46, true);
+    case "flag":
+      flag(compact ? 40 : 46, 21);
+      hand(compact ? 36 : 44, 35, true);
       break;
     case "earth":
       drawRows(rect, 23, 37, globe, { k: ink, w: "#6586a4", v: "#8cab68" });
@@ -167,36 +184,30 @@ export function paintCindy(
       hand(39, 44, true);
       break;
     case "music": {
+      seated();
       const band = "#343b49";
       rect(23, 8, 18, 3, band);
       rect(18, 10, 5, 3, band);
       rect(41, 10, 5, 3, band);
       rect(14, 12, 5, 11, band);
       rect(45, 12, 5, 11, band);
-      for (const x of [10, 46]) {
+      for (const x of [compact ? 12 : 10, compact ? 44 : 46]) {
         rect(x, 20, 8, 13, band);
         rect(x + 1, 22, 4, 9, "#7387a3");
       }
-      rect(56, 9, 2, 7, "#a6b8d3");
-      rect(57, 9, 5, 2, "#a6b8d3");
-      rect(53, 15, 4, 3, "#a6b8d3");
       break;
     }
     case "skills":
-      hand(6, 42);
-      hand(50, 42, true);
-      rect(2, 15, 8, 5, "#ae6b5c");
-      rect(54, 11, 9, 5, "#738166");
-      rect(2, 23, 6, 4, "#b59065");
-      rect(56, 21, 7, 4, "#6586a4");
+      hand(compact ? 12 : 9, 42);
+      hand(compact ? 42 : 47, 42, true);
       break;
     case "think":
+      seated();
       hand(40, 33, true);
       break;
     case "bye":
-      hand(51, 27, true);
-      rect(58, 23, 2, 3, brown);
-      rect(54, 21, 3, 1, brown);
+      hand(compact ? 44 : 48, 27, true);
+      rect(compact ? 47 : 53, 21, 2, 3, brown);
       break;
   }
 }
