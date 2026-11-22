@@ -361,7 +361,7 @@ function PinnedStageContent({
      inside its opposite half with >=75px clear gutter at 1280/1440/1920px. */
   const deviceBoxClass =
     story.device === "iphone"
-      ? "shrink-0 w-[min(24%,296px,31vh)] min-w-[210px]"
+      ? "shrink-0 w-[min(24%,296px,29vh)] min-w-[min(210px,29vh)]"
       : "shrink-0 w-[min(52%,610px,80vh)]";
 
   const scrubberLabels = useMemo(
@@ -545,12 +545,12 @@ function StackedStory({ story, lang, reducedMotion }: StackedStoryProps) {
 
   const frameWrapClass =
     story.device === "iphone"
-      ? "mx-auto w-[min(76vw,300px)]"
+      ? "mx-auto w-[min(78vw,272px)]"
       : "mx-auto w-full max-w-[640px]";
 
   const frameSizes =
     story.device === "iphone"
-      ? "(max-width: 767px) 76vw, 300px"
+      ? "(max-width: 767px) 78vw, 272px"
       : "(max-width: 767px) 92vw, 640px";
 
   return (
@@ -745,16 +745,40 @@ function GalleryLightbox({ item, device, lang, onClose }: GalleryLightboxProps) 
         <div
           className={`relative overflow-hidden rounded-2xl border border-white/12 bg-[#0d1018] shadow-2xl ${
             isPhone
-              ? "aspect-[560/1217] h-[min(72dvh,760px)] w-auto"
-              : "aspect-[1800/1125] w-full max-w-[960px]"
+              ? "aspect-[560/1217] h-[min(64dvh,600px)] w-auto"
+              : "aspect-[1800/1125] w-full max-w-[min(960px,104dvh)]"
           }`}
+          style={
+            isPhone
+              ? {
+                  position: "relative",
+                  overflow: "hidden",
+                  aspectRatio: "560 / 1217",
+                  height: "min(64dvh, 600px)",
+                  width: "auto",
+                  maxWidth: "100%",
+                }
+              : {
+                  position: "relative",
+                  overflow: "hidden",
+                  aspectRatio: "1800 / 1125",
+                  width: "100%",
+                  maxWidth: "min(960px, 104dvh)",
+                }
+          }
         >
           <Image
             src={item.src}
             alt={item.alt[lang]}
-            fill
-            sizes={isPhone ? "360px" : "(max-width: 1024px) 92vw, 960px"}
-            className="object-contain"
+            width={isPhone ? 560 : 1800}
+            height={isPhone ? 1217 : 1125}
+            sizes={isPhone ? "300px" : "(max-width: 1024px) 92vw, 960px"}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
           />
         </div>
 

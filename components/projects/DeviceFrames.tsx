@@ -1,10 +1,59 @@
 "use client";
 
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { motion, useTransform, type MotionValue } from "framer-motion";
 import type { Lang } from "@/lib/i18n";
 import type { DeviceKind, StoryScreen } from "@/lib/projectData/storyTypes";
 import styles from "./projectStory.module.css";
+
+/* Intrinsic screenshot dimensions. Screenshots render at their true aspect
+   ratio (object-fit: contain), never `fill` + `object-cover`, so a missing or
+   late stylesheet can never stretch them to the viewport. */
+const IPHONE_SHOT = { width: 560, height: 1217 } as const;
+const MACBOOK_SHOT = { width: 1800, height: 1125 } as const;
+
+/* Critical containment/sizing is inline so it holds even without external CSS. */
+const IPHONE_CHASSIS_STYLE: CSSProperties = {
+  position: "relative",
+  boxSizing: "border-box",
+  width: "100%",
+  // ≈520–600px tall at 1440x900, ≤65vh everywhere, ≤80% width on phones.
+  maxWidth: "min(100%, 78vw, 30svh, 17rem)",
+  marginInline: "auto",
+};
+
+const MACBOOK_WRAPPER_STYLE: CSSProperties = {
+  position: "relative",
+  boxSizing: "border-box",
+  width: "100%",
+  // Screen ≈ 0.625w plus ~64px of chrome → whole device stays ≤65vh tall.
+  maxWidth: "min(100%, 96vw, calc((65svh - 64px) * 1.6))",
+  marginInline: "auto",
+};
+
+const IPHONE_VIEWPORT_STYLE: CSSProperties = {
+  position: "relative",
+  width: "100%",
+  aspectRatio: `${IPHONE_SHOT.width} / ${IPHONE_SHOT.height}`,
+  overflow: "hidden",
+};
+
+const MACBOOK_VIEWPORT_STYLE: CSSProperties = {
+  position: "relative",
+  width: "100%",
+  aspectRatio: `${MACBOOK_SHOT.width} / ${MACBOOK_SHOT.height}`,
+  overflow: "hidden",
+};
+
+const SHOT_IMG_STYLE: CSSProperties = {
+  display: "block",
+  width: "100%",
+  height: "100%",
+  maxWidth: "100%",
+  objectFit: "contain",
+  objectPosition: "top center",
+};
 
 interface ScreenSlideProps {
   screen: StoryScreen;
@@ -14,6 +63,7 @@ interface ScreenSlideProps {
   progress: MotionValue<number>;
   lang: Lang;
   sizes: string;
+  shot: { width: number; height: number };
 }
 
 /**
@@ -29,6 +79,7 @@ function ScreenSlide({
   progress,
   lang,
   sizes,
+  shot,
 }: ScreenSlideProps) {
   const isFirst = index === 0;
   const fadeWindow = 0.045;
@@ -65,16 +116,18 @@ function ScreenSlide({
   return (
     <motion.div
       className="absolute inset-0 will-change-transform"
-      style={{ opacity, y, scale, zIndex: index + 1 }}
+      style={{ position: "absolute", inset: 0, opacity, y, scale, zIndex: index + 1 }}
     >
       <Image
         src={screen.src}
         alt={screen.alt[lang]}
-        fill
+        width={shot.width}
+        height={shot.height}
         sizes={sizes}
         preload={isFirst}
         loading={isFirst ? undefined : "lazy"}
-        className="object-cover object-top select-none"
+        className="select-none"
+        style={SHOT_IMG_STYLE}
         draggable={false}
       />
     </motion.div>
@@ -96,17 +149,17 @@ export function IPhoneStageFrame({
   progress,
   lang,
 }: StageFrameProps) {
-  const sizes = "(max-width: 767px) 76vw, 310px";
+  const sizes = "(max-width: 767px) 78vw, 272px";
 
   return (
-    <div className={styles.iphoneChassis}>
+    <div className={styles.iphoneChassis} style={IPHONE_CHASSIS_STYLE}>
       <span aria-hidden="true" className={`${styles.iphoneButton} ${styles.iphoneActionBtn}`} />
       <span aria-hidden="true" className={`${styles.iphoneButton} ${styles.iphoneVolUpBtn}`} />
       <span aria-hidden="true" className={`${styles.iphoneButton} ${styles.iphoneVolDownBtn}`} />
       <span aria-hidden="true" className={`${styles.iphoneButton} ${styles.iphonePowerBtn}`} />
 
       <div className={styles.iphoneBezel}>
-        <div className={styles.iphoneViewport}>
+        <div className={styles.iphoneViewport} style={IPHONE_VIEWPORT_STYLE}>
           {screens.map((screen, idx) => {
             const nextEnter = idx < screens.length - 1 ? enterPoints[idx + 1] : null;
             const coveredAt = nextEnter !== null ? Math.min(0.985, nextEnter + 0.048) : null;
@@ -120,6 +173,7 @@ export function IPhoneStageFrame({
                 progress={progress}
                 lang={lang}
                 sizes={sizes}
+                shot={IPHONE_SHOT}
               />
             );
           })}
@@ -156,7 +210,7 @@ export function MacBookStageFrame({
   );
 
   return (
-    <div className={styles.macbookWrapper}>
+    <div className={styles.macbookWrapper} style={MACBOOK_WRAPPER_STYLE}>
       <div className={styles.macbookLid}>
         <span aria-hidden="true" className={styles.macbookCamera} />
         <div className={styles.macbookScreenWrap}>
@@ -182,7 +236,7 @@ export function MacBookStageFrame({
             </motion.div>
           </div>
 
-          <div className={styles.macbookViewport}>
+          <div className={styles.macbookViewport} style={MACBOOK_VIEWPORT_STYLE}>
             {screens.map((screen, idx) => {
               const nextEnter = idx < screens.length - 1 ? enterPoints[idx + 1] : null;
               const coveredAt = nextEnter !== null ? Math.min(0.985, nextEnter + 0.048) : null;
@@ -196,6 +250,7 @@ export function MacBookStageFrame({
                   progress={progress}
                   lang={lang}
                   sizes={sizes}
+                  shot={MACBOOK_SHOT}
                 />
               );
             })}
@@ -231,7 +286,10 @@ export function StaticDeviceFrame({
 }: StaticDeviceFrameProps) {
   if (device === "iphone") {
     return (
-      <div className={`${styles.iphoneChassis} ${compact ? styles.iphoneChassisCompact : ""}`}>
+      <div
+        className={`${styles.iphoneChassis} ${compact ? styles.iphoneChassisCompact : ""}`}
+        style={IPHONE_CHASSIS_STYLE}
+      >
         {!compact && (
           <>
             <span aria-hidden="true" className={`${styles.iphoneButton} ${styles.iphoneActionBtn}`} />
@@ -241,15 +299,17 @@ export function StaticDeviceFrame({
           </>
         )}
         <div className={styles.iphoneBezel}>
-          <div className={styles.iphoneViewport}>
+          <div className={styles.iphoneViewport} style={IPHONE_VIEWPORT_STYLE}>
             <Image
               src={src}
               alt={alt}
-              fill
+              width={IPHONE_SHOT.width}
+              height={IPHONE_SHOT.height}
               sizes={sizes}
               preload={eager}
               loading={eager ? undefined : "lazy"}
-              className="object-cover object-top select-none"
+              className="select-none"
+              style={SHOT_IMG_STYLE}
               draggable={false}
             />
             <div aria-hidden="true" className={styles.iphoneGlassSheen} />
@@ -260,7 +320,7 @@ export function StaticDeviceFrame({
   }
 
   return (
-    <div className={styles.macbookWrapper}>
+    <div className={styles.macbookWrapper} style={MACBOOK_WRAPPER_STYLE}>
       <div className={`${styles.macbookLid} ${compact ? styles.macbookLidCompact : ""}`}>
         {!compact && <span aria-hidden="true" className={styles.macbookCamera} />}
         <div className={styles.macbookScreenWrap}>
@@ -281,15 +341,17 @@ export function StaticDeviceFrame({
             </span>
             <span className="w-7" aria-hidden="true" />
           </div>
-          <div className={styles.macbookViewport}>
+          <div className={styles.macbookViewport} style={MACBOOK_VIEWPORT_STYLE}>
             <Image
               src={src}
               alt={alt}
-              fill
+              width={MACBOOK_SHOT.width}
+              height={MACBOOK_SHOT.height}
               sizes={sizes}
               preload={eager}
               loading={eager ? undefined : "lazy"}
-              className="object-cover object-top select-none"
+              className="select-none"
+              style={SHOT_IMG_STYLE}
               draggable={false}
             />
             <div aria-hidden="true" className={styles.macbookGlassSheen} />

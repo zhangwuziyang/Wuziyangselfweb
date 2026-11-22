@@ -170,13 +170,22 @@ export default function CodeAndPowerClient() {
           <div
             data-scroll-reveal=""
             className="relative w-full rounded-2xl overflow-hidden shadow-2xl"
-            style={{ aspectRatio: "16/9", border: "1px solid rgba(255,255,255,0.08)" }}
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              maxWidth: "min(100%, calc(65svh * 3024 / 1720))",
+              marginInline: "auto",
+              aspectRatio: "3024 / 1720",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
           >
             <Image
               src="/photos/screenshot-codeandpower.png"
               alt="Code and Power website screenshot"
-              fill
-              className="object-cover object-top"
+              width={3024}
+              height={1720}
+              style={{ display: "block", width: "100%", height: "auto", objectFit: "contain" }}
               sizes="(max-width:900px) 100vw, 900px"
             />
           </div>
