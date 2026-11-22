@@ -143,7 +143,7 @@ try {
       const artHeight = pixels * 50 + 12;
       zone.children.set(".cindy-station__mark", new Element(() => box(laneLeft, top - scroll(), lane, artHeight)));
       zone.children.set(".cindy-station__hint", new Element(() => box(laneLeft, top - scroll() + artHeight + 5.6, lane, 20.8)));
-      zone.children.set(".cindy-station__caption", new Element(() => box(laneLeft + 28, top - scroll() + artHeight + 32, 304, 92)));
+      zone.children.set(".cindy-station__caption", new Element(() => box(laneLeft + 28, top - scroll() + artHeight + 32, 304, 120)));
       home.children.set(`[data-cindy-station="${chapter}"]`, zone);
       // Include room for focus outlines and the content's 10px reveal offset.
       addContent(markup.querySelector(".story-shell"), box(copy.left - 5, copy.top - 5, copy.width + 10, copy.height + 20));

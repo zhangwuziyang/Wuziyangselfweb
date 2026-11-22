@@ -20,7 +20,7 @@
 }
 
 @media (min-width: 48rem) {
-  .cindy-station__caption { block-size: 5.75rem; }
+  .cindy-station__caption { block-size: 7.5rem; }
 }
 
 .cindy-overlay {
@@ -183,6 +183,12 @@
     transform: translateY(-50%) rotate(45deg);
     border-width: 0 0 1px 1px;
   }
+}
+
+/* The narrowest phones leave little room beside Cindy; tighten the type so longer lines still fit. */
+@media (width < 22.5rem) {
+  .cindy-note { padding: .5rem .55rem; font-size: .8125rem; line-height: 1.34; }
+  .cindy-mobile-stage__caption { block-size: 9.75rem; }
 }
 
 .cindy-dock[data-speaking] .cindy-note { visibility: visible; }
