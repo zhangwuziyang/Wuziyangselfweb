@@ -1,9 +1,9 @@
 .home-story {
   --story-base: #f9f4eb;
   --story-ink: #28241f;
-  --story-muted: #484037;
-  --story-dim: #53493f;
-  --story-tint: #784d38;
+  --story-muted: #443a31;
+  --story-dim: #48392d;
+  --story-tint: #553321;
   --story-edge: #8b70534d;
   --story-control: #665443;
   --story-panel: #fdf9f1;
@@ -12,8 +12,9 @@
   --story-media: #e8dfd1;
   --story-button: #493429;
   --story-button-ink: #fffaf1;
+  --story-motif-ink: #705443;
   --story-wing: clamp(.625rem, 3vw, 1.125rem);
-  --cindy-pixels: 3.65;
+  --cindy-pixels: 3;
   position: relative;
   isolation: isolate;
   background: var(--story-base);
@@ -35,7 +36,7 @@
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.55'/%3E%3C/svg%3E"),
     radial-gradient(ellipse at 62% 16%, #fffbf4, transparent 74%);
-  opacity: .10;
+  opacity: .18;
 }
 
 .story-content { position: relative; }
@@ -51,86 +52,122 @@
 }
 
 .story-content > main > section::before,
-.story-content > [data-cindy-finish]::before {
+.story-content > main > section::after,
+.story-content > [data-cindy-finish]::before,
+.story-content > [data-cindy-finish]::after {
   content: "";
   position: absolute;
   z-index: -1;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 62% 55% at var(--story-wash-origin), var(--story-wash-tint), transparent 100%),
-    radial-gradient(ellipse 44% 50% at var(--story-glow-origin), var(--story-glow-tint), transparent 100%);
   mask-image: linear-gradient(transparent, #000 16%, #000 80%, transparent);
+}
+
+.story-content > main > section::before,
+.story-content > [data-cindy-finish]::before {
+  background:
+    radial-gradient(ellipse 79% 67% at var(--story-wash-origin), var(--story-wash-tint), transparent 100%),
+    radial-gradient(ellipse 58% 61% at var(--story-glow-origin), var(--story-glow-tint), transparent 100%);
+}
+
+.story-content > main > section::after,
+.story-content > [data-cindy-finish]::after {
+  background: var(--story-motif);
+  opacity: var(--story-motif-opacity, .06);
 }
 
 .story-content > main > #hero {
   --story-wash-origin: 77% 36%;
-  --story-wash-tint: rgb(236 163 125 / 30%);
+  --story-wash-tint: rgb(245 181 126 / 48%);
   --story-glow-origin: 13% 70%;
-  --story-glow-tint: rgb(223 186 131 / 19%);
+  --story-glow-tint: rgb(250 216 158 / 29%);
+  --story-motif: repeating-radial-gradient(ellipse at 77% 36%, transparent 0 2.5rem, var(--story-motif-ink) 2.5rem calc(2.5rem + 1px));
 }
 
 .story-content > main > #about {
   --story-wash-origin: 14% 45%;
-  --story-wash-tint: rgb(220 187 135 / 32%);
+  --story-wash-tint: rgb(179 197 173 / 55%);
   --story-glow-origin: 80% 63%;
-  --story-glow-tint: rgb(167 190 150 / 19%);
+  --story-glow-tint: rgb(203 214 188 / 32%);
+  --story-motif: repeating-linear-gradient(132deg, transparent 0 1.125rem, var(--story-motif-ink) 1.125rem calc(1.125rem + 1px));
 }
 
 .story-content > main > #experience {
   --story-wash-origin: 24% 34%;
-  --story-wash-tint: rgb(164 181 147 / 28%);
+  --story-wash-tint: rgb(231 159 139 / 47%);
   --story-glow-origin: 83% 67%;
-  --story-glow-tint: rgb(217 184 131 / 21%);
+  --story-glow-tint: rgb(245 190 175 / 30%);
+  --story-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='40'%3E%3Cpath d='M.5 0v40' stroke='%23705443' stroke-dasharray='3 7'/%3E%3C/svg%3E");
 }
 
 .story-content > main > #projects {
   --story-wash-origin: 20% 59%;
-  --story-wash-tint: rgb(205 136 114 / 23%);
+  --story-wash-tint: rgb(244 190 126 / 52%);
   --story-glow-origin: 78% 29%;
-  --story-glow-tint: rgb(235 185 142 / 23%);
+  --story-glow-tint: rgb(245 213 159 / 36%);
+  --story-motif:
+    linear-gradient(to right, var(--story-motif-ink) 1px, transparent 1px) 0 0 / 2.75rem 2.75rem,
+    linear-gradient(var(--story-motif-ink) 1px, transparent 1px) 0 0 / 2.75rem 2.75rem;
 }
 
 .story-content > main > #global {
   --story-wash-origin: 83% 44%;
-  --story-wash-tint: rgb(149 178 143 / 28%);
+  --story-wash-tint: rgb(165 191 163 / 55%);
   --story-glow-origin: 16% 72%;
-  --story-glow-tint: rgb(211 180 136 / 24%);
+  --story-glow-tint: rgb(198 210 184 / 38%);
+  --story-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 190' width='240' height='190'%3E%3Cg fill='none' stroke='%23705443'%3E%3Cpath d='M0 23C70 23 75 62 150 62S211 23 240 23M0 49C70 49 75 88 150 88S211 49 240 49M0 75C70 75 75 114 150 114S211 75 240 75M0 101C70 101 75 140 150 140S211 101 240 101M0 127C70 127 75 166 150 166S211 127 240 127'/%3E%3C/g%3E%3C/svg%3E");
+  --story-motif-opacity: .07;
 }
 
 .story-content > main > #music {
   --story-wash-origin: 31% 46%;
-  --story-wash-tint: rgb(229 151 133 / 28%);
+  --story-wash-tint: rgb(232 153 141 / 49%);
   --story-glow-origin: 89% 70%;
-  --story-glow-tint: rgb(187 158 133 / 19%);
+  --story-glow-tint: rgb(247 190 168 / 30%);
+  --story-motif: repeating-linear-gradient(
+    var(--story-motif-ink) 0 1px, transparent 1px 7px,
+    var(--story-motif-ink) 7px 8px, transparent 8px 14px,
+    var(--story-motif-ink) 14px 15px, transparent 15px 21px,
+    var(--story-motif-ink) 21px 22px, transparent 22px 28px,
+    var(--story-motif-ink) 28px 29px, transparent 29px 6rem
+  );
 }
 
 .story-content > main > #skills {
   --story-wash-origin: 70% 31%;
-  --story-wash-tint: rgb(225 191 128 / 30%);
+  --story-wash-tint: rgb(239 193 128 / 49%);
   --story-glow-origin: 19% 68%;
-  --story-glow-tint: rgb(157 177 145 / 21%);
+  --story-glow-tint: rgb(249 218 168 / 31%);
+  --story-motif: radial-gradient(circle, var(--story-motif-ink) 1px, transparent 1.5px) 0 0 / 1.25rem 1.25rem;
+  --story-motif-opacity: .08;
 }
 
 .story-content > main > #philosophy {
   --story-wash-origin: 48% 53%;
-  --story-wash-tint: rgb(183 190 158 / 28%);
+  --story-wash-tint: rgb(180 192 167 / 54%);
   --story-glow-origin: 87% 25%;
-  --story-glow-tint: rgb(233 168 137 / 20%);
+  --story-glow-tint: rgb(212 220 188 / 34%);
+  --story-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='127' height='113'%3E%3Cpath d='M18 28h4m63 47h3m18 30h2' stroke='%23705443' stroke-linecap='round'/%3E%3C/svg%3E");
+  --story-motif-opacity: .05;
 }
 
 .story-content > main > #contact {
   --story-wash-origin: 66% 59%;
-  --story-wash-tint: rgb(215 141 116 / 27%);
+  --story-wash-tint: rgb(228 153 132 / 46%);
   --story-glow-origin: 14% 29%;
-  --story-glow-tint: rgb(233 185 133 / 24%);
+  --story-glow-tint: rgb(248 196 175 / 31%);
+  --story-motif:
+    linear-gradient(to right, transparent calc(12% - 1px), var(--story-motif-ink) calc(12% - 1px) 12%, transparent 12%),
+    repeating-linear-gradient(var(--story-motif-ink) 0 1px, transparent 1px 1.875rem);
 }
 
 .story-content > [data-cindy-finish] {
   --story-wash-origin: 79% 70%;
-  --story-wash-tint: rgb(208 178 139 / 33%);
+  --story-wash-tint: rgb(228 194 140 / 46%);
   --story-glow-origin: 16% 43%;
-  --story-glow-tint: rgb(185 193 161 / 22%);
+  --story-glow-tint: rgb(245 217 173 / 32%);
+  --story-motif: repeating-linear-gradient(to right, transparent 0 2.75rem, var(--story-motif-ink) 2.75rem calc(2.75rem + 1px));
+  --story-motif-opacity: .05;
   border-block-start-color: transparent;
 }
 
@@ -473,7 +510,7 @@
   .home-story {
     --story-wing: clamp(1rem, 4.5vw, 2rem);
     --story-mobile-nav: calc(3rem + 1px);
-    --story-mobile-stage: 13rem;
+    --story-mobile-stage: 10rem;
     /* Match the launcher's 42px button and 20px bottom inset, plus breathing space. */
     --story-mobile-bottom: calc(4.25rem + env(safe-area-inset-bottom));
     block-size: 100dvh;
@@ -484,9 +521,10 @@
     inset: calc(var(--story-mobile-nav) + var(--story-mobile-stage)) 0 var(--story-mobile-bottom);
     overflow: auto;
     overscroll-behavior-y: contain;
-    scroll-padding-block: .75rem;
+    scroll-padding-block-start: 1rem;
+    scroll-padding-block-end: .75rem;
     scroll-behavior: smooth;
-    border-block: 1px solid var(--story-edge);
+    border-block-end: 1px solid var(--story-edge);
   }
 
   .home-story:has(.mobile-nav) .story-content { overflow: hidden; }
@@ -559,7 +597,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .home-story [data-cindy-intro] {
-    opacity: calc(.58 + .42 * var(--cindy-intro, 0));
+    opacity: 1;
     transform: translateY(calc((1 - var(--cindy-intro, 0)) * 10px));
   }
 

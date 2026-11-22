@@ -77,12 +77,12 @@ try {
 
   function simulate(width, height, lang, reduce = false) {
     const mobile = width < 768;
-    const pixels = mobile ? 3.65 : 5.6;
+    const pixels = mobile ? 3 : 5.6;
     const nav = 49;
-    const stageHeight = 208;
-    const readerTop = mobile ? nav + stageHeight + 1 : 0;
+    const stageHeight = 160;
+    const readerTop = mobile ? nav + stageHeight : 0;
     const readerBottom = mobile ? height - 69 : height;
-    const wing = mobile ? width * .045 : 112;
+    const wing = mobile ? Math.max(16, Math.min(width * .045, 32)) : 112;
     const lane = 360;
     const gap = width * .035;
     const crossingGap = mobile ? 0 : Math.max(192, Math.min(28 * 16 - width * .16, 272));
@@ -120,8 +120,9 @@ try {
     home.children.set(".story-content", reader);
     home.children.set(".cindy-mobile-stage", stage);
     if (mobile) {
-      stage.children.set(".cindy-mobile-stage__art", new Element(() => box(wing, nav, 160, stageHeight)));
-      stage.children.set(".cindy-mobile-stage__caption", new Element(() => box(wing + 172, nav + 16, width - wing * 2 - 172, 176)));
+      const stageWing = wing + Math.max(0, (width - 512) / 2);
+      stage.children.set(".cindy-mobile-stage__art", new Element(() => box(stageWing, nav, 136, stageHeight)));
+      stage.children.set(".cindy-mobile-stage__caption", new Element(() => box(stageWing + 146, nav + 8, width - stageWing * 2 - 146, 144)));
     }
     for (const [index, chapter] of CHAPTERS.entries()) {
       const markup = html.querySelector(`#${chapter}`);
@@ -200,11 +201,11 @@ try {
       frames.clear();
       for (const fn of pending) fn(time);
     };
-    const jump = top => {
+    const jump = (top, frameMs = 16) => {
       if (mobile) reader.scrollTop = top;
       else page.scrollY = top;
       target.dispatchEvent(new Event("scroll"));
-      render(16);
+      render(frameMs);
     };
     const counts = { sprite: 0, hint: 0, bubble: 0 };
     let minWidth = Infinity, maxWidth = 0;
@@ -222,8 +223,8 @@ try {
       const spriteBox = box(Math.min(hit.left, ink.left) - idlePad, Math.min(hit.top, ink.top) - idlePad - 2,
         Math.max(hit.right, ink.right) - Math.min(hit.left, ink.left) + idlePad * 2,
         Math.max(hit.bottom, ink.bottom) - Math.min(hit.top, ink.top) + idlePad * 2 + 2);
-      assert.ok(hit.width >= (mobile ? 140 : 200) && hit.width <= (mobile ? 160 : 224.01));
-      assert.ok(ink.width >= (mobile ? 140 : 200) && ink.width <= (mobile ? 160 : 260));
+      assert.ok(hit.width >= (mobile ? 115 : 200) && hit.width <= (mobile ? 120.01 : 224.01));
+      assert.ok(ink.width >= (mobile ? 115 : 200) && ink.width <= (mobile ? 135 : 260));
       minWidth = Math.min(minWidth, hit.width);
       maxWidth = Math.max(maxWidth, hit.width);
       const parts = [["sprite", spriteBox]];
@@ -241,6 +242,7 @@ try {
       for (const [part, rect] of parts) {
         counts[part]++;
         assert.ok(rect.left >= 0 && rect.right <= width && rect.top >= 0 && rect.bottom <= height, part + " fits the viewport");
+        if (mobile) assert.ok(rect.top >= nav && rect.bottom <= readerTop, part + " fits between the nav and reader");
         for (const { kind, bounds } of obstacles) {
           const top = Math.max(clip.top, bounds.top - scroll());
           const bottom = Math.min(clip.bottom, bounds.bottom - scroll());
@@ -258,6 +260,7 @@ try {
     for (const position of positions) {
       jump(position);
       const frame = check();
+      if (dock.hasAttribute("data-parked")) assert.ok(dock.hasAttribute("data-speaking"), "slow scrolling shows the bubble as soon as Cindy parks");
       if (previous) assert.ok(Math.hypot(frame.x - previous.x, frame.y - previous.y) < (mobile ? 12 : 90), "adjacent wheel steps stay continuous");
       forward.set(position, frame);
       previous = frame;
@@ -275,12 +278,23 @@ try {
       assert.ok([...forward.values()].some(({ squash }) => squash < .95));
       assert.ok([...forward.values()].some(({ squash }) => squash > 1.01));
     }
-    jump(end);
+    jump(12, 8);
+    jump(24, 8);
+    assert.ok(!dock.hasAttribute("data-speaking"), "speed also suppresses the bubble across smaller, high-frequency steps");
+    for (const top of chapterTops.slice(1, 4)) {
+      jump(top);
+      render(54);
+      assert.ok(dock.hasAttribute("data-parked"));
+      assert.ok(!dock.hasAttribute("data-speaking"), "fast scrolling through a brief park suppresses the bubble");
+    }
     for (const [index, top] of chapterTops.entries()) {
       jump(Math.min(top, end));
       assert.equal(dock.attrs.get("data-scene"), CHAPTERS[index]);
       assert.ok(dock.hasAttribute("data-hint"), `hint is visible at the ${CHAPTERS[index]} anchor (${width}×${height})`);
-      assert.ok(dock.hasAttribute("data-speaking"), "every chapter shows a bubble on the first parked frame");
+      render(103);
+      assert.ok(!dock.hasAttribute("data-speaking"), "bubble stays hidden during the fast-scroll window");
+      render(1);
+      assert.ok(dock.hasAttribute("data-speaking"), "bubble appears when the fast-scroll window closes without another scroll event");
       if (!mobile) {
         const parkedFrame = check();
         assert.equal(parkedFrame.x > width / 2, index % 2 === 1, "desktop chapters alternate sides");
@@ -290,14 +304,14 @@ try {
       if (reduce) {
         assert.equal(noteText.textContent, line, "reduced motion reveals the entire line");
       } else {
-        const firstToken = lang === "en" ? line.match(/^\S+\s*/)[0] : Array.from(line)[0];
-        assert.equal(noteText.textContent, firstToken, "typewriter reveals its first token on arrival");
-        for (let frame = 0; frame < 64; frame++) {
-          render(16);
+        const tokens = lang === "en" ? line.match(/\S+\s*/g) : Array.from(line);
+        assert.equal(noteText.textContent, tokens[0], "typewriter starts at the first token on arrival, including revisits");
+        for (let shown = 1; shown < tokens.length; shown++) {
+          render(29);
           check();
-          const text = noteText.textContent;
-          assert.ok(line.startsWith(text), "typewriter renders an ordered prefix");
-          if (lang === "en" && text && text !== line) assert.match(text, /\s$/, "English reveals complete words");
+          assert.equal(noteText.textContent, tokens.slice(0, shown).join(""));
+          render(1);
+          assert.equal(noteText.textContent, tokens.slice(0, shown + 1).join(""), "typewriter advances every 30ms without scrolling");
         }
         assert.equal(noteText.textContent, line);
       }
@@ -312,7 +326,7 @@ try {
     simulate(390, 844, lang);
   }
   simulate(1440, 900, "en", true);
-  simulate(390, 844, "zh-CN", true);
+  simulate(320, 568, "zh-CN", true);
 } finally {
   await rm(directory, { recursive: true, force: true });
 }

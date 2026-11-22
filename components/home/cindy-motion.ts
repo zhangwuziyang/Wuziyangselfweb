@@ -5,6 +5,7 @@ import {
 import { CINDY_BITMAP, paintCindy, type PixelOffset } from "./cindy-sprite";
 
 const IDLE_MS = 20_000;
+const FAST_SCROLL_MS = 120;
 const TYPE_MS = 30;
 const MOUTH_MS = 105;
 const BLINK_CYCLE = 6_200;
@@ -80,6 +81,8 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
   let paletteKey = "";
   let previousScroll = scrollPosition();
   let scrollDirection = 1;
+  let lastScroll = -Infinity;
+  let fastUntil = -Infinity;
   let lastActivity = performance.now();
   let attentionUntil = 0;
   let pointer: PixelOffset | null = null;
@@ -216,7 +219,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const poseMix = isReduced ? 0 : Math.round(ease(clamp((travel - TRAVEL_START) * 1.9)) * 40) / 40;
     const noteWidth = caption.width - 4;
     const noteHeight = caption.height - 8;
-    const noteY = route.reader ? caption.y : station.pixels * 22 + 14;
+    const noteY = route.reader ? station.y + caption.y - y : station.pixels * 22 + 14;
     const gaze = isReduced || asleep ? { x: 0, y: 0 } : preview ? { x: 2, y: -1 } : {
       x: pointer ? Math.round(clamp((pointer.x - x) / 85, -1, 1)) * facing : 0,
       y: pointer ? Math.round(clamp((pointer.y - y) / 85, -1, 1)) : 0,
@@ -246,17 +249,20 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const lang = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
     const line = scene.line[lang];
     const tokens = tokensFor(line, lang);
-    dialogue = updateCindyDialogue(dialogue, station.chapter, parked && captionVisible && noteWidth >= 82, time);
-    if (dialogue) {
+    const captionReady = parked && captionVisible && noteWidth >= 82;
+    const suppressed = time < fastUntil;
+    const newLine = noteMeasure.textContent !== line;
+    if (captionReady && !suppressed) {
       const key = `${line}:${noteWidth}:${noteHeight}`;
-      if (noteMeasure.textContent !== line) noteMeasure.textContent = line;
+      if (newLine) noteMeasure.textContent = line;
       if (measuredLine !== key || layoutChanged) {
         noteFits = note.scrollHeight <= note.clientHeight + 1;
         noteBlockSize = note.offsetHeight;
         measuredLine = key;
       }
     }
-    const speaking = Boolean(dialogue) && noteFits;
+    dialogue = updateCindyDialogue(newLine ? undefined : dialogue, station.chapter, captionReady && !suppressed && noteFits, time);
+    const speaking = Boolean(dialogue);
     const since = dialogue?.since ?? time;
     const elapsed = time - since;
     const shown = isReduced ? tokens.length : Math.min(1 + Math.floor(elapsed / TYPE_MS), tokens.length);
@@ -278,7 +284,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     dock.toggleAttribute("data-idle", canBlink && !preview);
     note.setAttribute("aria-hidden", String(!speaking));
     if (parked) {
-      const hintY = route.reader ? hint.y
+      const hintY = route.reader ? station.y + hint.y - y
         : speaking ? noteY + noteBlockSize + hint.height / 2 + 8
           : noteY - 3;
       writeVariable(dock, "--cindy-hint-y", `${hintY}px`);
@@ -331,7 +337,8 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const gesture = preview ? (Math.floor(time / 180) + 1) * 180 : Infinity;
     const idle = parked && !asleep ? lastActivity + IDLE_MS : Infinity;
     const attention = preview ? attentionUntil : Infinity;
-    const next = Math.min(nextToken, nextMouth, nextBlink, nextWag, gesture, idle, attention);
+    const resumeCaption = captionReady && suppressed ? fastUntil : Infinity;
+    const next = Math.min(nextToken, nextMouth, nextBlink, nextWag, gesture, idle, attention, resumeCaption);
     if (Number.isFinite(next)) timer = window.setTimeout(schedule, Math.max(1, next - time));
   }
 
@@ -343,9 +350,20 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const position = scrollPosition();
     const delta = position - previousScroll;
     if (delta) {
+      const now = performance.now();
+      // A large first jump after a pause can also be fast.
+      const interval = Math.min(now - lastScroll, 32);
+      // Suppress the bubble while scrolling fast; a slow event means the scroll is settling, so lift it at once.
+      if (Math.abs(delta) > Math.max(8, interval * 1.2)) fastUntil = now + FAST_SCROLL_MS;
+      else fastUntil = Math.min(fastUntil, now);
       previousScroll = position;
       scrollDirection = Math.sign(delta);
-      lastActivity = performance.now();
+      lastActivity = lastScroll = now;
+      // Scroll events can cross a station and return before the next animation frame.
+      if (dialogue) {
+        const sample = sampleGuide(route, position, reduced.matches);
+        if (now < fastUntil || sample?.station.chapter !== dialogue.chapter || sample.travel > TRAVEL_START) dialogue = undefined;
+      }
     }
     schedule();
   }

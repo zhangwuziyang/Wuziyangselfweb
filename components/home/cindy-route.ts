@@ -100,8 +100,8 @@ export function measureRoute(home: HTMLElement): Route {
     };
     if (reader && mobileArt && mobileCaption) {
       const art = mobileArt;
-      const shift = (down - .48) * 40 - 2;
-      const hint = { x: art.left + art.width / 2, y: pixels * 25 + 4, width: art.width, height: 16 };
+      const shift = (down - .48) * 16;
+      const hint = { x: art.left + art.width / 2, y: art.height / 2 - shift - 12, width: art.width, height: 16 };
       const caption = measureSlot(mobileCaption, art);
       return [{
         ...common, x: hint.x + across * 5, y: art.top + art.height / 2 + shift,

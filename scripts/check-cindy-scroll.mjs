@@ -82,8 +82,8 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
         const ink = inkBounds(canvas.getBoundingClientRect(), hit.width / 40);
         const desktop = !mobile;
         const edge = desktop ? 80 : 4;
-        const minWidth = desktop ? 200 : 140;
-        const maxWidth = desktop ? 260 : 160;
+        const minWidth = desktop ? 200 : 115;
+        const maxWidth = desktop ? 260 : 135;
         const fail = message => issues.push(`scrollY=${scroll} (${dock.dataset.scene}) ${message}`);
         if (sprite.getAttribute("aria-hidden") !== "false" || getComputedStyle(dock).opacity !== "1" || getComputedStyle(sprite).visibility !== "visible") fail("Cindy is hidden");
         if (hit.width < minWidth || hit.width > maxWidth) fail(`hit width ${hit.width}`);

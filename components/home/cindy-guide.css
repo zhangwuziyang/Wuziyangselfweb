@@ -38,18 +38,17 @@
     position: absolute;
     inset: var(--story-mobile-nav) 0 auto;
     display: grid;
-    grid-template-columns: 10rem minmax(0, 1fr);
+    grid-template-columns: 8.5rem minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
-    column-gap: .75rem;
+    column-gap: .625rem;
     align-items: center;
-    max-inline-size: 32rem;
     block-size: var(--story-mobile-stage);
-    margin-inline: auto;
-    padding-inline: var(--story-wing);
+    padding-inline: calc(var(--story-wing) + max(0px, (100% - 32rem) / 2));
+    background: linear-gradient(var(--story-nav) calc(100% - .75rem), #f1e8db);
   }
 
   .cindy-mobile-stage__art { align-self: stretch; }
-  .cindy-mobile-stage__caption { block-size: 11rem; }
+  .cindy-mobile-stage__caption { block-size: 9rem; }
 }
 
 .cindy-dock {
@@ -200,6 +199,7 @@
   }
   /* A quick little bob while the words type out, kept inside the breathing range. */
   .cindy-dock[data-typing] .cindy-sprite__art { animation: cindy-talk 260ms ease-in-out infinite; }
+  .cindy-dock[data-speaking] .cindy-note { animation: cindy-note-in 140ms ease-out both; }
 }
 
 /* The single-column layout skips the crossing, so it only gets a light entrance and a hop
@@ -234,6 +234,11 @@
 @keyframes cindy-hop-b {
   40% { transform: translate(-50%, calc(-50% - 7px)); }
   75% { transform: translate(-50%, -50%) scale(1.03, .96); }
+}
+
+@keyframes cindy-note-in {
+  from { opacity: 0; transform: var(--cindy-note-position) scale(.94); }
+  to { opacity: 1; transform: var(--cindy-note-position) scale(1); }
 }
 
 @media (min-width: 64rem) {
