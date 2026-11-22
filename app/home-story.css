@@ -32,7 +32,9 @@
 [data-story-blend] { opacity: 0; }
 
 [data-story-wash] {
-  background: radial-gradient(ellipse at 62% 16%, #fffbf4, transparent 74%);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.55'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 62% 16%, #fffbf4, transparent 74%);
   opacity: .10;
 }
 
@@ -40,10 +42,96 @@
 
 .story-content > main > section,
 .story-content > [data-cindy-finish] {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: var(--cindy-lane) minmax(0, 1fr);
   column-gap: var(--cindy-column-gap);
   padding-inline: max(var(--story-wing), (100% - 76rem) / 2);
+}
+
+.story-content > main > section::before,
+.story-content > [data-cindy-finish]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 62% 55% at var(--story-wash-origin), var(--story-wash-tint), transparent 100%),
+    radial-gradient(ellipse 44% 50% at var(--story-glow-origin), var(--story-glow-tint), transparent 100%);
+  mask-image: linear-gradient(transparent, #000 16%, #000 80%, transparent);
+}
+
+.story-content > main > #hero {
+  --story-wash-origin: 77% 36%;
+  --story-wash-tint: rgb(236 163 125 / 30%);
+  --story-glow-origin: 13% 70%;
+  --story-glow-tint: rgb(223 186 131 / 19%);
+}
+
+.story-content > main > #about {
+  --story-wash-origin: 14% 45%;
+  --story-wash-tint: rgb(220 187 135 / 32%);
+  --story-glow-origin: 80% 63%;
+  --story-glow-tint: rgb(167 190 150 / 19%);
+}
+
+.story-content > main > #experience {
+  --story-wash-origin: 24% 34%;
+  --story-wash-tint: rgb(164 181 147 / 28%);
+  --story-glow-origin: 83% 67%;
+  --story-glow-tint: rgb(217 184 131 / 21%);
+}
+
+.story-content > main > #projects {
+  --story-wash-origin: 20% 59%;
+  --story-wash-tint: rgb(205 136 114 / 23%);
+  --story-glow-origin: 78% 29%;
+  --story-glow-tint: rgb(235 185 142 / 23%);
+}
+
+.story-content > main > #global {
+  --story-wash-origin: 83% 44%;
+  --story-wash-tint: rgb(149 178 143 / 28%);
+  --story-glow-origin: 16% 72%;
+  --story-glow-tint: rgb(211 180 136 / 24%);
+}
+
+.story-content > main > #music {
+  --story-wash-origin: 31% 46%;
+  --story-wash-tint: rgb(229 151 133 / 28%);
+  --story-glow-origin: 89% 70%;
+  --story-glow-tint: rgb(187 158 133 / 19%);
+}
+
+.story-content > main > #skills {
+  --story-wash-origin: 70% 31%;
+  --story-wash-tint: rgb(225 191 128 / 30%);
+  --story-glow-origin: 19% 68%;
+  --story-glow-tint: rgb(157 177 145 / 21%);
+}
+
+.story-content > main > #philosophy {
+  --story-wash-origin: 48% 53%;
+  --story-wash-tint: rgb(183 190 158 / 28%);
+  --story-glow-origin: 87% 25%;
+  --story-glow-tint: rgb(233 168 137 / 20%);
+}
+
+.story-content > main > #contact {
+  --story-wash-origin: 66% 59%;
+  --story-wash-tint: rgb(215 141 116 / 27%);
+  --story-glow-origin: 14% 29%;
+  --story-glow-tint: rgb(233 185 133 / 24%);
+}
+
+.story-content > [data-cindy-finish] {
+  --story-wash-origin: 79% 70%;
+  --story-wash-tint: rgb(208 178 139 / 33%);
+  --story-glow-origin: 16% 43%;
+  --story-glow-tint: rgb(185 193 161 / 22%);
+  border-block-start-color: transparent;
 }
 
 .story-shell {
@@ -107,7 +195,6 @@
 }
 
 .story-chapter {
-  position: relative;
   padding-block: clamp(4.375rem, 8.5vw, 8.75rem);
 }
 

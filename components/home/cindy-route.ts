@@ -47,8 +47,6 @@ type GuideSample = {
   blend: number;
 };
 
-export const CAPTION_ENTER = .985;
-export const CAPTION_EXIT = .91;
 export const TRAVEL_START = ease(.22);
 
 // Horizontal and vertical positions within each chapter's reserved column.

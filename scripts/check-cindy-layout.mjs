@@ -70,13 +70,10 @@ try {
   assert.match(storyCSS, /@media \(width < 48rem\)\s*\{[\s\S]*?\.story-content\s*\{[^}]*overflow:\s*auto;/);
   assert.match(storyCSS, /section:nth-child\(even\) > \.cindy-station\s*\{ grid-area: 1 \/ 2;/);
 
-  const openLine = { chapter: "hero", since: 0, next: Infinity, visible: true, typingMs: 820 };
-  assert.ok(updateCindyDialogue(openLine, "hero", .9, true, true, 1_999, 0, 0).visible);
-  assert.ok(!updateCindyDialogue(openLine, "hero", .9, true, true, 2_020, 0, 0).visible);
-  const moving = updateCindyDialogue(openLine, "hero", 0, true, false, 1_000, 1_000, 0);
-  const waiting = updateCindyDialogue(moving, "about", 1, true, true, 1_400, 1_000, 0);
-  assert.equal(waiting.next, 2_020, "next chapter waits through typing and the full reading interval");
-  assert.ok(updateCindyDialogue(waiting, "about", 1, true, true, 2_020, 1_000, 0).visible);
+  const openLine = { chapter: "hero", since: 0 };
+  assert.equal(updateCindyDialogue(openLine, "hero", true, 16), openLine);
+  assert.equal(updateCindyDialogue(openLine, "hero", false, 16), undefined);
+  assert.deepEqual(updateCindyDialogue(openLine, "about", true, 32), { chapter: "about", since: 32 });
 
   function simulate(width, height, lang, reduce = false) {
     const mobile = width < 768;
@@ -278,13 +275,12 @@ try {
       assert.ok([...forward.values()].some(({ squash }) => squash < .95));
       assert.ok([...forward.values()].some(({ squash }) => squash > 1.01));
     }
+    jump(end);
     for (const [index, top] of chapterTops.entries()) {
       jump(Math.min(top, end));
-      render(1500);
-      render(340);
       assert.equal(dock.attrs.get("data-scene"), CHAPTERS[index]);
       assert.ok(dock.hasAttribute("data-hint"), `hint is visible at the ${CHAPTERS[index]} anchor (${width}×${height})`);
-      assert.ok(dock.hasAttribute("data-speaking"), "every chapter shows a bubble when parked");
+      assert.ok(dock.hasAttribute("data-speaking"), "every chapter shows a bubble on the first parked frame");
       if (!mobile) {
         const parkedFrame = check();
         assert.equal(parkedFrame.x > width / 2, index % 2 === 1, "desktop chapters alternate sides");
@@ -294,7 +290,8 @@ try {
       if (reduce) {
         assert.equal(noteText.textContent, line, "reduced motion reveals the entire line");
       } else {
-        assert.ok(noteText.textContent.length < line.length, "bubble opens before the full line is visible");
+        const firstToken = lang === "en" ? line.match(/^\S+\s*/)[0] : Array.from(line)[0];
+        assert.equal(noteText.textContent, firstToken, "typewriter reveals its first token on arrival");
         for (let frame = 0; frame < 64; frame++) {
           render(16);
           check();

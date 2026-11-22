@@ -1,13 +1,10 @@
 import { CINDY_SCENES, type Chapter } from "./cindy-scenes";
 import {
-  CAPTION_ENTER, CAPTION_EXIT, TRAVEL_START, clamp, ease, measureRoute, rgb, sampleGuide,
+  TRAVEL_START, clamp, ease, measureRoute, rgb, sampleGuide,
 } from "./cindy-route";
 import { CINDY_BITMAP, paintCindy, type PixelOffset } from "./cindy-sprite";
 
-const SETTLE_MS = 320;
-const MIN_LINE_MS = 1_200;
 const IDLE_MS = 20_000;
-const POP_LEAD_MS = 220;
 const TYPE_MS = 30;
 const MOUTH_MS = 105;
 const BLINK_CYCLE = 6_200;
@@ -26,7 +23,7 @@ type Guide = {
   noteMeasure: HTMLSpanElement;
   noteText: HTMLSpanElement;
 };
-type Dialogue = { chapter?: Chapter; since: number; eligibleSince?: number; next: number; visible: boolean; typingMs?: number };
+type Dialogue = { chapter: Chapter; since: number };
 
 const tokensByLine = new Map<string, string[]>();
 
@@ -39,26 +36,10 @@ function tokensFor(line: string, lang: "en" | "zh") {
 }
 
 export function updateCindyDialogue(
-  state: Dialogue, chapter: Chapter, phase: number, present: boolean, parked: boolean,
-  time: number, lastScroll: number, fastUntil: number, typingMs = 0,
-): Dialogue {
-  const hidden = { since: state.since, next: Infinity, visible: false, typingMs: state.typingMs };
-  if (!present || !parked) {
-    return hidden;
-  }
-  const holdUntil = state.since + MIN_LINE_MS + (state.typingMs ?? 0);
-  if (state.visible && state.chapter === chapter) {
-    const leaving = phase < CAPTION_EXIT;
-    return leaving && time >= holdUntil
-      ? hidden
-      : { ...state, next: leaving ? holdUntil : Infinity };
-  }
-  if (phase < CAPTION_ENTER) return hidden;
-  const eligibleSince = state.chapter === chapter ? state.eligibleSince ?? time : time;
-  const next = Math.max(eligibleSince + SETTLE_MS, lastScroll + SETTLE_MS, fastUntil, holdUntil);
-  return time >= next
-    ? { chapter, since: time, next: Infinity, visible: true, typingMs }
-    : { ...hidden, chapter, eligibleSince, next };
+  state: Dialogue | undefined, chapter: Chapter, canSpeak: boolean, time: number,
+): Dialogue | undefined {
+  if (!canSpeak) return undefined;
+  return state?.chapter === chapter ? state : { chapter, since: time };
 }
 
 function writeStyle(element: HTMLElement, property: "transform" | "opacity" | "backgroundColor", value: string) {
@@ -94,13 +75,11 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
   let resize = false;
   let frame = 0;
   let timer = 0;
-  let dialogue: Dialogue = { since: -Infinity, next: Infinity, visible: false };
+  let dialogue: Dialogue | undefined;
   let spriteKey = "";
   let paletteKey = "";
-  let lastScroll = -Infinity;
   let previousScroll = scrollPosition();
   let scrollDirection = 1;
-  let fastUntil = 0;
   let lastActivity = performance.now();
   let attentionUntil = 0;
   let pointer: PixelOffset | null = null;
@@ -204,7 +183,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const sample = sampleGuide(route, scroll, reduced.matches);
     if (!sample || document.hidden) {
       showActor(false);
-      dialogue = { since: dialogue.since, typingMs: dialogue.typingMs, next: Infinity, visible: false };
+      dialogue = undefined;
       dock.removeAttribute("data-speaking");
       dock.removeAttribute("data-typing");
       dock.setAttribute("data-travel", "");
@@ -224,7 +203,6 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const traveling = travel > TRAVEL_START;
     const parked = !traveling;
     const captionVisible = sample.y + caption.y + caption.height / 2 <= route.height;
-    const phase = 1 - travel;
     const asleep = time - lastActivity >= IDLE_MS && parked;
     const preview = !isReduced && time < attentionUntil && station.chapter === "projects" && parked;
     const step = preview ? Math.floor(time / 180) % 3 : 0;
@@ -260,7 +238,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     }
     dock.setAttribute("data-scene", station.chapter);
     dock.toggleAttribute("data-parked", parked);
-    dock.toggleAttribute("data-travel", traveling || firstFrameHere);
+    dock.toggleAttribute("data-travel", traveling);
     // The single-column layout has no crossing, so a small hop marks each new chapter instead.
     // Alternating names restarts the CSS animation without touching the dock's opacity.
     if (route.reader && firstFrameHere && drawnChapter && !isReduced) dock.dataset.arrive = ++arrivals % 2 ? "a" : "b";
@@ -268,9 +246,8 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const lang = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
     const line = scene.line[lang];
     const tokens = tokensFor(line, lang);
-    const typingMs = isReduced ? 0 : POP_LEAD_MS + tokens.length * TYPE_MS;
-    dialogue = updateCindyDialogue(dialogue, station.chapter, phase, visible && captionVisible && noteWidth >= 82, parked, time, lastScroll, fastUntil, typingMs);
-    if (dialogue.visible) {
+    dialogue = updateCindyDialogue(dialogue, station.chapter, parked && captionVisible && noteWidth >= 82, time);
+    if (dialogue) {
       const key = `${line}:${noteWidth}:${noteHeight}`;
       if (noteMeasure.textContent !== line) noteMeasure.textContent = line;
       if (measuredLine !== key || layoutChanged) {
@@ -279,16 +256,17 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
         measuredLine = key;
       }
     }
-    const speaking = dialogue.visible && noteFits;
-    const elapsed = time - dialogue.since;
-    const shown = isReduced ? tokens.length : clamp(Math.floor((elapsed - POP_LEAD_MS) / TYPE_MS), 0, tokens.length);
+    const speaking = Boolean(dialogue) && noteFits;
+    const since = dialogue?.since ?? time;
+    const elapsed = time - since;
+    const shown = isReduced ? tokens.length : Math.min(1 + Math.floor(elapsed / TYPE_MS), tokens.length);
     const typing = speaking && shown < tokens.length;
     if (speaking) {
       const text = typing ? tokens.slice(0, shown).join("") : line;
       if (noteText.textContent !== text) noteText.textContent = text;
     }
-    const mouthBeat = Math.floor((elapsed - POP_LEAD_MS) / MOUTH_MS);
-    const mouth = typing && mouthBeat >= 0 && mouthBeat % 2 === 0;
+    const mouthBeat = Math.floor(elapsed / MOUTH_MS);
+    const mouth = typing && mouthBeat % 2 === 0;
     const blinkPhase = time % BLINK_CYCLE;
     const canBlink = !isReduced && parked && !asleep && !typing;
     const blink = canBlink && blinkPhase >= BLINK_START;
@@ -344,8 +322,8 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
       spriteKey = nextKey;
       button.dataset.sprite = "ready";
     }
-    const nextToken = typing ? dialogue.since + POP_LEAD_MS + (shown + 1) * TYPE_MS : Infinity;
-    const nextMouth = typing ? dialogue.since + POP_LEAD_MS + (Math.max(-1, mouthBeat) + 1) * MOUTH_MS : Infinity;
+    const nextToken = typing ? since + shown * TYPE_MS : Infinity;
+    const nextMouth = typing ? since + (mouthBeat + 1) * MOUTH_MS : Infinity;
     const nextBlink = canBlink ? time + (blink ? BLINK_CYCLE : BLINK_START) - blinkPhase : Infinity;
     const nextWag = !canWag ? Infinity : wagPhase >= WAG_START
       ? time + WAG_BEAT - (wagPhase - WAG_START) % WAG_BEAT
@@ -353,7 +331,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const gesture = preview ? (Math.floor(time / 180) + 1) * 180 : Infinity;
     const idle = parked && !asleep ? lastActivity + IDLE_MS : Infinity;
     const attention = preview ? attentionUntil : Infinity;
-    const next = Math.min(dialogue.next, nextToken, nextMouth, nextBlink, nextWag, gesture, idle, attention);
+    const next = Math.min(nextToken, nextMouth, nextBlink, nextWag, gesture, idle, attention);
     if (Number.isFinite(next)) timer = window.setTimeout(schedule, Math.max(1, next - time));
   }
 
@@ -362,15 +340,12 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
   }
 
   function scroll() {
-    const now = performance.now();
     const position = scrollPosition();
     const delta = position - previousScroll;
     if (delta) {
-      if (Math.abs(delta) > Math.max(42, (now - lastScroll) * 1.3)) fastUntil = now + 410;
       previousScroll = position;
       scrollDirection = Math.sign(delta);
-      lastScroll = now;
-      lastActivity = now;
+      lastActivity = performance.now();
     }
     schedule();
   }

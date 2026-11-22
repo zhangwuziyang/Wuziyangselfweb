@@ -144,7 +144,6 @@
   transform-origin: var(--cindy-note-tip) 0;
   max-block-size: var(--cindy-note-height);
   visibility: hidden;
-  opacity: 0;
   padding: .56rem .8rem;
   border: 1px solid var(--story-edge);
   border-radius: .75rem;
@@ -154,7 +153,6 @@
   line-height: 1.38;
   overflow-wrap: anywhere;
   box-shadow: 0 5px 12px rgb(58 34 24 / 6%);
-  transition: opacity 150ms ease, visibility 0s linear 150ms;
 }
 
 .cindy-note > span { grid-area: 1 / 1; min-inline-size: 0; }
@@ -188,19 +186,12 @@
   }
 }
 
-.cindy-dock[data-speaking] .cindy-note {
-  visibility: visible;
-  opacity: 1;
-  transition: none;
-}
+.cindy-dock[data-speaking] .cindy-note { visibility: visible; }
 
-.cindy-dock[data-travel] :is(.cindy-note, .cindy-hint) {
+.cindy-dock[data-travel] .cindy-hint {
   opacity: 0;
   transition: none;
-  animation: none;
 }
-
-.cindy-dock[data-travel] .cindy-note { visibility: hidden; }
 
 @media (prefers-reduced-motion: no-preference) {
   .cindy-dock[data-parked] .cindy-sprite__art { animation: cindy-breathe 4.8s ease-in-out infinite; }
@@ -209,7 +200,6 @@
   }
   /* A quick little bob while the words type out, kept inside the breathing range. */
   .cindy-dock[data-typing] .cindy-sprite__art { animation: cindy-talk 260ms ease-in-out infinite; }
-  .cindy-dock[data-speaking]:not([data-travel]) .cindy-note { animation: cindy-note-in 220ms ease-out both; }
 }
 
 /* The single-column layout skips the crossing, so it only gets a light entrance and a hop
@@ -246,18 +236,13 @@
   75% { transform: translate(-50%, -50%) scale(1.03, .96); }
 }
 
-@keyframes cindy-note-in {
-  from { opacity: 0; transform: var(--cindy-note-position) scale(.92); }
-  to { opacity: 1; transform: var(--cindy-note-position) scale(1); }
-}
-
 @media (min-width: 64rem) {
   .cindy-note { font-size: 1rem; }
   .cindy-hint { font-size: .8125rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cindy-note, .cindy-hint { transition: none; }
+  .cindy-hint { transition: none; }
 }
 
 .home-story:has(.mobile-nav) .cindy-overlay { visibility: hidden; }
