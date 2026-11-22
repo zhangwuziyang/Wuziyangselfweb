@@ -1,4 +1,5 @@
 import StoryHeading from "@/components/home/StoryHeading";
+import CindyStation from "@/components/home/CindyStation";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Localized } from "@/components/ui/Localized";
 import { i18n } from "@/lib/i18n";
@@ -28,40 +29,43 @@ export default function Contact() {
       <div className="story-shell">
         <div>
 
-          <StoryHeading label={c.label} station="contact">
+          <StoryHeading label={c.label}>
             <Localized {...c.headline1} />
             <br /><Localized {...c.headline2} />
             <br /><span className="story-title-accent"><Localized {...c.headline3} /></span>
           </StoryHeading>
 
-          <ScrollReveal className="story-contact-lead">
-            <p
-              className="story-body mb-8 max-w-xl"
-            >
-              <Localized {...c.body} />
-            </p>
+          <div className="cindy-station-row mb-10">
+            <CindyStation chapter="contact" reverse />
+            <ScrollReveal>
+              <p
+                className="story-body mb-8 max-w-xl"
+              >
+                <Localized {...c.body} />
+              </p>
 
-            <div className="story-contact-actions mb-10 flex flex-col flex-wrap gap-3 sm:flex-row">
-              <Localized en={renderEmail("en")} zh={renderEmail("zh")} />
-              <a
-                href="https://www.linkedin.com/in/wuziyang-zhang-7b547229b"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-medium rounded-full px-7 py-3 story-button-secondary"
-              >
-                <Localized {...c.linkedin} />
-              </a>
-              <a
-                href="/resume-wuziyang-zhang.pdf"
-                download="Wuziyang-Zhang-Resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-medium rounded-full px-7 py-3 story-button-secondary"
-              >
-                <Localized {...c.resume} />
-              </a>
-            </div>
-          </ScrollReveal>
+              <div className="flex flex-col flex-wrap gap-3 sm:flex-row">
+                <Localized en={renderEmail("en")} zh={renderEmail("zh")} />
+                <a
+                  href="https://www.linkedin.com/in/wuziyang-zhang-7b547229b"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium rounded-full px-7 py-3 story-button-secondary"
+                >
+                  <Localized {...c.linkedin} />
+                </a>
+                <a
+                  href="/resume-wuziyang-zhang.pdf"
+                  download="Wuziyang-Zhang-Resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium rounded-full px-7 py-3 story-button-secondary"
+                >
+                  <Localized {...c.resume} />
+                </a>
+              </div>
+            </ScrollReveal>
+          </div>
 
           <ScrollReveal>
             <div className="grid grid-cols-1 gap-6 pt-8 sm:grid-cols-2 xl:grid-cols-4" style={{ borderTop: "1px solid var(--story-edge)" }}>

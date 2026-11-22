@@ -62,7 +62,7 @@ export default function ScrollEffects() {
     if (!motion.matches && "IntersectionObserver" in window) {
       const target = anchorTarget();
       for (const element of document.querySelectorAll<HTMLElement>('[data-scroll-reveal=""]')) {
-        if (element.getBoundingClientRect().top < window.innerHeight
+        if (element.closest(".home-story") || element.getBoundingClientRect().top < window.innerHeight
           || element.contains(document.activeElement)
           || (target && (target.contains(element) || element.contains(target)))) continue;
         element.dataset.scrollReveal = "pending";

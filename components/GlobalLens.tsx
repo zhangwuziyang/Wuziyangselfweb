@@ -25,6 +25,7 @@ export default function GlobalLens() {
 
         {/* Stats */}
         <div className="cindy-station-row mb-7">
+          <CindyStation chapter="global" reverse />
           <ScrollReveal className="flex flex-wrap gap-x-8 gap-y-4 sm:gap-x-14">
             {STATS.map((s) => (
               <div key={s.labelKey}>
@@ -37,7 +38,6 @@ export default function GlobalLens() {
               </div>
             ))}
           </ScrollReveal>
-          <CindyStation chapter="global" reverse />
         </div>
 
         {/* Cinematic image */}

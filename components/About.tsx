@@ -1,5 +1,4 @@
 import StoryHeading from "@/components/home/StoryHeading";
-import CindyStation from "@/components/home/CindyStation";
 import Image from "next/image";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
@@ -24,7 +23,7 @@ export default function About() {
     <section id="about" className="story-chapter">
       <div className="story-shell">
 
-        <StoryHeading label={a.label}>
+        <StoryHeading label={a.label} station="about">
           <Localized en={
             <>I turn messy<br />questions into<br /><span className="story-title-accent">working products.</span></>
           } zh={
@@ -36,7 +35,6 @@ export default function About() {
 
           {/* Portrait */}
           <div className="max-w-sm">
-            <CindyStation chapter="about" reverse />
             <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden story-photo-shadow">
               <Image
                 src="/photos/portrait.jpg"

@@ -42,9 +42,7 @@ const rows = [
 ];
 const CINDY_COLORS: Record<string, string> = { k:"#16110d", a:"#bb723e", b:"#884a1b", c:"#f5eedc", s:"#e0d1bb", r:"#da3628", d:"#b73120", p:"#ed9c80", g:"#858183", l:"#bababf" };
 
-// Author once on a snapped grid, then display at exactly 1× or 2×.
-export const CINDY_BITMAP = 96;
-const pixel = (value: number) => Math.round(value * CINDY_BITMAP / 64);
+export const CINDY_BITMAP = 64;
 export type CindyPose = "rest" | "walk" | "hello" | "book" | "timeline" | "flag" | "earth" | "music" | "skills" | "think" | "bye";
 export type CindyExpression = "neutral" | "happy" | "wink" | "surprise" | "think" | "shy" | "sleep";
 export type PixelOffset = { x: number; y: number };
@@ -129,25 +127,24 @@ export function paintCindy(
   canvas.clearRect(0, 0, CINDY_BITMAP, CINDY_BITMAP);
   drawCindy((x, y, w, h, color) => {
     canvas.fillStyle = color;
-    canvas.fillRect(pixel(x), pixel(y), pixel(x + w) - pixel(x), pixel(y + h) - pixel(y));
+    canvas.fillRect(x, y, w, h);
   }, pose, expression, gaze, step, compact);
 }
 
 const spriteBounds = new Map<string, { left: number; right: number; top: number; bottom: number }>();
 
-export function cindySpriteBounds(pose: CindyPose, sleeping: boolean, step: number, compact: boolean, facing: number) {
-  const key = [pose, sleeping, step, compact].join(":");
+export function cindySpriteBounds(pose: CindyPose, sleeping: boolean, step: number, compact: boolean, facing: number, scale: number) {
+  const key = [pose, sleeping, step, compact, scale].join(":");
   let bounds = spriteBounds.get(key);
   if (!bounds) {
     const center = CINDY_BITMAP / 2;
-    const scale = compact ? 1 : 2;
     bounds = { left: 0, right: 0, top: 0, bottom: 0 };
     const box = bounds;
     drawCindy((x, y, w, h) => {
-      box.left = Math.max(box.left, (center - pixel(x)) * scale);
-      box.right = Math.max(box.right, (pixel(x + w) - center) * scale);
-      box.top = Math.max(box.top, (center - pixel(y)) * scale);
-      box.bottom = Math.max(box.bottom, (pixel(y + h) - center) * scale);
+      box.left = Math.max(box.left, (center - x) * scale);
+      box.right = Math.max(box.right, (x + w - center) * scale);
+      box.top = Math.max(box.top, (center - y) * scale);
+      box.bottom = Math.max(box.bottom, (y + h - center) * scale);
     }, pose, sleeping ? "sleep" : "neutral", { x: 0, y: 0 }, step, compact);
     spriteBounds.set(key, bounds);
   }

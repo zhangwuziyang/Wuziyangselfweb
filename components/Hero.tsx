@@ -27,10 +27,8 @@ export default function Hero() {
               <Localized {...h.cta2} />
             </a>
           </div>
-          <div className="mt-4">
-            <CindyStation chapter="hero" />
-          </div>
         </div>
+        <CindyStation chapter="hero" />
         <div className="story-hero__portrait">
           <Image
             src="/photos/self-cutout.png"

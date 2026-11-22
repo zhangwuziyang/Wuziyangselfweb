@@ -1,10 +1,9 @@
 import { CINDY_SCENES, type Chapter } from "./cindy-scenes";
 import {
-  CAPTION_ENTER, CAPTION_EXIT, TRAVEL_END, clamp, measureRoute, rgb, samplePalette, sampleStation, stationMotion,
+  CAPTION_ENTER, CAPTION_EXIT, TRAVEL_START, clamp, ease, measureRoute, rgb, sampleGuide,
 } from "./cindy-route";
-import { cindySpriteBounds, paintCindy, type PixelOffset } from "./cindy-sprite";
+import { CINDY_BITMAP, paintCindy, type PixelOffset } from "./cindy-sprite";
 
-const STORY_WIDE = "(min-width: 70rem) and (min-height: 34rem)";
 const SETTLE_MS = 320;
 const MIN_LINE_MS = 1_200;
 const IDLE_MS = 20_000;
@@ -51,11 +50,17 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
   const timeline = home.querySelector<HTMLElement>("[data-timeline-fill]");
   const context = sprite.getContext("2d");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const wide = window.matchMedia(STORY_WIDE);
   const events = new AbortController();
   const { signal } = events;
 
+  const layers = Array.from({ length: 2 }, () => {
+    const layer = document.createElement("canvas");
+    layer.width = layer.height = CINDY_BITMAP;
+    return layer.getContext("2d");
+  });
+  const introductions = new Map<HTMLElement, { top: number; progress: number }>();
   let route = measureRoute(home);
+  readIntroductions();
   let track = readTimeline();
   let resize = false;
   let frame = 0;
@@ -65,7 +70,6 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
   let paletteKey = "";
   let lastScroll = -Infinity;
   let previousScroll = window.scrollY;
-  let direction = 1;
   let fastUntil = 0;
   let lastActivity = performance.now();
   let attentionUntil = 0;
@@ -89,8 +93,34 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     schedule();
   }
 
-  function backdrop(scroll: number) {
-    const { from, to, blend: amount } = samplePalette(route, scroll);
+  function readIntroductions() {
+    const selector = "main [data-scroll-reveal], .story-projects__caption > div, #music .story-photo-shadow, #music .story-panel";
+    for (const element of home.querySelectorAll<HTMLElement>(selector)) {
+      if (element.querySelector("[data-cindy-station]")) continue;
+      const previous = introductions.get(element);
+      const top = element.getBoundingClientRect().top;
+      const progress = previous?.progress ?? (top < route.height ? 1 : 0);
+      const offset = !reduced.matches && previous ? (1 - progress) * 10 : 0;
+      introductions.set(element, { top: top + window.scrollY - offset, progress });
+      if (!previous) {
+        writeVariable(element, "--cindy-intro", String(progress));
+        element.setAttribute("data-cindy-intro", "");
+      }
+    }
+  }
+
+  function introduceContent(y: number, scroll: number) {
+    const line = scroll + clamp(y + 150, route.height * .63, route.height * .89);
+    for (const [element, intro] of introductions) {
+      if (intro.progress >= 1) continue;
+      const progress = reduced.matches ? 1 : ease(clamp((line - intro.top + 29) / 112));
+      if (progress <= intro.progress) continue;
+      intro.progress = progress;
+      writeVariable(element, "--cindy-intro", progress.toFixed(3));
+    }
+  }
+
+  function backdrop({ from, to, blend: amount }: NonNullable<ReturnType<typeof sampleGuide>>) {
     const colors = `${from}:${to}`;
     if (paletteKey !== colors) {
       if (base) base.style.backgroundColor = rgb(CINDY_SCENES[from].color);
@@ -126,14 +156,14 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     if (layoutChanged) {
       route = measureRoute(home);
       track = readTimeline();
+      readIntroductions();
       resize = false;
     }
     const scroll = window.scrollY;
-    backdrop(scroll);
     lightTimeline(scroll);
 
-    const sample = sampleStation(route, scroll);
-    if (!sample || sample.phase <= .05 || document.hidden) {
+    const sample = sampleGuide(route, scroll, reduced.matches);
+    if (!sample || document.hidden) {
       showActor(false);
       dialogue = { since: dialogue.since, next: Infinity, visible: false };
       dock.removeAttribute("data-speaking");
@@ -143,59 +173,60 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
       return;
     }
 
-    const { station, phase, fullyVisible } = sample;
+    backdrop(sample);
+    introduceContent(sample.y, scroll);
+    const { station, travel, pixels } = sample;
     const firstFrameHere = drawnChapter !== station.chapter;
     const scene = CINDY_SCENES[station.chapter];
     const isReduced = reduced.matches;
-    const large = wide.matches;
-    const advance = stationMotion(sample, isReduced, large);
-    const parked = !advance.traveling && fullyVisible;
+    const { caption, hint } = station;
+    const compact = station.pixels === 4;
+    const traveling = travel > TRAVEL_START;
+    const fullyVisible = Math.min(station.art.top, caption.top) - scroll >= route.nav
+      && Math.max(hint.bottom, caption.bottom) - scroll <= route.height;
+    const parked = !traveling && fullyVisible;
+    const phase = 1 - travel;
     const asleep = time - lastActivity >= IDLE_MS && parked;
     const preview = !isReduced && time < attentionUntil && station.chapter === "projects" && parked;
-    const walk = advance.traveling && scene.entrance === "walk";
     const animateGesture = !isReduced && parked && !asleep && scene.pose !== "think";
-    const step = walk ? Math.floor(scroll / 15) % 3 : animateGesture ? Math.floor(time / 480) % 3 : 0;
-    const pose = asleep ? "rest" : walk ? "walk" : scene.pose;
+    const step = animateGesture ? Math.floor(time / 480) % 3 : 0;
+    const walkingStep = Math.floor(scroll / 18) % 3;
+    const pose = asleep ? "rest" : scene.pose;
     const expression = asleep ? "sleep" : hovered && parked ? "happy" : scene.expression;
-    const facing = walk ? (station.reverse ? 1 : -1) * direction : station.reverse ? -1 : 1;
-    const art = cindySpriteBounds(pose, asleep, step, !large, facing);
-    const hit = large ? 66 : 32;
-    const sway = isReduced || advance.traveling ? 0 : 2;
-    const sx = Math.max(hit, art.left + sway) * advance.scale + 2;
-    const dx = Math.max(hit, art.right + sway) * advance.scale + 2;
-    const sy = Math.max(hit, art.top + 4) * advance.scale + 2;
-    const dy = Math.max(hit, art.bottom, hit * 1.1) * advance.scale + 2;
-    const x = clamp(advance.x, station.left + sx, station.right - dx);
-    const y = clamp(advance.y, station.top + sy, station.bottom - dy);
-    const noteWidth = Math.min(232, station.reverse ? station.noteEdge - station.left - 4 : station.right - station.noteEdge - 4);
-    const localX = station.reverse ? station.noteEdge - noteWidth - x : station.noteEdge - x;
+    const facing = station.reverse ? -1 : 1;
+    const x = Math.round(sample.x);
+    const y = Math.round(sample.y);
+    const poseMix = isReduced ? 0 : Math.round(ease(clamp((travel - TRAVEL_START) * 1.9)) * 40) / 40;
+    const noteWidth = caption.right - caption.left - 4;
+    const noteHeight = caption.bottom - caption.top - 8;
     const gaze = isReduced || asleep ? { x: 0, y: 0 } : preview ? { x: 2, y: -1 } : {
       x: pointer ? Math.round(clamp((pointer.x - x) / 85, -1, 1)) * facing : 0,
-      y: pointer ? Math.round(clamp((pointer.y - y + scroll) / 85, -1, 1)) : 0,
+      y: pointer ? Math.round(clamp((pointer.y - y) / 85, -1, 1)) : 0,
     };
 
-    showActor(advance.opacity > .09);
-    writeStyle(dock, "transform", `translate3d(${Math.round(x)}px, ${Math.round(y - scroll)}px, 0)`);
-    writeStyle(dock, "opacity", advance.opacity.toFixed(3));
-    writeVariable(dock, "--cindy-scale", advance.scale.toFixed(3));
-    writeVariable(dock, "--cindy-facing", String(facing));
-    writeVariable(dock, "--cindy-note-x", `${localX.toFixed(2)}px`);
-    writeVariable(dock, "--cindy-note-width", `${Math.max(0, noteWidth).toFixed(2)}px`);
-    writeVariable(dock, "--cindy-note-height", `${station.bottom - station.top - 24}px`);
-    if (scene.entrance === "peek" && advance.traveling) {
-      writeVariable(dock, "--cindy-peek", `${Math.round((1 - clamp(phase / TRAVEL_END)) * 47 - 16)}px`);
+    showActor(true);
+    writeStyle(dock, "transform", `translate3d(${x}px, ${y}px, 0)`);
+    writeStyle(dock, "opacity", "1");
+    writeVariable(dock, "--cindy-pixels", pixels.toFixed(4));
+    if (!traveling) {
+      writeVariable(dock, "--cindy-note-x", `${caption.left + 2 - x}px`);
+      writeVariable(dock, "--cindy-note-y", `${(caption.top + caption.bottom) / 2 - y - scroll}px`);
+      writeVariable(dock, "--cindy-note-width", `${Math.max(0, noteWidth).toFixed(2)}px`);
+      writeVariable(dock, "--cindy-note-height", `${noteHeight}px`);
+      writeVariable(dock, "--cindy-hint-x", `${(hint.left + hint.right) / 2 - x}px`);
+      writeVariable(dock, "--cindy-hint-y", `${(hint.top + hint.bottom) / 2 - y - scroll}px`);
+      writeVariable(dock, "--cindy-hint-width", `${hint.right - hint.left - 4}px`);
+      dock.setAttribute("data-tail", station.tail);
     }
-    dock.toggleAttribute("data-reverse", station.reverse);
     dock.setAttribute("data-scene", station.chapter);
-    dock.setAttribute("data-entrance", scene.entrance);
     dock.toggleAttribute("data-parked", parked);
-    dock.toggleAttribute("data-travel", advance.traveling || firstFrameHere);
+    dock.toggleAttribute("data-travel", traveling || firstFrameHere);
 
     dialogue = updateCindyDialogue(dialogue, station.chapter, phase, visible && noteWidth >= 82, parked, time, lastScroll, fastUntil);
     if (dialogue.visible && dialogue.chapter) {
       const lang = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
       const line = CINDY_SCENES[dialogue.chapter].line[lang];
-      const key = `${line}:${noteWidth}:${station.bottom - station.top}`;
+      const key = `${line}:${noteWidth}:${noteHeight}`;
       if (note.textContent !== line) note.textContent = line;
       if (measuredLine !== key || layoutChanged) {
         noteFits = note.scrollHeight <= note.clientHeight + 1;
@@ -207,9 +238,30 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     note.setAttribute("aria-hidden", String(!speaking));
     drawnChapter = station.chapter;
 
-    const nextKey = [pose, expression, gaze.x, gaze.y, step, large].join(":");
+    const walkGaze = { x: 0, y: 0 };
+    const nextKey = poseMix === 1 ? `walk:${walkingStep}`
+      : [pose, expression, gaze.x, gaze.y, step, compact, facing, poseMix, poseMix ? walkingStep : 0].join(":");
     if (context && nextKey !== spriteKey) {
-      paintCindy(context, pose, expression, gaze, step, !large);
+      const [resting, walking] = layers;
+      const paintStation = (target: CanvasRenderingContext2D) => {
+        target.setTransform(facing, 0, 0, 1, facing < 0 ? CINDY_BITMAP : 0, 0);
+        paintCindy(target, pose, expression, gaze, step, compact);
+        target.resetTransform();
+      };
+      if (poseMix === 1) paintCindy(context, "walk", "neutral", walkGaze, walkingStep, true);
+      else if (poseMix > 0 && resting && walking) {
+        paintStation(resting);
+        paintCindy(walking, "walk", "neutral", walkGaze, walkingStep, true);
+        context.clearRect(0, 0, CINDY_BITMAP, CINDY_BITMAP);
+        // Add the two premultiplied frames so the shared body stays opaque through the pose blend.
+        context.globalCompositeOperation = "lighter";
+        context.globalAlpha = 1 - poseMix;
+        context.drawImage(resting.canvas, 0, 0);
+        context.globalAlpha = poseMix;
+        context.drawImage(walking.canvas, 0, 0);
+        context.globalAlpha = 1;
+        context.globalCompositeOperation = "source-over";
+      } else paintStation(context);
       spriteKey = nextKey;
       button.dataset.sprite = "ready";
     }
@@ -229,7 +281,6 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     const position = window.scrollY;
     const delta = position - previousScroll;
     if (delta) {
-      direction = Math.sign(delta);
       if (Math.abs(delta) > Math.max(42, (now - lastScroll) * 1.3)) fastUntil = now + 410;
       previousScroll = position;
       lastScroll = now;
@@ -266,7 +317,6 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     schedule();
   }, { signal });
   reduced.addEventListener("change", invalidate, { signal });
-  wide.addEventListener("change", invalidate, { signal });
 
   const sizes = new ResizeObserver(invalidate);
   for (const item of home.querySelectorAll("main > section, .story-nav, [data-cindy-station]")) sizes.observe(item);
@@ -278,6 +328,10 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     sizes.disconnect();
     language.disconnect();
     home.removeAttribute("data-cindy-present");
+    for (const element of introductions.keys()) {
+      element.removeAttribute("data-cindy-intro");
+      element.style.removeProperty("--cindy-intro");
+    }
     window.clearTimeout(timer);
     cancelAnimationFrame(frame);
   };

@@ -18,13 +18,13 @@ export default function Music() {
         </StoryHeading>
         <ScrollReveal className="grid grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-9 xl:gap-14">
           <div>
+            <div className="mb-6">
+              <CindyStation chapter="music" />
+            </div>
             <div className="space-y-4 font-light leading-[1.8] mb-10" style={{ fontSize: "clamp(1rem, 1.4vw, 1.125rem)", color: "var(--story-muted)" }}>
               <p><Localized {...m.p1} /></p>
               <p><Localized {...m.p2} /></p>
               <p><Localized {...m.p3} /></p>
-            </div>
-            <div className="mb-2">
-              <CindyStation chapter="music" reverse />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {m.credentials.map((item) => (
