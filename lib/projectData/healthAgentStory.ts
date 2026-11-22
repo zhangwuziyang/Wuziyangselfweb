@@ -27,7 +27,7 @@ export const healthAgentStory: ProjectStoryConfig = {
   },
   status: {
     zh: "核心功能已完成，准备上架 App Store · 计划先上线国内区",
-    en: "Core features complete, preparing for App Store launch",
+    en: "Core features complete, preparing for App Store launch (mainland China first)",
   },
   baseBackground: "#fbfaf6",
   endingBackground: "#090d11",
@@ -105,7 +105,7 @@ export const healthAgentStory: ProjectStoryConfig = {
         en: "A dozen Watch signals.\nThree clear scores.",
       },
       body: {
-        zh: "很多人每天戴着 Apple Watch 记录心率、睡眠与运动，却不知道今天该怎么安排。健康助理只和自己过去 60 天对比，把复杂指标合成「身体电量、运动、睡眠」，一眼读懂原因。",
+        zh: "很多人每天戴着 Apple Watch 记录心率、睡眠与运动，却不知道今天该怎么安排。健康助理只和自己过去 60 天对比，把复杂指标合成「身体电量、运动、睡眠」，一眼看清当天状态。",
         en: "Apple Watch records heart rate, sleep, and workouts every day—yet raw charts rarely tell you how to pace today. Compared strictly against your own 60-day baseline, a dozen signals distill into Energy, Activity, and Sleep.",
       },
       details: {
@@ -139,7 +139,7 @@ export const healthAgentStory: ProjectStoryConfig = {
       },
       headline: {
         zh: "数字手机先算好，\nAI 只负责讲清楚。",
-        en: "Math runs locally.\nAI speaks on grounded truth.",
+        en: "Math runs locally.\nAI explains real numbers.",
       },
       body: {
         zh: "通用 AI 不了解你的身体，还容易编出危险的热量建议。这里所有分数与热量安全下限都先在手机本地按规则算好；你想少吃一点，AI 也会守住安全红线、展示前后对比，并支持一键撤销。",
@@ -368,7 +368,7 @@ export const healthAgentStory: ProjectStoryConfig = {
       },
     },
     {
-      value: "2x",
+      value: "2",
       label: { zh: "双区域模型分流", en: "Dual-region routing" },
       note: {
         zh: "国内阿里云通义千问数据不出境，海外自动路由 Claude",

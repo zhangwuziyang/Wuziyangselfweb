@@ -17,7 +17,7 @@ export default function Hero() {
           </p>
           <h1 className="story-hero__name"><StoryName /></h1>
           <p className="story-hero__sub">
-            <Localized en="Economics & Information Science · Building AI Products" zh="经济学与信息科学 · 打造 AI 产品" />
+            <Localized en="Economics & Information Science · AI Business Analytics & AI Products" zh="经济学与信息科学 · AI 商业分析与 AI 产品" />
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10">
             <a href="#experience" className="group inline-flex items-center gap-2 rounded-full story-button-primary px-5 py-3 text-sm font-medium sm:px-7">

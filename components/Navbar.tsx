@@ -79,7 +79,7 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
 
             {/* Mobile hamburger */}
             <button
-              aria-label={open ? "Close menu" : "Open menu"}
+              aria-label={lang === "zh" ? (open ? "关闭菜单" : "打开菜单") : (open ? "Close menu" : "Open menu")}
               aria-expanded={open}
               aria-controls="mobile-nav"
               onClick={() => setOpen(!open)}

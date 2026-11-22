@@ -49,7 +49,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
     accent: "#ff6a00",
     overview: {
       en: "Joined Alibaba International's BI team supporting AliExpress logistics and supply chain. I brought together causal inference, a semantic metrics layer, and AI agents to quantify what faster delivery is worth, standardize metric definitions, and speed up global logistics diagnostics.",
-      zh: "加入阿里国际 BI-AE 物流与供应链团队，把因果分析、语义化数据基础设施与 AI Agent 落到国际电商场景中：量化履约改善带来的商业价值、拉齐指标口径，并加快全球物流异常的诊断效率。",
+      zh: "加入阿里国际 BI 团队，支持速卖通（AliExpress）物流与供应链业务，把因果分析、语义化数据基础设施与 AI Agent 落到国际电商场景中：量化履约改善带来的商业价值、拉齐指标口径，并加快全球物流异常的诊断效率。",
     },
     metrics: [
       { value: "$1.27M", label: { en: "Monthly GMV opportunity quantified", zh: "月度 GMV 增益空间" } },
@@ -98,7 +98,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
           ],
           zh: [
             "搭建每日物流监测流程，扫描全球各国六段履约达成率，对照 SLA 目标、7 天趋势与 30 天基线交叉比对，并将异常摘要直推钉钉。",
-            "设计三层诊断下钻路径：从国家与履约环节切入，锁定最差 TOP10 线路，再定位低表现承运商，将异常根因排查压到约 30 秒。",
+            "设计三层诊断下钻路径：从国家与履约环节切入，锁定表现最差的 10 条线路，再定位低表现承运商，将异常根因排查压到约 30 秒。",
             "补齐中英双语联网归因能力，结合地理与时间双重匹配外部事件，辅助排查港口关闭、罢工和航空管制等外部影响。",
           ],
         },
@@ -111,7 +111,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
             "Deployed and tested NVIDIA cuOpt alongside Qwen2.5-7B for vehicle-routing optimization, translating business constraints into solver-ready models and turning GPU outputs back into clear operational takeaways.",
           ],
           zh: [
-            "编写《AI 应用台操作指南》，覆盖代码建仓、ODPS 数据源连接、依赖安装、Debug 到灰度上线，帮团队把可复用分析真正跑成持续运行的能力。",
+            "编写《AI 应用台操作指南》，覆盖代码建仓、ODPS 数据源连接、依赖安装、Debug 到灰度上线，帮团队把一次性分析沉淀为可复用、可持续运行的工具。",
             "用 Qwen2.5-7B 搭配 NVIDIA cuOpt 跑通车辆路径规划实验：把业务约束转译为求解模型，再将 GPU 算出的结果翻译成面向决策的业务说明。",
           ],
         },
@@ -164,7 +164,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
           en: [
             "Built multiple linear regression and random-forest models to forecast new KOC growth and content output trends.",
             "Reached R² = 0.86, directly guiding quarterly operating targets and resource allocation.",
-            "Delivered 10+ slide decks summarizing the model findings, all adopted by the client.",
+            "Delivered 10+ analytical slides summarizing the model findings, all adopted by the client.",
           ],
           zh: [
             "构建多元回归模型与随机森林模型，预测 KOC 新增人数与内容产出变化趋势。",
@@ -179,7 +179,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
           en: [
             "Co-authored multiple rounds of executive presentations and helped design KOC growth paths and tiered UGC incentive systems.",
             "Applied K-Means clustering to 500+ user profiles and content types, identifying three core segments: \"Aesthetic Seeding,\" \"Daily Sharing,\" and \"Usage Insights.\"",
-            "Revamped the KOC grading framework using the Diamond Model and tailored playbooks by vehicle model and region, lifting UGC output by 27% the following month.",
+            "Revamped the KOC grading framework using the Diamond Model and tailored playbooks by vehicle model, region, and KOC tier, lifting UGC output by 27% the following month.",
           ],
           zh: [
             "联合项目组打磨多轮高层汇报材料，协助搭建 KOC 成长路径与 UGC 分层激励机制。",
@@ -192,7 +192,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
         title: { en: "System Building", zh: "体系搭建" },
         points: {
           en: [
-            "Led the creation of the 97-page Dongfeng Honda KOC Digital Operations Manual (PowerPoint), turning project insights into a standardized operating framework.",
+            "Co-authored the 97-page Dongfeng Honda KOC Digital Operations Manual (PowerPoint), turning project insights into a standardized operating framework.",
             "Authored a 15-page Word operating guide for internal training and process standardization.",
           ],
           zh: [
@@ -292,8 +292,8 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
     },
     accent: "#f59e0b",
     overview: {
-      en: "Joined ByteDance's overseas mini-game unit just as the team was shaping its international strategy. I conducted systematic industry research and produced a 100+ page report that became a core reference for internal strategy discussions.",
-      zh: "在字节跳动海外小游戏业务起势与定调的关键阶段加入团队，系统梳理行业格局，产出 100+ 页行研报告，成为内部战略讨论的核心参考底稿。",
+      en: "Joined ByteDance's overseas mini-game unit just as the team was shaping its international strategy. I contributed to systematic industry research and co-authored a 100+ page report that became a core reference for internal strategy discussions.",
+      zh: "在字节跳动海外小游戏业务起势与定调的关键阶段加入团队，参与系统梳理行业格局，协作产出 100+ 页行研报告，成为内部战略讨论的核心参考底稿。",
     },
     metrics: [
       { value: "10+",      label: { en: "Platforms benchmarked", zh: "竞品平台分析" } },
@@ -341,7 +341,7 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
           zh: [
             "从产品视角分析多款小游戏平台的功能结构与接入路径。",
             "评估不同功能入口设计对用户转化效率与内容分发效果的影响。",
-            "提炼出降低使用门槛、缩短触达路径的产品优化方向，助力提升平台内容供给与使用效率。",
+            "提炼出降低使用门槛、缩短触达路径的产品优化方向，以提升平台内容供给效率。",
           ],
         },
       },
@@ -378,10 +378,10 @@ export const EXPERIENCE_DATA: ExperienceDetail[] = [
     accent: "#8b5cf6",
     overview: {
       en: "Built ChartCreator out of a real frustration: non-technical professionals spending hours wrestling with chart formatting instead of focusing on the insight itself. I took the product from user research to a live interface using Claude Code, Codex, and a vibe coding workflow.",
-      zh: "做 ChartCreator 起于一个很具体的痛点：不少非技术从业者把大把时间耗在了调图表样式上，反而无暇打磨洞察本身。我借助 Claude Code、Codex 与 Vibe Coding 工作流，独立走完了从用户研究到部署上线的全流程。",
+      zh: "做 ChartCreator 起于一个很具体的痛点：不少非技术从业者把大把时间耗在了调图表样式上，反而无暇打磨洞察本身。我借助 Claude Code、Codex 与 Vibe Coding 工作流，主导完成了从用户研究、前端实现到接口联调上线的全流程。",
     },
     metrics: [
-      { value: "1",    label: { en: "Person team",             zh: "人团队"           } },
+      { value: "1",    label: { en: "Solo frontend builder",   zh: "人独立完成前端"   } },
       { value: "4",    label: { en: "Week MVP to launch",      zh: "周内 MVP 上线"    } },
       { value: "100%", label: { en: "Vibe-coded frontend",     zh: "Vibe Coding 前端" } },
       { value: "0",    label: { en: "Lines written manually",  zh: "行手写代码"       } },

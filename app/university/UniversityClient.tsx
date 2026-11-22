@@ -36,18 +36,18 @@ const RANKINGS = [
   {
     value: "20+",
     label: { en: "Nobel Laureates",      zh: "诺贝尔奖得主" },
-    source: { en: "Affiliated faculty",  zh: "相关教职人员" },
+    source: { en: "Affiliated scholars", zh: "校友及教职" },
   },
 ];
 
 const UW_ABOUT = {
   en: [
-    "The University of Wisconsin–Madison sits on the western shore of Lake Mendota, in the heart of Madison, one of America's most consistently livable cities. Founded in 1848, the same year Wisconsin became a state, it was built on the idea that a university belongs to the wider public as much as to its students.",
+    "The University of Wisconsin–Madison sits on the southern shore of Lake Mendota, in the heart of Madison, one of America's most consistently livable cities. Founded in 1848, the same year Wisconsin became a state, it was built on the idea that a university belongs to the wider public as much as to its students.",
     "That ethos, known as the Wisconsin Idea, still defines the place. Research here rarely stays inside the ivory tower; it flows into policy, industry, and the wider world. UW regularly ranks among the top five research universities in the United States, with depth across medicine, engineering, social sciences, and the humanities.",
     "For me, it offers the right balance: rigorous enough to stretch how I think, and open enough to let me work across disciplines.",
   ],
   zh: [
-    "威斯康星大学麦迪逊分校坐落在门多塔湖西岸、麦迪逊市中心，这是美国一向以宜居著称的城市。学校创办于 1848 年，与威斯康星州建州同年，建校伊始便笃信：大学既服务于学生，更要回馈整个社会。",
+    "威斯康星大学麦迪逊分校坐落在门多塔湖南岸、麦迪逊市中心，这是美国一向以宜居著称的城市。学校创办于 1848 年，与威斯康星州建州同年，建校伊始便笃信：大学既服务于学生，更要回馈整个社会。",
     "这份被称为「威斯康星理念」的精神，至今仍在塑造这所学校。这里的学术研究很少停留在象牙塔里，而是不断流入公共政策、产业实践与更广阔的现实世界。UW 长期位列全美前五研究型大学，在医学、工程、社会科学与人文领域都底蕴深厚。",
     "对我而言，这里有种恰到好处的平衡：严谨到足以打磨我的思考方式，又开放到允许我跨学科地探索与创造。",
   ],
@@ -188,8 +188,8 @@ export default function UniversityClient() {
               style={{ fontSize: "clamp(1rem, 1.6vw, 1.1rem)", lineHeight: 1.7, textShadow: "0 1px 8px rgba(0,0,0,0.3)" }}
             >
               {lang === "en"
-                ? "Economics & Information Science: where I think and build."
-                : "经济学与信息科学，是我思考与创造的地方。"}
+                ? "Economics & Information Science — sharpening how I think and build."
+                : "在这里修读经济学与信息科学，打磨我的思考与创造。"}
             </p>
           </ScrollReveal>
         </div>

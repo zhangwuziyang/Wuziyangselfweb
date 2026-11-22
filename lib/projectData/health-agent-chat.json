@@ -75,7 +75,7 @@
     },
     "answer": {
       "zh": "在这个项目里，我坚持所有分数都只和用户自己过去 60 天比、不和别人比，整套算法依据整理自约 70 篇文献。身体电量按身体放松度 35%、睡着时的心跳 25%、睡眠 25%、手腕温度 10% 和呼吸 5% 合成，积累 5 天 1–5 分自评后还可微调最多 ±12 分。运动分按心率算运动量并结合 iOS 18 训练强度评分，每天目标会随身体电量自动调整；睡眠分则综合睡够、作息规律与连续性，并为月经黄体期单独计算基准。",
-      "en": "In this project, I designed every score to compare only against your own past 60 days rather than other users, drawing on rules compiled from roughly 70 papers. Energy weights HRV at 35%, sleeping heart rate at 25%, sleep at 25%, wrist temperature at 10%, and respiration at 5%, and fine-tunes by up to ±12 points after five days of 1–5 self-ratings. Activity scores heart-rate load (TRIMP) plus iOS 18 strength ratings with targets that adapt to Energy, while Sleep combines duration, regularity, and continuity alongside a separate luteal-phase baseline."
+      "en": "In this project, I designed every score to compare only against your own past 60 days rather than other users, drawing on rules compiled from roughly 70 papers. Energy weights HRV at 35%, sleeping heart rate at 25%, sleep at 25%, wrist temperature at 10%, and respiration at 5%, and fine-tunes by up to ±12 points after five days of 1–5 self-ratings. Activity scores heart-rate load (TRIMP) plus iOS 18 workout effort ratings with targets that adapt to Energy, while Sleep combines duration, regularity, and continuity alongside a separate luteal-phase baseline."
     },
     "facts": [
       {
@@ -155,12 +155,12 @@
         "source": "PDF 第8页"
       },
       {
-        "zh": "热量区间宽度为 100–300 千卡并取整到 50，被安全规则抬高时卡片会标注「已按安全范围调整」。",
+        "zh": "热量区间宽度为 100–300 千卡并按 50 千卡取整，被安全规则抬高时卡片会标注「已按安全范围调整」。",
         "en": "Calorie ranges span 100–300 kcal rounded to 50 and display a safety-adjustment notice whenever a floor raises the target.",
         "source": "PDF 第8页"
       },
       {
-        "zh": "AI 撰写的计划理由会经过校验，数字必须来自输入数据且禁止出现「不能吃」「病」「药」等禁用表述。",
+        "zh": "AI 撰写的计划理由会经过校验，数字必须来自输入数据且拦截「不能吃」「病」「药」等禁用表述。",
         "en": "AI plan rationales are checked so all numbers come from input data and forbidden terms like \"cannot eat,\" \"disease,\" or \"medicine\" are blocked.",
         "source": "PDF 第9页"
       },
@@ -262,7 +262,7 @@
         "source": "PDF 第10页"
       },
       {
-        "zh": "吃药提醒可从「健康」导入用药并标注影响心率的药，App 从不建议开始、停止或调整任何药物。",
+        "zh": "吃药提醒可从「健康」导入用药并标注影响心率的药，App 从不建议开始服用、停用或调整任何药物。",
         "en": "Medication reminders import from Apple Health and can flag heart-rate-affecting drugs, while the app never advises starting, stopping, or changing medications.",
         "source": "PDF 第10页"
       },
@@ -304,7 +304,7 @@
     },
     "answer": {
       "zh": "健康类产品最容易触碰的风险是热量焦虑和医疗越界，所以我专门设计了敏感人群保护与急症兜底机制。只要用户提到进食障碍、怀孕、哺乳、糖尿病等关键词，或者未满 18 岁、手动关闭「显示热量」，App 会立刻隐藏全部热量与营养数字，计划只保留运动和睡眠；就算在锁屏或后台读不到记忆，也会一律默认按敏感处理。遇到胸痛、自伤等急症关键词时，系统直接给出当地急救电话和心理援助热线、不交给 AI 自由发挥，且所有页面均明确标注仅供参考、不是医疗诊断。",
-      "en": "Calorie anxiety and medical overreach are the highest risks in health products, so I built dedicated sensitive-group and emergency safeguards. Whenever a user mentions eating disorders, pregnancy, breastfeeding, or diabetes—or is under 18 or turns off calorie display—the app hides all calorie and nutrition numbers, restricts plans to activity and sleep, and defaults to sensitive mode if memory is unreadable while locked or backgrounded. Urgent keywords like chest pain or self-harm bypass AI completely to surface local emergency and crisis hotlines, and every screen states that outputs are not medical diagnosis."
+      "en": "Calorie anxiety and medical overreach are the highest risks in health products, so I built dedicated sensitive-group and emergency safeguards. Whenever a user mentions eating disorders, pregnancy, breastfeeding, or diabetes—or is under 18 or turns off calorie display—the app hides all calorie and nutrition numbers, restricts plans to activity and sleep, and defaults to sensitive mode if memory is unreadable while locked or backgrounded. Urgent keywords like chest pain or self-harm bypass AI completely to surface local emergency and crisis hotlines, and every screen states that outputs are not a medical diagnosis."
     },
     "facts": [
       {
@@ -334,7 +334,7 @@
       },
       {
         "zh": "产品坚持只说相关不说因果、不做诊断，所有内容标注「仅供参考，不是医疗诊断」。",
-        "en": "The app reports correlation rather than causation, makes no diagnoses, and labels all content as for reference only and not medical diagnosis.",
+        "en": "The app reports correlation rather than causation, makes no diagnoses, and labels all content as for reference only and not a medical diagnosis.",
         "source": "PDF 第3页"
       }
     ],
@@ -471,7 +471,7 @@
       ]
     },
     "answer": {
-      "zh": "客户端我采用原生 SwiftUI（iOS 17+）加 HealthKit 构建，在手机端承载算分引擎、异常检测、安全热量计算、加密对话、桌面小组件与后台任务，并提供查询、记录、修改三类本地工具供 AI 在对话中按需调用。后端采用 FastAPI + PostgreSQL，配合 Nginx 和 systemd 部署在阿里云 Ubuntu，负责 Apple 登录、提示词按版本号统一管理以及每人每天次数与 token 的双重限流。运维方面我还配置了每日自动与异地 90 天备份、SSH 仅密钥登录、日志按周期自动清理，以及可不发新版临时关闭 AI 的远程开关。",
+      "zh": "客户端我采用原生 SwiftUI（iOS 17+）加 HealthKit 构建，在手机端承载算分引擎、异常检测、安全热量计算、加密对话、桌面小组件与后台任务，并提供查询、记录、修改三类本地工具供 AI 在对话中按需调用。后端采用 FastAPI + PostgreSQL，配合 Nginx 和 systemd 部署在阿里云 Ubuntu，负责 Apple 登录、提示词按版本号统一管理以及每人每天次数与 token 的双重限流。运维方面我还配置了每日自动备份并异地留存 90 天、SSH 仅密钥登录、日志按周期自动清理，以及可不发新版临时关闭 AI 的远程开关。",
       "en": "I built the client natively in SwiftUI (iOS 17+) with HealthKit to host on-device scoring, anomaly checks, calorie guardrails, encrypted chat, widgets, and background tasks, exposing query, logging, and plan-modification tools for AI to invoke locally. The backend uses FastAPI and PostgreSQL with Nginx and systemd on Alibaba Cloud Ubuntu, managing Sign in with Apple, versioned prompts, and dual daily request-count plus token limits. For operations, I set up daily plus 90-day off-site backups, key-only SSH hardening, scheduled log cleanup, and a remote switch to pause AI without shipping a new build."
     },
     "facts": [
@@ -593,7 +593,7 @@
         "source": "PDF 第19页"
       },
       {
-        "zh": "示例数据模式全程标注「示例数据」，并在退出时清干净。",
+        "zh": "示例数据模式全程标注「示例数据」，并在退出时自动清空。",
         "en": "Sample-data mode is labeled throughout and clears all sample records cleanly upon exit.",
         "source": "PDF 第5页"
       },

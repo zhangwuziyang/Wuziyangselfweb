@@ -27,7 +27,7 @@ export default function CindyGuide() {
   }, []);
 
   return (
-    <aside className="cindy-overlay" aria-label={lang === "zh" ? "Cindy 网站导览" : "Cindy’s site guide"}>
+    <aside className="cindy-overlay" aria-label={lang === "zh" ? "小管家 Cindy 导览" : "Cindy’s guide notes"}>
       <div className="cindy-mobile-stage" aria-hidden="true">
         <div className="cindy-mobile-stage__art" />
         <div className="cindy-mobile-stage__caption" />
@@ -40,7 +40,7 @@ export default function CindyGuide() {
           type="button"
           tabIndex={-1}
           aria-hidden="true"
-          aria-label={lang === "zh" ? "和 Cindy 聊聊" : "Ask Cindy"}
+          aria-label={lang === "zh" ? "和 Cindy 聊聊" : "Chat with Cindy"}
           aria-haspopup="dialog"
           onClick={event => openChat(event.currentTarget)}
         >

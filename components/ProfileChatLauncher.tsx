@@ -24,7 +24,7 @@ export function useOpenProfileChat() {
 
 export default function ProfileChatLauncher({ children }: { children: ReactNode }) {
   const { lang } = useLang();
-  const openLabel = lang === "zh" ? "和 Cindy 聊聊" : "Ask Cindy";
+  const openLabel = lang === "zh" ? "和 Cindy 聊聊" : "Chat with Cindy";
   const [Panel, setPanel] = useState<ChatPanel | null>(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);

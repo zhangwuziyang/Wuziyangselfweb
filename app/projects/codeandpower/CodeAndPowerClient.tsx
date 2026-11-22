@@ -15,7 +15,7 @@ const content = {
   taglineAuthor: "— Kimberlé Crenshaw",
   overview: {
     en: "Code and Power is an educational website exploring how implicit bias shapes the digital systems we build and use every day. Built as an academic project with Matt Steines, it frames technology not as a neutral tool but as a reflection of the values — and blind spots — of its creators.",
-    zh: "《Code and Power》是一个探讨隐性偏见如何塑造我们日常所用数字系统的教育性网站。该项目与 Matt Steines 合作完成，将技术定义为其创造者价值观与盲区的映射，而非中立工具。",
+    zh: "《Code and Power》是一个探讨隐性偏见如何塑造日常数字系统的教育性网站。该项目与 Matt Steines 合作完成，不把技术视作中立工具，而是看作创造者价值观与盲区的映射。",
   },
   sections: [
     {
@@ -28,7 +28,7 @@ const content = {
         ],
         zh: [
           "谁在构建技术——它以谁的需求为中心？每一个设计决策都隐含着对用户的假设。",
-          "机器学习数据集、招聘流程和产品团队中的隐性偏见会随时间累积，产生对某些用户友好、对另一些用户不友好的系统。",
+          "机器学习数据集、招聘流程和产品团队中的隐性偏见会随时间累积，最终造出只照顾到部分群体、却忽视另一些人的系统。",
           "认识到这一点并非悲观主义——而是构建更公平工具的第一步。",
         ],
       },
@@ -42,8 +42,8 @@ const content = {
           "Educational resources on the site are designed for first-year students encountering these ideas for the first time, prioritizing clarity over jargon.",
         ],
         zh: [
-          "金伯利·克伦肖的交叉性框架——最初为法律理论所开发——可直接转化为产品思维：单轴\"用户\"视角会抹去处于多重边缘的人群。",
-          "网站收录了积极推动种族、阶层与性别平等的创新者，证明包容性是工程约束，而非事后想法。",
+          "金伯利·克伦肖（Kimberlé Crenshaw）最初在法学领域提出「交叉性」框架，它同样适用于产品思维：只按单一维度定义「用户」，会让处于多重边缘的群体被忽视。",
+          "网站收录了积极推动种族、阶层与性别平等的创新者，说明包容性本就是工程约束，而非事后补救。",
           "站内教育资源面向首次接触这些理念的大一学生设计，以清晰表达优先，避免术语堆砌。",
         ],
       },
@@ -59,9 +59,9 @@ const content = {
         ],
         zh: [
           "通过 Google Teachable Machine 与 TensorFlow.js，我训练了一个四分类图像识别模型，用于区分两只羊驼和两只獾——所有训练图像均为自拍照片（共 548 张以上，涵盖不同光线、角度与距离）。",
-          "模型暴露了一个常见的 ML 陷阱：它学会了走捷径。它依赖物体大小和拍摄距离，而非动物本身的特征——一个脆弱的系统，在新场景下随时崩溃。",
+          "模型暴露了一个常见的 ML 陷阱：它学会了走捷径，只盯着物体大小和拍摄距离，而不是动物本身的特征。这样的系统极其脆弱，一换新场景就会失效。",
           "这与 Joy Buolamwini 提出的「编码凝视」概念直接相关：当训练数据缺乏多样性，模型便继承了这些缺口。遗漏本身，就是一种偏见。",
-          "训练完全在浏览器内通过 MobileNet 迁移学习完成，每次迭代仅需 30–60 秒——快到可以反复试验，慢到足以观察每个版本的失败之处。",
+          "训练完全在浏览器内通过 MobileNet 迁移学习完成，每次迭代仅需 30–60 秒——既快到可以反复试验，又留出了看清每一版错在哪里的余地。",
         ],
       },
     },
@@ -74,8 +74,8 @@ const content = {
           "Writing for a general audience is harder than writing for experts. Reducing complexity without losing accuracy is a skill I kept returning to.",
         ],
         zh: [
-          "框架本身是一种设计选择。问题的呈现方式决定了哪些解决方案看起来可行——以及哪些群体依然隐形。",
-          "跨学科合作能产出更好的作品。Matt 带来了不同的视角，这种摩擦是有价值的。",
+          "如何界定问题，本身就是一种设计选择。问题的呈现方式决定了哪些方案看起来可行，以及哪些群体会被忽略。",
+          "跨学科合作能产出更好的作品。Matt 带来了不同的视角，观点碰撞反而催生了更好的想法。",
           "为普通读者写作比为专家写作更难。在不失准确性的前提下化繁为简，是我一直在打磨的能力。",
         ],
       },
@@ -197,7 +197,7 @@ export default function CodeAndPowerClient() {
             style={{ borderLeft: `2px solid ${ACCENT}` }}
           >
             <p className="font-light leading-[1.8] italic mb-2" style={{ fontSize: "clamp(1rem, 1.5vw, 1.1rem)", color: "#86868b" }}>
-              &quot;{content.tagline[lang]}&quot;
+              {lang === "zh" ? `「${content.tagline.zh}」` : `“${content.tagline.en}”`}
             </p>
             <p className="text-sm" style={{ color: "#48484a" }}>{content.taglineAuthor}</p>
           </blockquote>

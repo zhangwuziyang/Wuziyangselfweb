@@ -92,7 +92,7 @@
         "PostgreSQL",
         "Qwen / Claude"
       ],
-      "disclaimer": "Scores and recommendations are for reference only and are not medical diagnosis. All screenshots come from simulator test data or the app's built-in sample-data mode, with no real user data."
+      "disclaimer": "Scores and recommendations are for reference only and are not a medical diagnosis. All screenshots come from simulator test data or the app's built-in sample-data mode, with no real user data."
     }
   }
 }

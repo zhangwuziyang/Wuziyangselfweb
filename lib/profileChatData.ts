@@ -92,8 +92,8 @@ const PROJECTS_OVERVIEW = {
 
 export const PROFILE_CHAT_COPY = {
   title: { en: "Cindy", zh: "Cindy" },
-  subtitle: { en: "About me", zh: "关于我" },
-  status: { en: "Portfolio assistant", zh: "个人网站助手" },
+  subtitle: { en: "About Wuziyang Zhang", zh: "了解张吴梓洋" },
+  status: { en: "Wuziyang Zhang’s pixel guide", zh: "张吴梓洋的像素小管家" },
   aiLoading: { en: "Ask now · Local AI warming up", zh: "可直接提问 · 本地 AI 后台准备中" },
   aiReady: { en: "Local AI ready", zh: "本地 AI 已就绪" },
   aiFallback: { en: "Instant knowledge mode", zh: "即时知识模式" },
@@ -134,8 +134,8 @@ export const PROFILE_CHAT_COPY = {
     zh: "低置信度或未命中 → 停止生成，并明确说明知识库暂无对应信息。",
   },
   greeting: {
-    en: "Hi, I’m Cindy, Wuziyang’s portfolio guide. I can show you his experience, projects, and skills or help you get in touch.",
-    zh: "你好，我是 Cindy，这个网站的小管家。我可以介绍梓洋的经历、项目和技能，也可以帮你找到联系方式。",
+    en: "Hi, I’m Cindy, Wuziyang Zhang’s pixel guide. Ask me about his internships, projects, skills, or how to reach him.",
+    zh: "你好，我是张吴梓洋的小管家 Cindy。想了解他的实习、项目、技能或联系方式，都可以问我。",
   },
   placeholder: { en: "Ask a question…", zh: "输入你想问的问题…" },
   send: { en: "Send", zh: "发送" },
@@ -147,21 +147,21 @@ export const PROFILE_CHAT_COPY = {
       "What did you do at Alibaba?",
       "What are your strongest skills?",
       "Where should I start?",
-      "what is offer radar",
-      "what is my health agent",
+      "What is Offer Radar?",
+      "What is My Health Agent?",
     ],
     zh: [
       "用一句话介绍自己",
       "你在阿里巴巴做了什么？",
       "你最擅长什么？",
       "我应该从哪里开始看？",
-      "offer雷达是什么",
-      "健康助理是什么",
+      "Offer 雷达是什么？",
+      "健康助理是什么？",
     ],
   },
   fallback: {
-    en: "Here’s how I work: I first search this portfolio’s knowledge base for relevant information, then a WebLLM running locally in your browser turns the retrieved facts into a conversational answer. I couldn’t find this question in the knowledge base, so I can’t give you a reliable answer yet. You can rephrase it or ask about my education, experience, projects, skills, or contact details.",
-    zh: "我的工作方式是先在这份个人网站的知识库中检索相关资料，再由浏览器本地运行的 WebLLM 把找到的事实整理成对话式回答。这个问题目前没有在知识库中找到对应信息，因此我暂时无法给出可靠答案。你可以换一种问法，或询问我的教育、经历、项目、能力与联系方式。",
+    en: "Here’s how I work: I first search this portfolio’s knowledge base for relevant facts, and when local AI is enabled, WebLLM running in your browser turns them into a natural reply. I couldn’t find this question in the knowledge base, so I can’t give a reliable answer yet. Try rephrasing, or ask about Wuziyang Zhang’s education, experience, projects, skills, or contact details.",
+    zh: "我会先在这个网站的知识库里查找相关资料，启用本地 AI 后再由浏览器里的 WebLLM 整理成自然回答。这个问题目前在知识库里查不到，所以我没法乱猜。你可以换种问法，或者问我张吴梓洋的教育背景、实习经历、项目、能力和联系方式。",
   },
 } as const;
 
@@ -179,19 +179,19 @@ export function detectProfileChatLanguage(question: string, fallback: Lang): Lan
 const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText }> = {
   about: {
     href: "/#about",
-    label: { en: "View About me", zh: "查看关于我" },
+    label: { en: "View About Wuziyang Zhang", zh: "查看关于张吴梓洋" },
   },
   university: {
     href: "/university",
-    label: { en: "View my education", zh: "查看教育背景" },
+    label: { en: "View education", zh: "查看教育背景" },
   },
   experience: {
     href: "/#experience",
-    label: { en: "View my experience", zh: "查看工作经历" },
+    label: { en: "View experience", zh: "查看实习经历" },
   },
   projects: {
     href: "/#projects",
-    label: { en: "View my projects", zh: "查看我的项目" },
+    label: { en: "View projects", zh: "查看项目" },
   },
   alibaba: {
     href: "/experience/alibaba-international",
@@ -219,7 +219,7 @@ const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText 
   },
   skills: {
     href: "/#skills",
-    label: { en: "View my capabilities", zh: "查看能力图谱" },
+    label: { en: "View capabilities", zh: "查看能力图谱" },
   },
   global: {
     href: "/#global",
@@ -231,7 +231,7 @@ const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText 
   },
   philosophy: {
     href: "/#philosophy",
-    label: { en: "View how I think", zh: "查看我的思维方式" },
+    label: { en: "View how he thinks", zh: "查看他的思考方式" },
   },
   contact: {
     href: "/#contact",
@@ -332,24 +332,24 @@ const INTENTS: ProfileChatIntent[] = [
     id: "greeting",
     keywords: ["你好", "您好", "嗨", "哈喽", "在吗", "hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
     answer: {
-      en: "Hi, nice to meet you. I’m Cindy. Ask me about Wuziyang, what he’s built, where he’s worked, or what he’s looking for next.",
-      zh: "你好，很高兴认识你。我是 Cindy。可以问我梓洋是谁、做过哪些项目、在哪里工作过，或者他接下来想找什么机会。",
+      en: "Hi, I’m Cindy. Ask me about Wuziyang Zhang’s projects, internships, or what he’s looking for next.",
+      zh: "你好，我是 Cindy。关于张吴梓洋的项目、实习经历或求职方向，都可以问我。",
     },
   },
   {
     id: "assistant-identity",
     keywords: ["你是ai吗", "你是机器人吗", "你是真人吗", "你是什么助手", "这是ai吗", "are you ai", "are you a robot", "are you real", "what kind of assistant are you"],
     answer: {
-      en: "I’m Cindy, the guide to Wuziyang’s portfolio. I answer questions about his experience, skills, and projects using the information on this site and can show you where to read more.",
-      zh: "我是 Cindy，这个网站的导览员。我会根据站内信息回答关于梓洋经历、能力和项目的问题，也可以带你去看相关页面。",
+      en: "I’m Cindy, Wuziyang Zhang’s pixel guide. I answer questions about his experience, projects, and skills from what’s on this site, and point you to the right page.",
+      zh: "我是张吴梓洋的像素小管家 Cindy。我会根据网站上的资料介绍他的经历、项目和技能，并带你找到对应页面。",
     },
   },
   {
     id: "assistant-capabilities",
     keywords: ["你能做什么", "你会做什么", "能问你什么", "你可以回答什么", "怎么用", "帮助", "帮帮我", "what can you do", "what can i ask", "how can you help", "help", "how do i use this"],
     answer: {
-      en: "I can give a quick introduction, explain any experience or project, summarize skills and measurable results, describe how I work with AI, recommend where to start, discuss role fit, and guide you to the exact page or contact channel behind each answer.",
-      zh: "我可以快速自我介绍，解释任意一段经历或项目，总结技能与量化成果，说明我如何与 AI 协作，推荐浏览顺序，讨论适合的岗位，并在回答后带你前往对应页面或联系方式。",
+      en: "I can give a quick intro to Wuziyang Zhang, walk through any internship or project, summarize his skills and measurable results, explain how he works with AI, suggest where to start, discuss role fit, and point you straight to the matching section or contact link.",
+      zh: "我可以快速介绍张吴梓洋，展开讲他的任意一段实习或项目，汇总技能与量化成果，说说他怎么和 AI 协作、适合哪些岗位，也能按你的关注点指路到对应页面或联系方式。",
     },
   },
   {
@@ -357,7 +357,7 @@ const INTENTS: ProfileChatIntent[] = [
     keywords: ["一句话介绍", "用一句话介绍自己", "简短介绍", "快速介绍", "30秒介绍", "电梯陈述", "one sentence", "short introduction", "quick intro", "elevator pitch", "summarize yourself"],
     answer: {
       en: "I’m Wuziyang Zhang, a UW–Madison Economics and Information Science student who combines strategy, data, and AI product building to turn complex business questions into measurable decisions and usable systems.",
-      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，主修经济学与信息科学，专注于结合战略、数据与 AI 产品能力，把复杂商业问题转化为可量化的决策和可使用的系统。",
+      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，主修经济学与信息科学，专注于结合战略、数据与 AI 产品能力，把复杂商业问题转化为可量化的决策和好用的系统。",
     },
   },
   {
@@ -428,15 +428,15 @@ const INTENTS: ProfileChatIntent[] = [
     id: "assistant-technology",
     keywords: ["这个机器人怎么做的", "用了什么模型", "什么模型", "webllm", "本地模型", "技术原理", "机器人技术", "how does this chatbot work", "what model", "local model", "chatbot technology"],
     answer: {
-      en: "This assistant combines a structured portfolio knowledge base with a 4-bit Qwen2.5 0.5B model running locally through WebLLM. The knowledge base supplies the facts; the model turns them into a more natural first-person answer and streams it into the conversation.",
-      zh: "这个助手把结构化个人知识库与通过 WebLLM 本地运行的 4-bit Qwen2.5 0.5B 模型结合起来。知识库负责提供准确事实，小模型负责把它组织成自然的第一人称回答并流式输出。",
+      en: "This assistant pairs a structured portfolio knowledge base with a 4-bit Qwen3.5 model (0.8B or 2B depending on your GPU) running locally through WebLLM. The knowledge base supplies the verified facts, and the local model turns them into a natural reply streamed straight in your browser.",
+      zh: "这个助手把结构化站内知识库与通过 WebLLM 在本地运行的 4-bit Qwen3.5 模型（按设备显存自动选择 0.8B 或 2B）结合起来。知识库负责提供核实过的事实，本地小模型负责把它整理成自然回答并流式输出。",
     },
   },
   {
     id: "assistant-privacy",
     keywords: ["隐私", "数据会上传吗", "会发送数据吗", "问题发到哪里", "本地运行", "离线", "privacy", "data transfer", "where does my question go", "runs locally", "on device"],
     answer: {
-      en: "My questions are processed on the visitor’s device once the local model is ready; they are not sent to a hosted AI API. The browser downloads and caches the model files, while the portfolio knowledge and generation stay inside the browser session.",
+      en: "Your questions are processed directly on your device once the local model is ready; they are not sent to a hosted AI API. The browser downloads and caches the model files, while the portfolio knowledge and generation stay inside your browser session.",
       zh: "本地模型准备好后，你的问题会直接在访问设备上处理，不会发送到托管式 AI API。浏览器只需下载并缓存模型文件，个人知识与生成过程都留在浏览器会话中。",
     },
   },
@@ -453,7 +453,7 @@ const INTENTS: ProfileChatIntent[] = [
     keywords: ["你是谁", "他是谁", "介绍一下你自己", "介绍一下自己", "介绍梓洋", "介绍张吴梓洋", "自我介绍", "个人简介", "关于梓洋", "who is wuziyang", "introduce yourself", "introduce wuziyang", "about him", "personal profile", "personal background"],
     answer: {
       en: "I’m Wuziyang Zhang, a UW–Madison student and builder working where business strategy, data analysis, and AI products meet. I like turning ambiguous questions into structured, usable outcomes — with equal attention to logic and experience.",
-      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，关注商业战略、数据分析与 AI 产品的交叉地带。我擅长把模糊问题拆成清晰结构，并进一步做成可执行、好使用的成果。",
+      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，关注商业战略、数据分析与 AI 产品的交叉地带。我擅长把模糊问题拆成清晰结构，并进一步做成可执行、好用的成果。",
     },
   },
   {
@@ -509,7 +509,7 @@ const INTENTS: ProfileChatIntent[] = [
     keywords: ["工作经历", "实习经历", "经历概览", "做过什么", "所有经历", "experience", "work history", "internships", "career history", "where has he worked"],
     answer: {
       en: "My selected experience spans Alibaba International, ByteDance, Roland Berger, and Guoyuan Securities. The common thread is using research, data, and product thinking to turn complex business questions into decisions or working systems.",
-      zh: "我的代表经历包括阿里国际、字节跳动、罗兰贝格、国元证券。共同主线是用研究、数据与产品思维，把复杂商业问题转化为决策依据或可运行的系统。",
+      zh: "我的代表经历包括阿里国际、字节跳动、罗兰贝格和国元证券。共同主线是用研究、数据与产品思维，把复杂商业问题转化为决策依据或可运行的系统。",
     },
   },
   {
@@ -586,7 +586,7 @@ const INTENTS: ProfileChatIntent[] = [
     id: "alibaba-agent",
     keywords: ["物流agent", "物流智能体", "物流异常", "物流异常怎么监测", "怎么监测", "异常监测", "异常定位", "指标库", "语义层", "血缘", "agent", "metrics library", "logistics sentinel", "monitoring", "lineage", "yaml"],
     answer: {
-      en: "I built an AI-readable logistics metrics layer in Markdown and YAML, plus reusable workflows for definition extraction and SQL lineage. My daily sentinel monitored six fulfilment stages and supported country → route → carrier drill-down, bringing root-cause diagnosis to roughly 30 seconds.",
+      en: "I built an AI-readable logistics metrics layer in Markdown and YAML, plus reusable workflows for definition extraction and SQL lineage. My daily sentinel monitored six fulfillment stages and supported country → route → carrier drill-down, bringing root-cause diagnosis to roughly 30 seconds.",
       zh: "我用 Markdown 与 YAML 搭建 AI 可读的物流指标语义层，并制作指标抽取与 SQL 血缘追踪流程。每日监测 Agent 覆盖六段履约，可从国家下钻到线路与承运商，将根因定位缩短至约 30 秒。",
     },
   },
@@ -594,7 +594,7 @@ const INTENTS: ProfileChatIntent[] = [
     id: "alibaba-workbench",
     keywords: ["ai应用台", "workbench", "操作指南", "灰度上线", "odps连接", "团队赋能", "部署分析", "deployment guide"],
     answer: {
-      en: "I wrote an AI Workbench operations guide covering repository setup, ODPS connectivity, dependency installation, debugging, and grey-release deployment. The goal was to help the team turn one-off analyses into reusable, maintainable capabilities.",
+      en: "I wrote an AI Workbench operations guide covering repository setup, ODPS connectivity, dependency installation, debugging, and gray-release deployment. The goal was to help the team turn one-off analyses into reusable, maintainable capabilities.",
       zh: "我编写了《AI 应用台操作指南》，覆盖代码建仓、ODPS 数据源连接、依赖安装、调试与灰度上线，目标是帮助团队把一次性分析沉淀为可复用、可维护的能力。",
     },
   },
@@ -714,7 +714,7 @@ const INTENTS: ProfileChatIntent[] = [
     id: "roland-deliverables",
     keywords: ["罗兰贝格产出", "97页", "运营体系", "体系文件", "客户交付", "consulting deliverables", "97 pages", "operation manual"],
     answer: {
-      en: "Beyond the analysis, I helped translate the project into a 97-page Dongfeng Honda KOC digital-operation system and a 15-page Word operating guide. The point was to make the strategy trainable and repeatable after the consulting engagement ended.",
+      en: "Beyond the analysis, I helped translate the project into the 97-page Dongfeng Honda KOC Digital Operations Manual and a 15-page Word operating guide. The point was to make the strategy trainable and repeatable after the consulting engagement ended.",
       zh: "除分析外，我还参与把项目沉淀为 97 页东风本田 KOC 数字化运营体系文件和 15 页 Word 操作指南，让策略在咨询项目结束后仍能被培训、复用与持续执行。",
     },
   },
@@ -882,8 +882,8 @@ const INTENTS: ProfileChatIntent[] = [
     id: "global-detail",
     keywords: ["去过多少地方", "多少国家", "多少城市", "几个大洲", "去过哪些城市", "纽约东京巴黎", "how many countries", "how many cities", "continents", "cities visited", "where have you traveled"],
     answer: {
-      en: "I’ve traveled across more than 20 countries, 100 cities, and five continents. The portfolio highlights places including New York, Istanbul, Toronto, Lima, Tokyo, Paris, Singapore, London, Seoul, Berlin, and Machu Picchu in Peru.",
-      zh: "我走访过 20 多个国家、100 多座城市，覆盖五大洲。网站中展示或提到的地点包括纽约、伊斯坦布尔、多伦多、利马、东京、巴黎、新加坡、伦敦、首尔、柏林，以及秘鲁马丘比丘。",
+      en: "I’ve traveled across more than 20 countries, 100 cities, and five continents. The portfolio highlights places including New York, Istanbul, Toronto, Lima, Tokyo, Paris, Chicago, Singapore, London, Seoul, Berlin, and Machu Picchu in Peru.",
+      zh: "我走访过 20 多个国家、100 多座城市，覆盖五大洲。网站中展示或提到的地点包括纽约、伊斯坦布尔、多伦多、利马、东京、巴黎、芝加哥、新加坡、伦敦、首尔、柏林，以及秘鲁马丘比丘。",
     },
   },
   {
@@ -954,7 +954,7 @@ const INTENTS: ProfileChatIntent[] = [
     id: "contact",
     keywords: ["怎么联系", "联系方式", "联系他", "找他", "contact", "get in touch", "reach him", "reach out"],
     answer: {
-      en: "The easiest ways to reach me are email or LinkedIn. My English-facing email is zhangwuziyang@gmail.com, and my LinkedIn profile is linked in the Contact section at the bottom of the site.",
+      en: "The easiest ways to reach me are email or LinkedIn. My English-facing email is zhangwuziyang@gmail.com (for Chinese-language contact, 3168661545@qq.com), and my LinkedIn profile is linked in the Contact section at the bottom of the site.",
       zh: "最方便的方式是邮件或 LinkedIn。中文联系我可使用 3168661545@qq.com；英文联系可使用 zhangwuziyang@gmail.com，网站底部的联系区也有 LinkedIn 入口。",
     },
   },
@@ -1137,9 +1137,9 @@ function buildExperienceComparisonAnswer(query: string, lang: Lang): string | un
   if (compared.length < 2) return undefined;
 
   if (lang === "zh") {
-    return `${compared.map(({ zh }) => zh).join("；")}。共同点是都用数据支持真实决策，核心差异在于它们分别落在业务运营、客户交付、平台判断、投资研究或产品构建的不同环节。`;
+    return `${compared.map(({ zh }) => zh).join("；")}。共同点是都用数据支持真实决策，核心差异在于它们分别落在业务运营、客户交付、平台判断或投资研究的不同环节。`;
   }
-  return `${compared.map(({ en }) => en).join("; ")}. They all used evidence to support real decisions, but each placed me at a different point between operating workflows, client delivery, platform judgment, investment research, and product building.`;
+  return `${compared.map(({ en }) => en).join("; ")}. They all used evidence to support real decisions, but each placed me at a different point across operating workflows, client delivery, platform judgment, and investment research.`;
 }
 
 function findExperienceSubject(value: string) {

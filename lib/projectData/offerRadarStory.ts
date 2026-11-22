@@ -128,7 +128,7 @@ export const offerRadarStory: ProjectStoryConfig = {
       id: "company-radar",
       indexLabel: "02",
       eyebrow: {
-        zh: "839 家招聘主体库",
+        zh: "覆盖 839 个招聘主体",
         en: "839 VERIFIED EMPLOYERS",
       },
       headline: {
@@ -136,11 +136,11 @@ export const offerRadarStory: ProjectStoryConfig = {
         en: "13 industries mapped into\nreach, match, and safety.",
       },
       body: {
-        zh: "围绕「偏好 → 行业 → 公司」三步收窄选择：内置 13 个行业 839 家招聘主体与官网入口，自动分好冲一冲、比较稳与保底，还能贴入任意 JD 做 0–100 分匹配分析。只推荐，绝不背着你自动代投。",
+        zh: "围绕「偏好 → 行业 → 公司」三步收窄选择：内置 13 个行业、839 个招聘主体与官网入口，自动分好冲一冲、比较稳与保底，还能粘贴任意 JD 做 0–100 分匹配分析。只推荐，绝不背着你自动代投。",
         en: "Move through a three-step funnel from preferences to industries to curated picks. Backed by 839 hiring entities across 13 industries with official links, batch-apply lists, and 0–100 JD match scoring—recommending clearly while never auto-applying.",
       },
       details: {
-        zh: ["13 个行业 · 839 家主体", "冲稳保 + 海投清单", "0–100 分 JD 匹配分析"],
+        zh: ["13 个行业 · 839 个招聘主体", "冲稳保 + 海投清单", "0–100 分 JD 匹配分析"],
         en: ["839 entities · 13 industries", "Reach / Match / Safety tiers", "0–100 JD match scoring"],
       },
       accent: "#2563eb",
@@ -278,7 +278,7 @@ export const offerRadarStory: ProjectStoryConfig = {
     src: "/projects/offer-radar-web.mp4",
     poster: "/projects/offer-radar-poster.jpg",
     eyebrow: { zh: "产品实录", en: "PRODUCT WALKTHROUGH" },
-    title: { zh: "100 秒看懂完整校招流", en: "See the full workflow in motion." },
+    title: { zh: "100 秒看懂校招全流程", en: "See the full workflow in motion." },
     caption: {
       zh: "演示画面中的人物与数据均为模拟，配音为 AI 合成。",
       en: "Simulated candidate profile and data; voiceover synthesized with AI.",
@@ -333,7 +333,7 @@ export const offerRadarStory: ProjectStoryConfig = {
       src: "/images/projects/offer-radar/o-045.webp",
       title: { zh: "深色模式简历工作室", en: "Dark-Mode Resume Studio" },
       caption: {
-        zh: "深色工作区衬托真实 A4 白纸，黄标靠拢修改与行容量尺清晰聚焦。",
+        zh: "深色工作区衬托真实 A4 白纸，黄标靠拢修改与一页排版清晰聚焦。",
         en: "A crisp A4 sheet floats against a dark workspace, keeping yellow stretch edits unmistakable.",
       },
       alt: {
@@ -350,7 +350,7 @@ export const offerRadarStory: ProjectStoryConfig = {
   stats: [
     {
       value: "839",
-      label: { zh: "招聘主体库", en: "Hiring entities" },
+      label: { zh: "个招聘主体", en: "Hiring entities" },
       note: { zh: detail.zh.highlights[0], en: detail.en.highlights[0] },
     },
     {
@@ -360,7 +360,7 @@ export const offerRadarStory: ProjectStoryConfig = {
     },
     {
       value: "30",
-      label: { zh: "岗位面经与模拟", en: "Interview tracks" },
+      label: { zh: "类岗位面经", en: "Interview tracks" },
       note: { zh: detail.zh.highlights[2], en: detail.en.highlights[2] },
     },
     {

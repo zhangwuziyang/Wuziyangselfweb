@@ -12,12 +12,12 @@ export const i18n = {
   },
 
   hero: {
-    nameLabel:  { en: "吴梓洋  ·  Wuziyang Zhang", zh: "张吴梓洋" },
+    nameLabel:  { en: "Wuziyang Zhang", zh: "张吴梓洋" },
     headline1:  { en: "Think in systems.",          zh: "以系统思考。" },
     headline2:  { en: "Build with taste.",          zh: "用品味创造。" },
-    sub1:       { en: "Economics & Information Science · Building AI Products —", zh: "经济学与信息科学 · 打造 AI 产品" },
+    sub1:       { en: "Economics & Information Science · AI Business Analytics & AI Products", zh: "经济学与信息科学 · AI 商业分析与 AI 产品" },
     sub2:       { en: "at the University of Wisconsin–Madison.", zh: "威斯康星大学麦迪逊分校。" },
-    cta1:       { en: "View Work",  zh: "查看经历" },
+    cta1:       { en: "View Experience", zh: "查看经历" },
     cta2:       { en: "About Me",   zh: "关于我"   },
     scroll:     { en: "Scroll",     zh: "下滑"     },
   },
@@ -28,7 +28,7 @@ export const i18n = {
     accentWord: { en: "working products.", zh: "好产品。" },
     p1: { en: "I study Economics and Information Science at the University of Wisconsin–Madison, splitting my time between market research, data analysis, and building AI products.", zh: "我在威斯康星大学麦迪逊分校读经济学与信息科学，平时把时间花在市场研究、数据分析和打造 AI 产品上。" },
     p2: { en: "I like starting with a vague question, finding the real structure underneath, and turning it into something people can actually use. How a product feels matters to me just as much as how it works.", zh: "我喜欢从一团模糊的问题入手，理出藏在底层的结构，再把它做成真正能用的东西。一件产品用起来顺不顺手，在我眼里和它背后的逻辑一样重要。" },
-    p3: { en: "Along the way, I've worked in consulting and finance, taken AI products from early sketch to live interface, and traveled through 20+ countries to watch how people, markets, and cultures behave up close.", zh: "一路走来，我在咨询公司和金融机构做过项目，独立把 AI 产品从草图做到上线，也走过 20 多个国家，近距离观察不同地方的人、市场与文化究竟如何运转。" },
+    p3: { en: "Along the way, I've worked across internet tech (ByteDance, Alibaba), a leading consulting firm (Roland Berger), and finance (Guoyuan Securities), taken AI products from early sketch to working interface, and traveled through 20+ countries to watch how people, markets, and cultures behave up close.", zh: "一路走来，我在互联网（字节、阿里）、头部咨询公司（罗兰贝格）和金融机构（国元证券）做过项目，把 AI 产品从早期草图做到完整可用，也走过 20 多个国家，近距离观察不同地方的人、市场与文化究竟如何运转。" },
     p4: { en: "The most interesting ideas usually live in the overlap between fields. That's where I like to work.", zh: "最有意思的想法，往往长在不同领域的交界处。我喜欢待在那里。" },
     tags: {
       en: ["Business Strategy", "AI Products", "Market Research", "Data Analysis", "Vibe Coding", "Global Perspective"],
@@ -42,9 +42,9 @@ export const i18n = {
   },
 
   projects: {
-    label:    { en: "Building",     zh: "在建"         },
+    label:    { en: "Selected Projects", zh: "精选项目" },
     headline: { en: "What I make.", zh: "我正在创造。"   },
-    tagline:  { en: "The best products feel inevitable in hindsight.\nSimple enough to disappear. Useful enough to stay.", zh: "最好的产品，事后看来皆是必然。" },
+    tagline:  { en: "The best products feel inevitable in hindsight.", zh: "好产品做出来以后，会让人觉得它本就该是这样。" },
   },
 
   global: {
@@ -53,7 +53,7 @@ export const i18n = {
     headline2: { en: "my fieldwork.",      zh: "就是我的田野。"  },
     statLabels: {
       Countries:  { en: "Countries",  zh: "个国家" },
-      Cities:     { en: "Cities",     zh: "个城市" },
+      Cities:     { en: "Cities",     zh: "座城市" },
       Continents: { en: "Continents", zh: "个大洲" },
     },
     p1: { en: "I travel to see how people actually make decisions: what they value, what they build, and how they move through daily life. Every city teaches me something a data table can't.", zh: "我出门看世界，想看的是真实的人怎么做选择：他们在意什么、造出什么、日子怎么过。每座城市给我的启发，数据表里都找不到。" },
@@ -79,9 +79,9 @@ export const i18n = {
   music: {
     label:     { en: "Aesthetic Sensibility", zh: "感性与品味"      },
     headline1: { en: "Music taught me rhythm", zh: "音乐先教会我节奏，"  },
-    headline2: { en: "before product",         zh: "后来是产品，"  },
-    headline3: { en: "taught me flow.",        zh: "教会我流畅。"  },
-    headline3Accent: { en: "taught me flow.", zh: "教会我流畅。" },
+    headline2: { en: "before product",         zh: "后来做产品，"  },
+    headline3: { en: "taught me flow.",        zh: "才更懂什么是顺畅。"  },
+    headline3Accent: { en: "taught me flow.", zh: "才更懂什么是顺畅。" },
     p1: { en: "I've played piano since childhood, reaching National Grade 9 alongside Grade 6 in music theory. Years of practice quietly shaped the way I think.", zh: "我从小练钢琴，考过了全国钢琴九级和乐理六级。这么多年和琴键打交道，悄悄塑成了我思考问题的方式。" },
     p2: { en: "Music showed me that structure is what makes freedom possible, and that discipline gives expression its shape. The performances that look effortless are almost always built on hours of invisible work.", zh: "音乐让我懂得，结构恰恰是自由的底气，克制的训练才能撑起真正的表达。那些听来举重若轻的演奏，背后都是日复一日看不见的功夫。" },
     p3: { en: "Restraint, internal logic, timing: those are the same instincts I bring to product work and writing. Taste isn't surface decoration; it's how you decide what belongs.", zh: "克制、章法、分寸感，这些从音乐里长出来的直觉，也被我带进了产品和写作里。品味从来不是表面的修饰，而是决定什么该留、什么该舍的眼光。" },
@@ -89,7 +89,7 @@ export const i18n = {
       { key: "Piano",        name: { en: "Piano",        zh: "钢琴"   }, credential: { en: "Grade 9",      zh: "九级"      }, meta: { en: "National Grading System", zh: "全国等级考试" } },
       { key: "Music Theory", name: { en: "Music Theory", zh: "乐理"   }, credential: { en: "Grade 6",      zh: "六级"      }, meta: { en: "National Grading System", zh: "全国等级考试" } },
       { key: "Guitar",       name: { en: "Guitar",       zh: "吉他"   }, credential: { en: "Acoustic",     zh: "木吉他"    }, meta: { en: "Self-taught, ongoing",    zh: "自学中"      } },
-      { key: "Hulusi",       name: { en: "Hulusi",       zh: "葫芦丝" }, credential: { en: "Traditional",  zh: "传统"      }, meta: { en: "Chinese instrument",      zh: "中国乐器"    } },
+      { key: "Hulusi",       name: { en: "Hulusi",       zh: "葫芦丝" }, credential: { en: "Traditional",  zh: "传统吹奏"  }, meta: { en: "Chinese instrument",      zh: "中国民族乐器" } },
     ],
   },
 
@@ -113,7 +113,7 @@ export const i18n = {
     quote2:    { en: "and hard to forget.\"",       zh: "又让人念念不忘的作品。」" },
     p1: { en: "The best technology fades into the background. When software is intuitive enough, you stop noticing the tool and start thinking through it.", zh: "最好的技术往往懂得隐身。当软件顺手到让你忘了它的存在，你就不再是在「使用」工具，而是在借着它思考。" },
     p2: { en: "Good work holds rigor and taste in the same hand. It has a clear point of view, and you can feel the care running from the underlying structure all the way to the final detail.", zh: "好作品总能兼顾严谨与品味。它有鲜明的判断，也能让你从底层架构一路感受到末梢细节的用心。" },
-    signature: { en: "吴梓洋  ·  Wuziyang Zhang", zh: "张吴梓洋" },
+    signature: { en: "Wuziyang Zhang", zh: "张吴梓洋" },
   },
 
   contact: {
@@ -121,7 +121,7 @@ export const i18n = {
     headline1: { en: "If something here", zh: "如果这里有哪一处"    },
     headline2: { en: "sparked a thought,",       zh: "正好触动了你，"    },
     headline3: { en: "let's talk.",       zh: "不妨聊聊。"      },
-    body: { en: "I'm open to internships, full-time roles, research collaborations, and good conversations. Building a product, hiring for a team, or just curious to compare notes? Say hello.", zh: "实习、全职、研究合作，或是一场投缘的对谈，我都敞开欢迎。无论你正在打磨产品、为团队招人，还是单纯想交换想法，随时打个招呼吧。" },
+    body: { en: "I'm open to internships, full-time roles, research collaborations, and good conversations. Building a product, hiring for a team, or just curious to compare notes? Say hello.", zh: "实习、全职、研究合作，或是一场投缘的交流，我都很欢迎。无论你正在打磨产品、为团队招人，还是单纯想交换想法，随时打个招呼吧。" },
     sendEmail: { en: "Send Email",      zh: "发邮件"   },
     linkedin:  { en: "LinkedIn",        zh: "LinkedIn"     },
     resume:    { en: "Download Résumé", zh: "下载简历" },
@@ -139,10 +139,10 @@ export const i18n = {
   },
 
   footer: {
-    copy:   { en: "Wuziyang Zhang. Designed with intent.", zh: "张吴梓洋 · 以意为形。" },
+    copy:   { en: "Wuziyang Zhang. Designed with intent.", zh: "张吴梓洋 · 用心设计。" },
     email:  { en: "Email",  zh: "邮件" },
     resume: { en: "Résumé", zh: "简历" },
-    mono:   { en: "吴梓洋 · WZ", zh: "张吴梓洋 · WZ" },
+    mono:   { en: "Wuziyang Zhang · WZ", zh: "张吴梓洋 · WZ" },
   },
 } as const;
 

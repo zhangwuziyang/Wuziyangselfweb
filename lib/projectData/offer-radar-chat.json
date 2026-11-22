@@ -75,7 +75,7 @@
       ]
     },
     "answer": {
-      "zh": "直接问通用 AI，每次都要重新交代背景，而且它不熟校招节奏、也容易替学生编数字。我做 Offer 雷达时定了几条硬规矩：长期存下档案、母版简历和投递记录，只推荐不代投，原文和回答里没有的数字绝不编造，所有改动必须先展示给学生、点确认才生效。它交付的也不是泛泛的聊天文本，而是能直接投递的一页纸 Word 或 PDF 简历、海投清单和校招日历。",
+      "zh": "直接问通用 AI，每次都要重新交代背景，而且它不熟校招节奏、也容易替学生编数字。我做 Offer 雷达时定了几条硬规矩：长期存下档案、母版简历和投递记录，只推荐不代投，简历和补充说明里没有的数字绝不编造，所有改动必须先展示给学生、点确认才生效。它交付的也不是泛泛的聊天文本，而是能直接投递的一页纸 Word 或 PDF 简历、海投清单和校招日历。",
       "en": "Generic AI chats force students to repeat their background every session, miss campus recruiting timelines, and readily invent metrics. I designed Offer Radar around persistent memory and firm boundaries: it never auto-applies on recruiting sites, never fabricates missing numbers, and shows every proposed write for explicit confirmation before saving. Instead of raw chat paragraphs, it produces concrete deliverables like one-page Word or PDF resumes, filterable batch-apply sheets, and synced recruiting schedules."
     },
     "facts": [
@@ -124,7 +124,7 @@
     },
     "answer": {
       "zh": "我给岗位雷达整理了一套真实公司库，覆盖 13 个行业的 839 个招聘主体，其中 340 个带官网校招入口，并标明了分层依据、2027 届招聘季和核对日期。找公司走「偏好 → 行业 → 公司」三步漏斗，按学生竞争力与公司层级映射「冲一冲 / 比较稳 / 保底」，既给最多 30 家的精选推荐，也提供可一次收藏最多 100 家或导出 Excel 的海投清单。粘贴岗位描述还能做 0 到 100 分的五维匹配分析，如果届别、学历或专业等硬门槛不符，总分会直接封顶在 60 分。",
-      "en": "I built the company radar on a verified database of 839 hiring entities across 13 industries, including 340 official campus-portal links along with tier rationale, 2027 recruiting dates, and verification timestamps. Discovery runs through a preference-to-industry-to-company funnel that maps reach, match, and safety tiers, pairing up to 30 curated picks with a batch-apply list that supports bookmarking up to 100 companies at once or exporting to Excel. Students can also paste any job description for a 0–100 five-dimension match analysis that caps the total score at 60 whenever hard requirements like graduation year, degree, or major do not match."
+      "en": "I built Job Radar on a verified database of 839 hiring entities across 13 industries, including 340 official campus-portal links along with tier rationale, 2027 recruiting dates, and verification timestamps. Discovery runs through a preference-to-industry-to-company funnel that maps reach, match, and safety tiers, pairing up to 30 curated picks with a batch-apply list that supports bookmarking up to 100 companies at once or exporting to Excel. Students can also paste any job description for a 0–100 five-dimension match analysis that caps the total score at 60 whenever hard requirements like graduation year, degree, or major do not match."
     },
     "facts": [
       {
@@ -383,7 +383,7 @@
       ]
     },
     "answer": {
-      "zh": "前端采用 Next.js 16.4、React 19.2 和 Tailwind CSS v4（约 2.2 万行 TypeScript），后端是异步 FastAPI 加 SQLAlchemy 2（约 2 万行 Python、111 个接口），正式库用 PostgreSQL 17 共 28 张表，并由 Docker Compose 编排 Postgres、后端、前端和自动 HTTPS 的 Caddy 四个容器。为了把一页简历排准，容器内集成了 python-docx、LibreOffice 与思源宋体，官网只读抓取则用 Playwright 无头 Chromium 并钉 IP 防 DNS 重绑定。质量上我配了 718 个后端 pytest 用例（覆盖率门槛 80%）和 114 个前端 vitest 用例，每次推送跑三路 CI，还写了端到端真模型简历评测脚本来对比不同模型的写满程度和成本。",
+      "zh": "前端采用 Next.js 16.4、React 19.2 和 Tailwind CSS v4（约 2.2 万行 TypeScript），后端是异步 FastAPI 加 SQLAlchemy 2（约 2 万行 Python、111 个接口），正式库用 PostgreSQL 17 共 28 张表，并由 Docker Compose 编排 Postgres、后端、前端和自动 HTTPS 的 Caddy 四个容器。为了把一页简历排准，容器内集成了 python-docx、LibreOffice 与思源宋体，官网只读抓取则用 Playwright 无头 Chromium，并固定解析 IP（IP Pinning）防 DNS 重绑定。质量上我配了 718 个后端 pytest 用例（覆盖率门槛 80%）和 114 个前端 vitest 用例，每次推送跑三路 CI，还写了端到端真模型简历评测脚本来对比不同模型的写满程度和成本。",
       "en": "I built the frontend with Next.js 16.4, React 19.2, and Tailwind CSS v4 (~22,000 lines of TypeScript) and the backend with async FastAPI and SQLAlchemy 2 (~20,000 lines of Python, 111 API endpoints) on PostgreSQL 17 with 28 tables, deployed via Docker Compose alongside Caddy for automatic HTTPS. Inside the container, I paired python-docx, LibreOffice, and Source Han Serif to measure exact one-page PDF fit, while read-only portal checks use headless Chromium via Playwright with IP pinning against DNS rebinding. For reliability, I wrote 718 backend pytest tests (80% coverage gate), 114 frontend vitest tests, a three-job CI pipeline, and an end-to-end real-model resume benchmark."
     },
     "facts": [
@@ -499,7 +499,7 @@
       ]
     },
     "answer": {
-      "zh": "目前 Offer 雷达 v1.0（2026 年 10 月 27 日）的功能开发已经全部完成，正处于等待上线手续的阶段，主要是境内服务器和域名的 ICP 备案、阿里云短信签名与模板，以及上线后 30 日内补齐公安联网备案。我把合规直接做进了代码门禁：模型、搜索、语音与短信全走境内服务且启动时拦截境外地址，调用 AI 前必须过手机号实名和协议同意「两道门」，关闭个性化推荐后接口会直接拒绝推荐，导出文件也带隐式 AI 标识。在等待人社局关于网络招聘服务许可答复之前，它会先以「公司目录 + 岗位匹配分析」的纯工具版免费上线。",
+      "zh": "目前 Offer 雷达 v1.0（2026 年 10 月 27 日）的功能开发已经全部完成，正处于等待上线手续的阶段，主要是境内服务器和域名的 ICP 备案、阿里云短信签名与模板，以及上线后 30 日内补齐公安联网备案。我把合规直接做进了代码门禁：模型、搜索、语音与短信全走境内服务且启动时拦截境外地址，调用 AI 前必须过手机号实名和协议同意「两道门」，关闭个性化推荐后接口会直接拒绝推荐，导出文件也带隐式 AI 标识。在收到人社局关于网络招聘服务许可的答复之前，它会先以「公司目录 + 岗位匹配分析」的纯工具版免费上线。",
       "en": "Offer Radar v1.0 (dated October 27, 2026) is feature-complete and awaiting launch filings, specifically China ICP registration, Alibaba Cloud SMS signature and template approval, and public-security filing within 30 days of launch. I enforced compliance directly in code: all models, search, speech, and SMS services run onshore in China with foreign endpoints blocked on startup, AI access requires verified phone login and policy consent, turning off personalized recommendations disables them at the API layer, and exports carry implicit AI metadata. Ahead of guidance from the local HRSSB on online recruitment licensing, it will launch free in pure-tool mode with the company directory and JD match analyzer only."
     },
     "facts": [

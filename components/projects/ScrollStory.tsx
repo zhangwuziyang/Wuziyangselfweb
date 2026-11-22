@@ -950,7 +950,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
                   className="mb-3 text-[11px] font-semibold tracking-[0.14em] uppercase"
                   style={{ color: story.accentDark }}
                 >
-                  {zh ? "更多界面" : "GALLERY"}
+                  {zh ? "界面一览" : "GALLERY"}
                 </p>
                 <h2 className="mb-4 text-[clamp(1.85rem,3.6vw,2.9rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-[#f5f5f7]">
                   {story.galleryHeading[lang]}

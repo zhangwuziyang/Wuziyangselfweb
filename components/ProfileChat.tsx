@@ -27,7 +27,7 @@ const MOBILE_CHAT = "(width < 48rem), (hover: none) and (pointer: coarse) and (h
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const CHAT_LABELS = {
   en: {
-    status: "Here to introduce you to Wuziyang",
+    status: "Wuziyang Zhang’s pixel guide",
     conversation: "Conversation with Cindy",
     you: "You",
     suggestions: ["What projects has he built?", "What’s his internship experience?", "How can I contact him?"],
@@ -38,7 +38,7 @@ const CHAT_LABELS = {
     stop: "Stop generating",
   },
   zh: {
-    status: "随时为你介绍梓洋",
+    status: "张吴梓洋的像素小管家",
     conversation: "与 Cindy 的对话",
     you: "你",
     suggestions: ["他做过哪些项目？", "他的实习经历？", "怎么联系他？"],
