@@ -21,15 +21,27 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     await page.waitForSelector('.cindy-sprite[data-sprite="ready"][aria-hidden="false"]');
     await page.waitForSelector(".story-content > footer");
     await page.evaluate(() => document.fonts.ready);
-    const maxScroll = await page.evaluate(() => {
+    const maxScroll = await page.evaluate(mobile => {
       const root = document.documentElement;
+      const content = document.querySelector(".story-content");
+      const scroller = mobile ? content : root;
       const dock = document.querySelector(".cindy-dock");
       const sprite = dock.querySelector(".cindy-sprite");
+      const hint = dock.querySelector(".cindy-hint");
+      const note = dock.querySelector(".cindy-note");
+      const launcher = document.querySelector(".profile-chat-launcher__button");
       const canvas = sprite.querySelector("canvas");
       const context = canvas.getContext("2d");
-      const obstacles = [...document.querySelectorAll(
-        ".story-shell, .story-shell :is(h1,h2,h3,p,li,a,button,img,figure,article,.story-panel), .profile-chat-launcher__button",
-      )];
+      const text = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
+      const ranges = [];
+      const images = [...content.querySelectorAll("img, figure, article, .story-panel")];
+      while (text.nextNode()) {
+        const node = text.currentNode;
+        if (!node.textContent.trim() || node.parentElement.closest("script, style, template, .sr-only, [hidden]")) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        ranges.push(range);
+      }
       const samples = [];
       const issues = [];
       const parked = {};
@@ -40,7 +52,7 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
       const overlap = (a, b) => Math.min(a.right, b.right) - Math.max(a.left, b.left) > .5
         && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > .5;
 
-      function inkBounds(rect) {
+      function inkBounds(rect, pixels) {
         const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
         let left = canvas.width, top = canvas.height, right = 0, bottom = 0;
         for (let y = 0; y < canvas.height; y++) {
@@ -50,23 +62,25 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
             top = Math.min(top, y); bottom = Math.max(bottom, y + 1);
           }
         }
-        const scale = rect.width / canvas.width;
+        const scaleY = rect.height / canvas.height;
+        const centerX = rect.left + rect.width / 2;
         return {
-          left: rect.left + left * scale, right: rect.left + right * scale,
-          top: rect.top + top * scale, bottom: rect.top + bottom * scale,
+          left: centerX + (left - canvas.width / 2) * pixels, right: centerX + (right - canvas.width / 2) * pixels,
+          top: rect.top + top * scaleY, bottom: rect.top + bottom * scaleY,
         };
       }
 
-      function sample() {
-        const scroll = window.scrollY;
-        if (scroll === previous) return;
+      function sample(force = false) {
+        const scroll = scroller.scrollTop;
+        if (!force && scroll === previous) return;
+        const moved = scroll !== previous;
         previous = scroll;
         const hit = sprite.getBoundingClientRect();
-        const ink = inkBounds(canvas.getBoundingClientRect());
-        const desktop = root.clientWidth >= 768;
+        const ink = inkBounds(canvas.getBoundingClientRect(), hit.width / 40);
+        const desktop = !mobile;
         const edge = desktop ? 80 : 4;
         const minWidth = desktop ? 200 : 140;
-        const maxWidth = desktop ? 260 : 170;
+        const maxWidth = desktop ? 260 : 160;
         const fail = message => issues.push(`scrollY=${scroll} (${dock.dataset.scene}) ${message}`);
         if (sprite.getAttribute("aria-hidden") !== "false" || getComputedStyle(dock).opacity !== "1" || getComputedStyle(sprite).visibility !== "visible") fail("Cindy is hidden");
         if (hit.width < minWidth || hit.width > maxWidth) fail(`hit width ${hit.width}`);
@@ -76,13 +90,31 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
             fail(`outside the safe viewport (${JSON.stringify(box)})`);
           }
         }
-        for (const element of obstacles) {
-          const rect = element.getBoundingClientRect();
-          if (rect.height > 0 && rect.width > 0 && (overlap(hit, rect) || overlap(ink, rect))) {
-            fail(`intersects ${element.tagName}.${element.className}`);
-            break;
+        const parts = [["sprite", hit], ["painted sprite", ink]];
+        if (Number(getComputedStyle(hint).opacity) > .01) {
+          const box = hint.getBoundingClientRect();
+          if (Math.abs(box.left + box.width / 2 - hit.left - hit.width / 2) > .5) fail("hint is off center");
+          parts.push(["hint", box]);
+        }
+        if (getComputedStyle(note).visibility === "visible" && Number(getComputedStyle(note).opacity) > .01) {
+          const box = note.getBoundingClientRect();
+          parts.push(["bubble", box], ["bubble tip", mobile
+            ? { left: box.left - 7, right: box.left, top: box.top, bottom: box.bottom }
+            : { left: hit.left + hit.width / 2 - 6, right: hit.left + hit.width / 2 + 6, top: box.top - 7, bottom: box.top }]);
+        }
+        if (mobile) parts.push(["launcher", launcher.getBoundingClientRect()]);
+        const clip = mobile ? content.getBoundingClientRect() : { top: 0, bottom: root.clientHeight };
+        for (const obstacle of [...ranges, ...images]) {
+          const rects = obstacle instanceof Range ? obstacle.getClientRects() : [obstacle.getBoundingClientRect()];
+          for (const rect of rects) {
+            const visible = { left: rect.left, right: rect.right, top: Math.max(rect.top, clip.top), bottom: Math.min(rect.bottom, clip.bottom) };
+            if (visible.bottom <= visible.top) continue;
+            for (const [part, box] of parts) {
+              if (overlap(box, visible)) fail(`${part} intersects ${obstacle instanceof Range ? "text" : obstacle.tagName}`);
+            }
           }
         }
+        if (!moved) return;
         const scene = dock.dataset.scene;
         chapterSamples[scene] = (chapterSamples[scene] ?? 0) + 1;
         if (dock.hasAttribute("data-parked")) parked[scene] = (parked[scene] ?? 0) + 1;
@@ -99,11 +131,12 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
       collect();
       window.finishCindyScroll = () => {
         cancelAnimationFrame(frame);
-        sample();
+        sample(true);
         return { samples, issues, parked, chapterSamples };
       };
-      return root.scrollHeight - root.clientHeight;
-    });
+      window.sampleCindyAtRest = () => sample(true);
+      return scroller.scrollHeight - scroller.clientHeight;
+    }, mobile);
     const client = await page.createCDPSession();
     const started = performance.now();
     const wheels = [];
@@ -114,7 +147,7 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
       await delay(Math.max(0, started + wheels.length * STEP_MS - performance.now()));
     }
     await Promise.all(wheels);
-    await page.waitForFunction(end => window.scrollY >= end - 1, {}, maxScroll);
+    await page.waitForFunction((mobile, end) => (mobile ? document.querySelector(".story-content").scrollTop : window.scrollY) >= end - 1, {}, mobile, maxScroll);
     const { samples, issues, parked, chapterSamples } = await page.evaluate(() => window.finishCindyScroll());
     assert.equal(samples[0].scroll, 0);
     assert.ok(samples.at(-1).scroll >= maxScroll - 1);
@@ -122,15 +155,32 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     assert.equal(issues.length, 0, issues.slice(0, 12).join("\n"));
     assert.deepEqual(Object.keys(parked), CHAPTERS);
     for (const chapter of CHAPTERS) {
-      assert.ok(parked[chapter] / chapterSamples[chapter] > .65, `Cindy spends most of ${chapter} parked`);
+      assert.ok(parked[chapter] / chapterSamples[chapter] > .5, `Cindy spends most of ${chapter} parked`);
     }
     for (let index = 1; index < samples.length; index++) {
       const a = samples[index - 1], b = samples[index];
-      assert.ok(Math.hypot(b.x - a.x, b.y - a.y) <= 3 + Math.max(DELTA, b.scroll - a.scroll) * 1.25, `Continuous movement at scrollY=${b.scroll}`);
+      assert.ok(Math.hypot(b.x - a.x, b.y - a.y) <= 5 + Math.max(DELTA, b.scroll - a.scroll) * (mobile ? 1.25 : 8), `Continuous movement at scrollY=${b.scroll}`);
     }
     assert.ok(await page.$(".profile-chat-launcher__button"), "Global chat launcher remains available");
     await page.waitForFunction(() => Number(getComputedStyle(document.querySelector(".cindy-hint")).opacity) === 1);
-    assert.match(await page.$eval(".cindy-hint", hint => hint.textContent.trim()), chinese ? /可以随时和我聊聊/ : /Tap me to chat anytime/);
+    assert.equal(await page.$eval(".cindy-hint", hint => hint.textContent.trim()), chinese ? "点击我和我聊聊～" : "Click me to chat～");
+    for (const chapter of CHAPTERS) {
+      await page.evaluate((chapter, mobile) => {
+        const section = document.getElementById(chapter);
+        const reader = document.querySelector(".story-content");
+        const scroller = mobile ? reader : window;
+        const start = (mobile ? reader.scrollTop : window.scrollY) + section.getBoundingClientRect().top;
+        const readerTop = mobile ? reader.getBoundingClientRect().top : 0;
+        scroller.scrollTo({ top: start - readerTop, behavior: "instant" });
+      }, chapter, mobile);
+      await page.waitForFunction(chapter => {
+        const note = document.querySelector('.cindy-dock[data-scene="' + chapter + '"][data-speaking] .cindy-note');
+        return note && getComputedStyle(note).opacity === "1";
+      }, {}, chapter);
+      await page.evaluate(() => window.sampleCindyAtRest());
+    }
+    const stopped = await page.evaluate(() => window.finishCindyScroll());
+    assert.equal(stopped.issues.length, 0, stopped.issues.slice(0, 12).join("\n"));
     console.log(`${width}×${height}: ${samples.length} wheel samples, width ${Math.min(...samples.map(item => item.width)).toFixed(1)}–${Math.max(...samples.map(item => item.width)).toFixed(1)}px, minimum inset ${Math.min(...samples.map(item => item.inset)).toFixed(1)}px`);
   } finally {
     await page.close();

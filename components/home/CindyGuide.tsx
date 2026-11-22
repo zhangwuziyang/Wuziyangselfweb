@@ -15,14 +15,23 @@ export default function CindyGuide() {
   const button = useRef<HTMLButtonElement>(null);
   const sprite = useRef<HTMLCanvasElement>(null);
   const note = useRef<HTMLParagraphElement>(null);
+  const noteMeasure = useRef<HTMLSpanElement>(null);
+  const noteText = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (!dock.current || !button.current || !sprite.current || !note.current) return;
-    return mountCindy({ dock: dock.current, button: button.current, sprite: sprite.current, note: note.current });
+    if (!dock.current || !button.current || !sprite.current || !note.current || !noteMeasure.current || !noteText.current) return;
+    return mountCindy({
+      dock: dock.current, button: button.current, sprite: sprite.current,
+      note: note.current, noteMeasure: noteMeasure.current, noteText: noteText.current,
+    });
   }, []);
 
   return (
     <aside className="cindy-overlay" aria-label={lang === "zh" ? "Cindy 网站导览" : "Cindy’s site guide"}>
+      <div className="cindy-mobile-stage" aria-hidden="true">
+        <div className="cindy-mobile-stage__art" />
+        <div className="cindy-mobile-stage__caption" />
+      </div>
       <div ref={dock} className="cindy-dock">
         <div className="cindy-shadow" aria-hidden="true" />
         <button
@@ -40,10 +49,13 @@ export default function CindyGuide() {
             <canvas ref={sprite} width={CINDY_BITMAP} height={CINDY_BITMAP} />
           </span>
         </button>
-        <p className="cindy-hint" aria-hidden="true">
-          {lang === "zh" ? "可以随时和我聊聊" : "Tap me to chat anytime"}
+        <p ref={note} className="cindy-note" aria-hidden="true">
+          <span ref={noteMeasure} className="cindy-note__measure" aria-hidden="true" />
+          <span ref={noteText} className="cindy-note__text" />
         </p>
-        <p ref={note} className="cindy-note" aria-hidden="true" />
+        <p className="cindy-hint" aria-hidden="true">
+          {lang === "zh" ? "点击我和我聊聊～" : "Click me to chat～"}
+        </p>
       </div>
     </aside>
   );

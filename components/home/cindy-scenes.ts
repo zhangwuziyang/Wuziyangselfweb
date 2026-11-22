@@ -19,7 +19,7 @@ export const CINDY_SCENES: Record<Chapter, Scene> = {
   },
   about: {
     pose: "book", expression: "neutral", entrance: "peek", color: [227, 216, 198],
-    line: { en: "I opened his UW–Madison notes on econ and info science.", zh: "我翻到梓洋在麦迪逊学经济和信息科学这页。" },
+    line: { en: "I opened his UW–Madison notes on econ and info science.", zh: "这页写着梓洋在麦迪逊读经济和信息科学。" },
   },
   experience: {
     pose: "timeline", expression: "happy", entrance: "slide", color: [246, 239, 229],
@@ -27,23 +27,23 @@ export const CINDY_SCENES: Record<Chapter, Scene> = {
   },
   projects: {
     pose: "flag", expression: "neutral", entrance: "walk", color: [224, 213, 201],
-    line: { en: "I’ll show you his two demos: Offer Radar and My Health Agent.", zh: "我带你试试他做的求职雷达和健康助理。" },
+    line: { en: "I’ll show you his two demos: Offer Radar and My Health Agent.", zh: "我带你试试他做的 Offer 雷达和健康助理。" },
   },
   global: {
     pose: "earth", expression: "surprise", entrance: "hop", color: [243, 239, 231],
-    line: { en: "I picked Machu Picchu from his travels across 20-plus countries.", zh: "我从他去过的二十多国挑了马丘比丘。" },
+    line: { en: "I picked Machu Picchu from his travels across 20-plus countries.", zh: "他去过二十多个国家，我先挑了马丘比丘。" },
   },
   music: {
     pose: "music", expression: "happy", entrance: "sway", color: [225, 212, 192],
-    line: { en: "I’ll cue the piano. He practised all the way to Grade 9!", zh: "我给你听听他练到九级的钢琴功夫。" },
+    line: { en: "He’s played piano since childhood, all the way to Grade 9.", zh: "他从小练琴，一路考到了九级。" },
   },
   skills: {
     pose: "skills", expression: "neutral", entrance: "peek", color: [245, 237, 223],
-    line: { en: "I’ve got my lens on his data and product skills.", zh: "我用放大镜找到了他的数据和产品本领。" },
+    line: { en: "I’ve got my lens on his data and product skills.", zh: "我拿放大镜看了看他的数据和产品功夫。" },
   },
   philosophy: {
     pose: "think", expression: "think", entrance: "slide", color: [222, 211, 197],
-    line: { en: "I wrote down his rule: make it useful, elegant, and memorable.", zh: "我记下他的准则，实用、优雅，还要让人记住。" },
+    line: { en: "I wrote down his rule: make it useful, elegant, and memorable.", zh: "我记下了他的准则：实用、优雅，还要让人记住。" },
   },
   contact: {
     pose: "bye", expression: "shy", entrance: "walk", color: [247, 237, 223],

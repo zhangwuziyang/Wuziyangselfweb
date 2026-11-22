@@ -52,6 +52,7 @@ const cream = CINDY_COLORS.c;
 const brown = CINDY_COLORS.b;
 
 type Rect = (x: number, y: number, width: number, height: number, color: string) => void;
+type Performance = { blink?: boolean; mouth?: boolean };
 
 function drawRows(rect: Rect, x: number, y: number, pattern: readonly string[], colors: Record<string, string>, flip = false) {
   pattern.forEach((line, row) => {
@@ -65,9 +66,9 @@ function drawRows(rect: Rect, x: number, y: number, pattern: readonly string[], 
   });
 }
 
-function eyes(rect: Rect, expression: CindyExpression, gaze: PixelOffset) {
+function eyes(rect: Rect, expression: CindyExpression, gaze: PixelOffset, blink = false) {
   for (const x of [22, 40]) {
-    if (expression === "sleep") {
+    if (blink || expression === "sleep") {
       rect(x - 1, 25, 5, 1, ink);
     } else if (expression === "happy") {
       rect(x, 23, 3, 1, ink);
@@ -115,6 +116,10 @@ const globe = [
   "kwwwwwwwvvvwwwwwwk", "kwwwwwwwvvwwwwwwwk", "kwwwwwwwwvwwwwwwwk", ".kwwwwwwwvvwwwwwk.",
   "..kwwwwwwwwwwwwk..", "...kwwwwwwwwwwk...", "....kkwwwwwwkk....", "......kkkkkk......",
 ];
+const lens = [
+  "...kkkk...", "..kkggkk..", ".kggggggk.", "kkghggggkk", "kggggggggk",
+  "kggggggggk", "kkggggggkk", ".kggggggk.", "..kkggkk..", "...kkkk...",
+];
 
 export function paintCindy(
   canvas: CanvasRenderingContext2D,
@@ -123,12 +128,13 @@ export function paintCindy(
   gaze: PixelOffset,
   step = 0,
   compact = false,
+  performance?: Performance,
 ) {
   canvas.clearRect(0, 0, CINDY_BITMAP, CINDY_BITMAP);
   drawCindy((x, y, w, h, color) => {
     canvas.fillStyle = color;
     canvas.fillRect(x, y, w, h);
-  }, pose, expression, gaze, step, compact);
+  }, pose, expression, gaze, step, compact, performance);
 }
 
 const spriteBounds = new Map<string, { left: number; right: number; top: number; bottom: number }>();
@@ -153,18 +159,17 @@ export function cindySpriteBounds(pose: CindyPose, sleeping: boolean, step: numb
 
 function drawCindy(
   rect: Rect, pose: CindyPose, expression: CindyExpression, gaze: PixelOffset,
-  step: number, compact: boolean,
+  step: number, compact: boolean, performance?: Performance,
 ) {
   const hand = (x: number, y: number, flip = false) => drawRows(rect, x, y, paw, CINDY_COLORS, flip);
 
   drawRows(rect, 12, 12, rows, CINDY_COLORS);
-  eyes(rect, expression, gaze);
-
-  const flag = (x: number, y: number) => {
-    rect(x, y, 2, 17, ink);
-    rect(x + 2, y, 7, 5, "#ad4236");
-    rect(x + 2, y + 3, 4, 2, "#dd6554");
-  };
+  eyes(rect, expression, gaze, performance?.blink);
+  if (performance?.mouth) {
+    rect(29, 34, 6, 5, cream);
+    rect(30, 35, 4, 3, ink);
+    rect(31, 37, 2, 1, CINDY_COLORS.p);
+  }
 
   const seated = () => {
     for (const x of [18, 37]) {
@@ -176,11 +181,12 @@ function drawCindy(
   switch (pose) {
     case "walk": {
       const stride = [0, 2, -2][step] ?? 0;
+      hand(12, 39 + stride);
+      hand(44, 39 - stride, true);
       rect(20 - stride, 50, 8, 3 + Math.max(0, stride), ink);
       rect(36 + stride, 50, 8, 3 + Math.max(0, -stride), ink);
       rect(21 - stride, 50, 6, 2, cream);
       rect(37 + stride, 50, 6, 2, cream);
-      flag(compact ? 42 : 46, 30);
       break;
     }
     case "book":
@@ -201,10 +207,16 @@ function drawCindy(
       for (const y of [27, 34, 41]) rect(42, y, 4, 3, y === 27 + step * 7 ? "#b2543b" : cream);
       hand(41, 43, true);
       break;
-    case "flag":
-      flag(compact ? 40 : 46, 21 - step);
-      hand(compact ? 36 : 44, 35, true);
+    case "flag": {
+      const x = compact ? 48 : 51;
+      const y = 21 - step;
+      rect(x, y, 1, 17, brown);
+      drawRows(rect, x + 1, y, ["rrrr..", "rddrr.", "rdddrr", "rrrr..", "rrr..."], {
+        r: "#ad4236", d: "#dd6554",
+      });
+      hand(x - 3, y + 12, true);
       break;
+    }
     case "earth":
       drawRows(rect, 23, 37, globe, { k: ink, w: "#6586a4", v: "#8cab68" });
       rect(29 + 3 * step, 43, 2, 2, "#f4d697");
@@ -231,12 +243,11 @@ function drawCindy(
     }
     case "skills": {
       const y = 35 - step;
-      rect(41, y, 11, 9, ink);
-      rect(43, y + 2, 7, 5, "#dfc49a");
-      rect(44, y + 2, 2, 2, "#fff5d9");
-      rect(46, y + 9, 3, 8, ink);
-      rect(46, y + 11, 2, 4, "#a45e38");
-      hand(41, 46, true);
+      hand(44, y + 11, true);
+      drawRows(rect, 41, y, lens, { k: ink, g: "#b7d1d0", h: "#f4faf7" });
+      drawRows(rect, 47, y + 8, ["kk...", "kak..", ".kak.", "..kak", "...kk"], {
+        k: ink, a: "#ad794c",
+      });
       break;
     }
     case "think":

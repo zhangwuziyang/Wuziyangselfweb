@@ -31,16 +31,18 @@ const CHAT_LABELS = {
     conversation: "Conversation with Cindy",
     you: "You",
     suggestions: ["What projects has he built?", "What’s his internship experience?", "How can I contact him?"],
+    settings: "Chat settings",
     enableAI: "Enable local AI",
     retryAI: "Retry local AI",
     replying: "Replying…",
     stop: "Stop generating",
   },
   zh: {
-    status: "随时为你介绍 Wuziyang",
+    status: "随时为你介绍梓洋",
     conversation: "与 Cindy 的对话",
     you: "你",
     suggestions: ["他做过哪些项目？", "他的实习经历？", "怎么联系他？"],
+    settings: "聊天设置",
     enableAI: "启用本地 AI",
     retryAI: "重试本地 AI",
     replying: "正在回复…",
@@ -404,11 +406,6 @@ export default function ProfileChat({ open, readOrigin, onClose }: {
                   </button>
                 ))}
               </div>
-              <details className="profile-chat-details">
-                <summary>{copy.howItWorks[lang]}</summary>
-                <p>{modeDescription}</p>
-                <p>{copy.howItWorksBody[lang]}</p>
-              </details>
             </div>
           )}
         </div>
@@ -444,15 +441,25 @@ export default function ProfileChat({ open, readOrigin, onClose }: {
           </form>
           <div className="profile-chat-footer__mode">
             <span role="status">{modeLabel}</span>
-            {(aiStatus === "idle" || aiStatus === "failed") && (
-              <button type="button" onClick={() => void enableLocalAI()}>
-                {aiStatus === "failed" ? labels.retryAI : labels.enableAI}
-              </button>
-            )}
           </div>
           {aiStatus === "loading" && (
             <progress className="profile-chat-footer__progress" value={aiProgress} max={1} aria-label={copy.aiLoading[lang]} />
           )}
+          <details className="profile-chat-details">
+            <summary>{labels.settings}</summary>
+            <div className="profile-chat-details__body">
+              <p>{modeDescription}</p>
+              {(aiStatus === "idle" || aiStatus === "failed") && (
+                <button type="button" onClick={() => void enableLocalAI()}>
+                  {aiStatus === "failed" ? labels.retryAI : labels.enableAI}
+                </button>
+              )}
+              <details>
+                <summary>{copy.howItWorks[lang]}</summary>
+                <p>{copy.howItWorksBody[lang]}</p>
+              </details>
+            </div>
+          </details>
         </footer>
       </div>
     </dialog>

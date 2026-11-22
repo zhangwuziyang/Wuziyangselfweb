@@ -13,8 +13,6 @@
   --story-button: #493429;
   --story-button-ink: #fffaf1;
   --story-wing: clamp(.625rem, 3vw, 1.125rem);
-  --cindy-lane: clamp(9.25rem, 40vw, 13rem);
-  --cindy-column-gap: clamp(.625rem, 2.5vw, 1.5rem);
   --cindy-pixels: 3.65;
   position: relative;
   isolation: isolate;
@@ -384,6 +382,43 @@
 
 .story-content [data-timeline-fill] { transform: scaleY(0); }
 
+@media (width < 48rem) {
+  .home-story {
+    --story-wing: clamp(1rem, 4.5vw, 2rem);
+    --story-mobile-nav: calc(3rem + 1px);
+    --story-mobile-stage: 13rem;
+    /* Match the launcher's 42px button and 20px bottom inset, plus breathing space. */
+    --story-mobile-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+    block-size: 100dvh;
+  }
+
+  .story-content {
+    position: absolute;
+    inset: calc(var(--story-mobile-nav) + var(--story-mobile-stage)) 0 var(--story-mobile-bottom);
+    overflow: auto;
+    overscroll-behavior-y: contain;
+    scroll-padding-block: .75rem;
+    scroll-behavior: smooth;
+    border-block: 1px solid var(--story-edge);
+  }
+
+  .home-story:has(.mobile-nav) .story-content { overflow: hidden; }
+  .story-content > main > section,
+  .story-content > [data-cindy-finish] { display: block; }
+  .cindy-station { display: none; }
+
+  .story-content .story-hero__track {
+    min-block-size: auto;
+    padding-block: clamp(2.5rem, 6svh, 4.5rem) 3.5rem;
+  }
+
+  .story-hero__name { font-size: clamp(2.75rem, 10vw, 5.25rem); }
+}
+
+@media (width < 48rem) and (prefers-reduced-motion: reduce) {
+  .story-content { scroll-behavior: auto; }
+}
+
 @media (min-width: 48rem) {
   .home-story {
     --story-wing: clamp(5rem, 8vw, 9.625rem);
@@ -391,6 +426,18 @@
     --cindy-column-gap: clamp(1.5rem, 3.5vw, 3.5rem);
     --cindy-pixels: 5.6;
   }
+
+  /* Keep the chapter columns the same width on either side of the crossing. */
+  .story-content > main > section + section {
+    margin-block-start: clamp(12rem, calc(28rem - 16vw), 17rem);
+  }
+
+  .story-content > main > section:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr) var(--cindy-lane);
+  }
+
+  .story-content > main > section:nth-child(even) > .story-shell { grid-area: 1 / 1; }
+  .story-content > main > section:nth-child(even) > .cindy-station { grid-area: 1 / 2; }
 }
 
 @container story-copy (min-width: 34rem) {

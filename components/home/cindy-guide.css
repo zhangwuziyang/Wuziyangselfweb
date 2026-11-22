@@ -31,6 +31,27 @@
   pointer-events: none;
 }
 
+.cindy-mobile-stage { display: none; }
+
+@media (width < 48rem) {
+  .cindy-mobile-stage {
+    position: absolute;
+    inset: var(--story-mobile-nav) 0 auto;
+    display: grid;
+    grid-template-columns: 10rem minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: .75rem;
+    align-items: center;
+    max-inline-size: 32rem;
+    block-size: var(--story-mobile-stage);
+    margin-inline: auto;
+    padding-inline: var(--story-wing);
+  }
+
+  .cindy-mobile-stage__art { align-self: stretch; }
+  .cindy-mobile-stage__caption { block-size: 11rem; }
+}
+
 .cindy-dock {
   --cindy-pixels: 4;
   --cindy-scale: calc(var(--cindy-pixels) / 6);
@@ -60,6 +81,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  scale: 1 var(--cindy-squash, 1);
 }
 
 .cindy-sprite canvas {
@@ -100,7 +122,7 @@
   inset: 0 auto auto 0;
   inline-size: max-content;
   max-inline-size: var(--cindy-hint-width);
-  transform: translate(var(--cindy-hint-x), calc(var(--cindy-hint-y) - 50%));
+  transform: translate(-50%, calc(var(--cindy-hint-y) - 50%));
   color: color-mix(in srgb, var(--story-muted) 77%, var(--story-soft));
   font-size: .75rem;
   line-height: 1.15;
@@ -113,10 +135,13 @@
 .cindy-dock[data-hint] .cindy-hint { opacity: 1; }
 
 .cindy-note {
+  --cindy-note-position: translate(var(--cindy-note-x), var(--cindy-note-y));
   position: absolute;
   inset: 0 auto auto 0;
+  display: grid;
   inline-size: var(--cindy-note-width);
-  transform: translate(var(--cindy-note-x), calc(var(--cindy-note-y) - 50%));
+  transform: var(--cindy-note-position);
+  transform-origin: var(--cindy-note-tip) 0;
   max-block-size: var(--cindy-note-height);
   visibility: hidden;
   opacity: 0;
@@ -132,10 +157,13 @@
   transition: opacity 150ms ease, visibility 0s linear 150ms;
 }
 
+.cindy-note > span { grid-area: 1 / 1; min-inline-size: 0; }
+.cindy-note__measure { visibility: hidden; }
+
 .cindy-note::before {
   content: "";
   position: absolute;
-  inset: -5px auto auto 50%;
+  inset: -5px auto auto var(--cindy-note-tip);
   inline-size: 8px;
   block-size: 8px;
   transform: translateX(-50%) rotate(45deg);
@@ -144,27 +172,54 @@
   background: var(--story-panel);
 }
 
+@media (width < 48rem) {
+  .cindy-note {
+    --cindy-note-position: translate(var(--cindy-note-x), calc(var(--cindy-note-y) - 50%));
+    transform-origin: 0 50%;
+    padding: .56rem .6rem;
+    font-size: .875rem;
+    line-height: 1.35;
+  }
+
+  .cindy-note::before {
+    inset: 50% auto auto -5px;
+    transform: translateY(-50%) rotate(45deg);
+    border-width: 0 0 1px 1px;
+  }
+}
+
 .cindy-dock[data-speaking] .cindy-note {
   visibility: visible;
   opacity: 1;
-  transition: opacity 250ms ease;
-}
-
-.cindy-dock[data-travel] .cindy-note {
-  visibility: hidden;
-  opacity: 0;
   transition: none;
 }
 
+.cindy-dock[data-travel] :is(.cindy-note, .cindy-hint) {
+  opacity: 0;
+  transition: none;
+  animation: none;
+}
+
+.cindy-dock[data-travel] .cindy-note { visibility: hidden; }
+
 @media (prefers-reduced-motion: no-preference) {
-  .cindy-dock[data-parked] .cindy-sprite__art { animation: cindy-breathe 3.6s ease-in-out infinite; }
-  .cindy-dock[data-parked][data-scene="music"] .cindy-sprite__art { animation: cindy-listen 2.1s ease-in-out infinite; }
+  .cindy-dock[data-parked] .cindy-sprite__art { animation: cindy-breathe 4.8s ease-in-out infinite; }
+  .cindy-dock[data-idle] .cindy-sprite__art {
+    animation: cindy-breathe 4.8s ease-in-out infinite, cindy-tilt 17s ease-in-out infinite;
+  }
+  .cindy-dock[data-speaking]:not([data-travel]) .cindy-note { animation: cindy-note-in 220ms ease-out both; }
 }
 
 @keyframes cindy-breathe { 50% { transform: translateY(-2px); } }
-@keyframes cindy-listen {
-  25% { transform: translate(-2px, -3px); }
-  75% { transform: translate(2px, -2px); }
+
+@keyframes cindy-tilt {
+  0%, 82%, 92%, 100% { rotate: 0deg; }
+  87% { rotate: -2deg; }
+}
+
+@keyframes cindy-note-in {
+  from { opacity: 0; transform: var(--cindy-note-position) scale(.92); }
+  to { opacity: 1; transform: var(--cindy-note-position) scale(1); }
 }
 
 @media (min-width: 64rem) {

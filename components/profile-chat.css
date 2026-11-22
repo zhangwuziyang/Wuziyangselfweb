@@ -92,6 +92,18 @@ body:has(.home-story[data-cindy-present]) .profile-chat-launcher__glyph { displa
 
 .profile-chat-dialog::backdrop { background: #3220134d; }
 
+@media (width >= 48rem) {
+  body:has(.profile-chat-dialog[open]:not(:modal)) .home-story::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background: rgb(255 248 236 / 48%);
+    backdrop-filter: blur(6px);
+  }
+}
+
 body:has(.profile-chat-dialog:modal) { overflow: hidden; }
 
 .profile-chat-dialog__layout {
@@ -268,7 +280,7 @@ body:has(.profile-chat-dialog:modal) { overflow: hidden; }
 }
 
 .profile-chat-details {
-  margin-block-start: 1.15rem;
+  margin-block-start: .2rem;
   color: var(--chat-muted);
   font-size: .79rem;
   line-height: 1.55;
@@ -277,12 +289,23 @@ body:has(.profile-chat-dialog:modal) { overflow: hidden; }
 .profile-chat-details summary {
   inline-size: fit-content;
   padding: .12rem 0;
-  color: var(--chat-accent);
+  color: var(--chat-muted);
   cursor: pointer;
 }
 
 .profile-chat-details summary:hover { text-decoration: underline; }
-.profile-chat-details p { margin-block-start: .46rem; }
+.profile-chat-details__body {
+  max-block-size: 23dvh;
+  overflow-y: auto;
+}
+
+.profile-chat-details__body > * { margin-block-start: .35rem; }
+.profile-chat-details__body button {
+  min-block-size: 1.55rem;
+  color: var(--chat-accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
 
 .profile-chat-footer {
   padding: .78rem 1.1rem .72rem;
@@ -356,15 +379,6 @@ body:has(.profile-chat-dialog:modal) { overflow: hidden; }
   font-size: .75rem;
   line-height: 1.45;
 }
-
-.profile-chat-footer__mode button {
-  min-block-size: 1.55rem;
-  color: var(--chat-accent);
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.profile-chat-footer__mode button:hover { text-decoration: underline; }
 
 .profile-chat-footer__progress {
   display: block;
