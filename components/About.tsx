@@ -1,4 +1,5 @@
 import StoryHeading from "@/components/home/StoryHeading";
+import CindyStation from "@/components/home/CindyStation";
 import Image from "next/image";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
@@ -34,8 +35,9 @@ export default function About() {
         <ScrollReveal className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,.78fr)_minmax(0,1fr)] md:gap-9 xl:gap-14 items-start">
 
           {/* Portrait */}
-          <div className="story-about-perch">
-            <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden story-photo-shadow" data-cindy-anchor="" data-cindy-perch="">
+          <div className="max-w-sm">
+            <CindyStation chapter="about" reverse />
+            <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden story-photo-shadow">
               <Image
                 src="/photos/portrait.jpg"
                 alt="Wuziyang Zhang"

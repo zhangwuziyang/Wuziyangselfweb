@@ -45,14 +45,13 @@ const CINDY_COLORS: Record<string, string> = { k:"#16110d", a:"#bb723e", b:"#884
 // Author once on a snapped grid, then display at exactly 1× or 2×.
 export const CINDY_BITMAP = 96;
 const pixel = (value: number) => Math.round(value * CINDY_BITMAP / 64);
-export type CindyPose = "rest" | "walk" | "hello" | "perch" | "timeline" | "flag" | "earth" | "music" | "skills" | "think" | "bye";
+export type CindyPose = "rest" | "walk" | "hello" | "book" | "timeline" | "flag" | "earth" | "music" | "skills" | "think" | "bye";
 export type CindyExpression = "neutral" | "happy" | "wink" | "surprise" | "think" | "shy" | "sleep";
 export type PixelOffset = { x: number; y: number };
 
 const ink = CINDY_COLORS.k;
 const cream = CINDY_COLORS.c;
 const brown = CINDY_COLORS.b;
-const alternateColors = { ...CINDY_COLORS, r: "#537652", d: "#34563a", p: "#9eaa79" };
 
 type Rect = (x: number, y: number, width: number, height: number, color: string) => void;
 
@@ -124,7 +123,6 @@ export function paintCindy(
   pose: CindyPose,
   expression: CindyExpression,
   gaze: PixelOffset,
-  alternate: boolean,
   step = 0,
   compact = false,
 ) {
@@ -132,7 +130,7 @@ export function paintCindy(
   drawCindy((x, y, w, h, color) => {
     canvas.fillStyle = color;
     canvas.fillRect(pixel(x), pixel(y), pixel(x + w) - pixel(x), pixel(y + h) - pixel(y));
-  }, pose, expression, gaze, alternate, step, compact);
+  }, pose, expression, gaze, step, compact);
 }
 
 const spriteBounds = new Map<string, { left: number; right: number; top: number; bottom: number }>();
@@ -150,7 +148,7 @@ export function cindySpriteBounds(pose: CindyPose, sleeping: boolean, step: numb
       box.right = Math.max(box.right, (pixel(x + w) - center) * scale);
       box.top = Math.max(box.top, (center - pixel(y)) * scale);
       box.bottom = Math.max(box.bottom, (pixel(y + h) - center) * scale);
-    }, pose, sleeping ? "sleep" : "neutral", { x: 0, y: 0 }, false, step, compact);
+    }, pose, sleeping ? "sleep" : "neutral", { x: 0, y: 0 }, step, compact);
     spriteBounds.set(key, bounds);
   }
   return facing === 1 ? bounds : { ...bounds, left: bounds.right, right: bounds.left };
@@ -158,11 +156,11 @@ export function cindySpriteBounds(pose: CindyPose, sleeping: boolean, step: numb
 
 function drawCindy(
   rect: Rect, pose: CindyPose, expression: CindyExpression, gaze: PixelOffset,
-  alternate: boolean, step: number, compact: boolean,
+  step: number, compact: boolean,
 ) {
   const hand = (x: number, y: number, flip = false) => drawRows(rect, x, y, paw, CINDY_COLORS, flip);
 
-  drawRows(rect, 12, 12, rows, alternate ? alternateColors : CINDY_COLORS);
+  drawRows(rect, 12, 12, rows, CINDY_COLORS);
   eyes(rect, expression, gaze);
 
   const flag = (x: number, y: number) => {
@@ -188,25 +186,31 @@ function drawCindy(
       flag(compact ? 42 : 46, 30);
       break;
     }
-    case "perch":
+    case "book":
       seated();
-      hand(15, 44);
-      hand(41, 44, true);
+      rect(20, 40, 24, 10, ink);
+      rect(22, 40, 9, 8, "#f5e3bb");
+      rect(33, 40, 9, 8, step === 1 ? "#fff1d4" : "#f5e3bb");
+      rect(24, 43, 5, 1, "#b89a77");
+      rect(35, 43, 5, 1, "#b89a77");
+      hand(17, 45);
+      hand(40, 45, true);
       break;
     case "hello":
-      hand(compact ? 12 : 8, 32);
-      flag(42, 27);
+      hand(compact ? 12 : 8, 32 - step * 2);
       break;
     case "timeline":
-      if (!compact) hand(46, 34, true);
-      flag(compact ? 40 : 46, 23);
+      rect(43, 25, 2, 20, "#6c4834");
+      for (const y of [27, 34, 41]) rect(42, y, 4, 3, y === 27 + step * 7 ? "#b2543b" : cream);
+      hand(41, 43, true);
       break;
     case "flag":
-      flag(compact ? 40 : 46, 21);
+      flag(compact ? 40 : 46, 21 - step);
       hand(compact ? 36 : 44, 35, true);
       break;
     case "earth":
       drawRows(rect, 23, 37, globe, { k: ink, w: "#6586a4", v: "#8cab68" });
+      rect(29 + 3 * step, 43, 2, 2, "#f4d697");
       hand(19, 44);
       hand(39, 44, true);
       break;
@@ -222,19 +226,28 @@ function drawCindy(
         rect(x, 20, 8, 13, band);
         rect(x + 1, 22, 4, 9, "#7387a3");
       }
+      rect(51, 8 - step, 2, 6, brown);
+      rect(51, 8 - step, 5, 2, brown);
+      rect(49, 13 - step, 4, 2, brown);
       break;
     }
-    case "skills":
-      hand(compact ? 12 : 9, 42);
-      hand(compact ? 42 : 47, 42, true);
+    case "skills": {
+      const y = 35 - step;
+      rect(41, y, 11, 9, ink);
+      rect(43, y + 2, 7, 5, "#dfc49a");
+      rect(44, y + 2, 2, 2, "#fff5d9");
+      rect(46, y + 9, 3, 8, ink);
+      rect(46, y + 11, 2, 4, "#a45e38");
+      hand(41, 46, true);
       break;
+    }
     case "think":
       seated();
       hand(40, 33, true);
       break;
     case "bye":
-      hand(compact ? 44 : 48, 27, true);
-      rect(compact ? 47 : 53, 21, 2, 3, brown);
+      hand(compact ? 44 : 48, 27 - step * 2, true);
+      rect(compact ? 47 : 53, 21 - step, 2, 3, brown);
       break;
   }
 }

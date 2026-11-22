@@ -10,13 +10,12 @@ export default function Philosophy() {
     <section id="philosophy" className="story-chapter">
       <div className="story-shell">
 
-        <StoryHeading label={ph.label}>
+        <StoryHeading label={ph.label} station="philosophy">
           <Localized {...ph.headline} />
         </StoryHeading>
 
         <ScrollReveal className="max-w-3xl border-l border-[var(--story-edge)] pl-5 sm:pl-8">
           <blockquote
-            data-cindy-anchor=""
             className="mb-8 text-[clamp(1.7rem,3.5vw,3.65rem)] font-medium leading-[1.12] tracking-tight"
           >
             <Localized en={
@@ -35,7 +34,7 @@ export default function Philosophy() {
 
           <div className="mt-9 flex items-center gap-4">
             <div className="h-px w-10 bg-[var(--story-edge)]" />
-            <span data-cindy-content="" className="text-xs font-medium tracking-[0.22em]" style={{ color: "var(--story-dim)" }}>
+            <span className="text-xs font-medium tracking-[0.22em]" style={{ color: "var(--story-dim)" }}>
               <Localized {...ph.signature} />
             </span>
           </div>

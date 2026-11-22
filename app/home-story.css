@@ -12,7 +12,7 @@
   --story-media: #e8dfd1;
   --story-button: #493429;
   --story-button-ink: #fffaf1;
-  --story-wing: clamp(4.75rem, 17vw, 5.125rem);
+  --story-wing: 3.375rem;
   position: relative;
   isolation: isolate;
   background: var(--story-base);
@@ -168,8 +168,7 @@
   overflow: clip;
   border: 1px solid var(--story-edge);
   border-radius: clamp(1.5rem, 3vw, 3rem);
-  background: radial-gradient(ellipse at 54% 32%, #f2e8d9, #e0cdb7 91%);
-  box-shadow: 0 24px 65px rgb(76 54 37 / 11%);
+  background: var(--story-soft);
 }
 
 .story-hero__name {
@@ -367,12 +366,30 @@
 
 .story-content [data-timeline-fill] { transform: scaleY(0); }
 
-body:has(.home-story) .profile-chat-launcher { display: none; }
+body:has(.home-story) .profile-chat-launcher { right: .5rem; }
+
+body:has(.home-story) .profile-chat-launcher button {
+  inline-size: 2.625rem;
+  min-inline-size: 0;
+  block-size: 2.625rem;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #8b705366;
+  background: #fdf9f1;
+  color: #684631;
+  box-shadow: 0 .25rem 1rem rgb(70 48 30 / 12%);
+}
+
+body:has(.home-story) .profile-chat-launcher__label { display: none; }
+body:has(.home-story) .profile-chat-launcher__avatar { border: 0; background: transparent; }
+body:has(.home-story[data-cindy-present]) .profile-chat-launcher__avatar { display: none; }
+body:has(.home-story[data-cindy-present]) .profile-chat-launcher__glyph { display: block; }
 
 @media (min-width: 48rem) {
   .home-story { --story-wing: clamp(5rem, 10vw, 9.625rem); }
   .story-hero__track { grid-template-columns: minmax(0, 1fr) minmax(0, .93fr); }
   .story-about-media { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+  body:has(.home-story) .profile-chat-launcher { right: 1.25rem; }
 }
 
 @media (min-width: 70rem) and (min-height: 34rem) {
@@ -381,7 +398,6 @@ body:has(.home-story) .profile-chat-launcher { display: none; }
   .story-content :is(#experience, #skills, #philosophy) { padding-block-end: clamp(4.625rem, 5.1vw, 5rem); }
   .story-content :is(#projects, #philosophy, #contact) { padding-block-start: clamp(4.625rem, 5.1vw, 5rem); }
   .story-hero__track { padding-block-end: clamp(6rem, 10svh, 8rem); }
-  .story-about-perch { padding-block-start: 8.5rem; }
 
   .story-contact-lead {
     display: grid;

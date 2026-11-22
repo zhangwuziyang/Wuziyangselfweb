@@ -1,4 +1,5 @@
 import StoryHeading from "@/components/home/StoryHeading";
+import CindyStation from "@/components/home/CindyStation";
 import Image from "next/image";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Localized } from "@/components/ui/Localized";
@@ -22,6 +23,9 @@ export default function Music() {
               <p><Localized {...m.p2} /></p>
               <p><Localized {...m.p3} /></p>
             </div>
+            <div className="mb-2">
+              <CindyStation chapter="music" reverse />
+            </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {m.credentials.map((item) => (
                 <div key={item.key} className="story-panel rounded-2xl p-4"
@@ -34,7 +38,7 @@ export default function Music() {
             </div>
           </div>
 
-          <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden story-photo-shadow" data-cindy-anchor="">
+          <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden story-photo-shadow">
             <Image
               src="/photos/music-piano.jpg"
               alt="Playing piano"

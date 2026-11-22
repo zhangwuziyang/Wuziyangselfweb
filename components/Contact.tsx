@@ -28,7 +28,7 @@ export default function Contact() {
       <div className="story-shell">
         <div>
 
-          <StoryHeading label={c.label}>
+          <StoryHeading label={c.label} station="contact">
             <Localized {...c.headline1} />
             <br /><Localized {...c.headline2} />
             <br /><span className="story-title-accent"><Localized {...c.headline3} /></span>
@@ -41,7 +41,7 @@ export default function Contact() {
               <Localized {...c.body} />
             </p>
 
-            <div className="story-contact-actions mb-10 flex flex-col flex-wrap gap-3 sm:flex-row" data-cindy-anchor="">
+            <div className="story-contact-actions mb-10 flex flex-col flex-wrap gap-3 sm:flex-row">
               <Localized en={renderEmail("en")} zh={renderEmail("zh")} />
               <a
                 href="https://www.linkedin.com/in/wuziyang-zhang-7b547229b"

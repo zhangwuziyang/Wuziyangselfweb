@@ -19,7 +19,7 @@ export default function Experience() {
     <section id="experience" className="story-chapter">
       <div className="story-shell">
 
-        <StoryHeading label={e.label}>
+        <StoryHeading label={e.label} station="experience">
           <Localized {...e.headline} />
         </StoryHeading>
 
@@ -32,7 +32,7 @@ export default function Experience() {
               <ScrollReveal as="li" key={exp.slug} className="relative grid grid-cols-[16px_minmax(0,1fr)] gap-x-2 pb-10 last:pb-0 sm:gap-x-4">
 
                 <div className="flex justify-center pt-3 sm:pt-4">
-                  <span className="story-timeline-node" data-cindy-anchor="" data-cindy-node="" aria-hidden="true" />
+                  <span className="story-timeline-node" data-cindy-node="" aria-hidden="true" />
                 </div>
 
                 <div className="min-w-0">

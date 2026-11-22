@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import ProjectPreview from "@/components/home/ProjectPreview";
+import CindyStation from "@/components/home/CindyStation";
 import { HEALTH_FRAMES, OFFER_FRAMES } from "@/components/home/story-media";
 import { Localized } from "@/components/ui/Localized";
 import { i18n } from "@/lib/i18n";
@@ -34,12 +35,15 @@ export default function Projects() {
 
   return (
     <section id="projects" className="story-chapter story-projects">
-      <header className="story-projects__caption story-shell">
-        <p className="story-eyebrow"><Localized {...p.label} /></p>
-        <h2 className="story-title"><Localized {...p.headline} /></h2>
-        <p className="story-body">
-          <Localized en={p.tagline.en.split("\n")[0]} zh={p.tagline.zh.split("\n")[0]} />
-        </p>
+      <header className="story-projects__caption story-shell cindy-station-row">
+        <div>
+          <p className="story-eyebrow"><Localized {...p.label} /></p>
+          <h2 className="story-title"><Localized {...p.headline} /></h2>
+          <p className="story-body">
+            <Localized en={p.tagline.en.split("\n")[0]} zh={p.tagline.zh.split("\n")[0]} />
+          </p>
+        </div>
+        <CindyStation chapter="projects" />
       </header>
 
       <div id="project-gallery" className="story-projects__gallery story-shell">
@@ -71,7 +75,7 @@ export default function Projects() {
                   <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
               </div>
-              <div className="story-project__media" data-cindy-anchor="">
+              <div className="story-project__media">
                 <ProjectPreview frames={frames} phone={device === "phone"} name={{ en: en.title, zh: zh.title }} />
               </div>
             </article>

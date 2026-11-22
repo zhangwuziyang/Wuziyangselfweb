@@ -1,4 +1,5 @@
 import StoryHeading from "@/components/home/StoryHeading";
+import CindyStation from "@/components/home/CindyStation";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Localized } from "@/components/ui/Localized";
 import { i18n } from "@/lib/i18n";
@@ -22,11 +23,14 @@ export default function Skills() {
         <StoryHeading label={s.label}>
           <Localized {...s.headline} />
         </StoryHeading>
-        <ScrollReveal>
-          <p className="story-body mb-9 max-w-2xl"><Localized {...s.tagline} /></p>
-        </ScrollReveal>
+        <div className="cindy-station-row cindy-station-row--leading mb-6">
+          <ScrollReveal>
+            <p className="story-body max-w-lg"><Localized {...s.tagline} /></p>
+          </ScrollReveal>
+          <CindyStation chapter="skills" />
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" data-cindy-anchor="">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {s.groups.map((group) => (
             <ScrollReveal key={group.symbol}>
               <div
