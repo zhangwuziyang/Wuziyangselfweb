@@ -52,7 +52,7 @@ const cream = CINDY_COLORS.c;
 const brown = CINDY_COLORS.b;
 
 type Rect = (x: number, y: number, width: number, height: number, color: string) => void;
-type Performance = { blink?: boolean; mouth?: boolean };
+type Performance = { blink?: boolean; mouth?: boolean; tail?: number };
 
 function drawRows(rect: Rect, x: number, y: number, pattern: readonly string[], colors: Record<string, string>, flip = false) {
   pattern.forEach((line, row) => {
@@ -109,6 +109,13 @@ export const CINDY_AVATAR_PATHS = (() => {
   return [...Object.entries(paths), [ink, face]];
 })();
 
+// A striped tail curled around the front of her feet, inside the body's silhouette so it
+// never widens the sprite. Frame 0 rests; 1 lifts the tip and 2 curls it in: a small wag.
+const tails = [
+  ["........", "kk......", "kak.....", "kbk.....", "kaak....", ".kbaakkk", "..kkkkk."],
+  ["kk......", "kak.....", "kbk.....", "kak.....", "kbak....", ".kaabkkk", "..kkkkk."],
+  ["........", "........", ".kkk....", "kaak....", "kbak....", ".kaabkkk", "..kkkkk."],
+] as const;
 const paw = ["..kkkk..", ".kcccck.", "kccccsck", "kcccssak", "kccssaak", ".kaaakk.", "..kkk..."];
 const globe = [
   "......kkkkkk......", "....kkwwwwwwkk....", "...kwwvvvwwwwwk...", "..kwwwvvvwwwwvwk..",
@@ -165,6 +172,8 @@ function drawCindy(
 
   drawRows(rect, 12, 12, rows, CINDY_COLORS);
   eyes(rect, expression, gaze, performance?.blink);
+  // Paws and props drawn below sit on top of the tail. Walk frames are compact and tail-less.
+  if (!compact && pose !== "walk") drawRows(rect, 12, 44, tails[performance?.tail ?? 0] ?? tails[0], CINDY_COLORS);
   if (performance?.mouth) {
     rect(29, 34, 6, 5, cream);
     rect(30, 35, 4, 3, ink);

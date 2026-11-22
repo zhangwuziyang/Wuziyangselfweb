@@ -16,7 +16,7 @@ export default function GlobalLens() {
 
   return (
     <section id="global" className="story-chapter">
-      <CindyStation chapter="global" reverse />
+      <CindyStation chapter="global" />
       <div className="story-shell">
 
         <StoryHeading label={g.label}>

@@ -16,7 +16,7 @@ type Station = {
   y: number;
   pixels: number;
   compact: boolean;
-  reverse: boolean;
+  facing: 1 | -1;
   artHeight: number;
   hint: Slot;
   caption: Slot;
@@ -96,7 +96,7 @@ export function measureRoute(home: HTMLElement): Route {
     const compact = pixels < 5;
     const [across, down] = STAGE[chapter];
     const common = {
-      chapter, pixels, compact, reverse: zone.hasAttribute("data-cindy-reverse"),
+      chapter, pixels, compact, facing: 1 as const,
       sectionTop: bounds.top + scroll, sectionHeight: bounds.height,
       contentTop: content.top + scroll, contentBottom: content.bottom + scroll,
     };
@@ -122,8 +122,10 @@ export function measureRoute(home: HTMLElement): Route {
     const y = topY <= bottomY
       ? clamp(nav + available * down, topY, Math.max(topY, Math.min(bottomY, captionY)))
       : clamp((nav + height) / 2, art.height / 2, Math.max(art.height / 2, bottomY));
+    // Face the copy: a station in the right-hand lane turns left toward the text.
+    const facing: 1 | -1 = art.left + art.width / 2 > content.left + content.width / 2 ? -1 : 1;
     return [{
-      ...common,
+      ...common, facing,
       x: art.left + art.width / 2 + across * roomX, y, artHeight: art.height, hint, caption,
     }];
   });
@@ -162,26 +164,42 @@ function desktopBridge(from: Station, to: Station, nav: number, height: number):
   return { from, to, start: start - shoulder, end: end + shoulder, crossing: { start, end, middle, high, low, lift } };
 }
 
+// Accelerate, cruise at a steady pace, then brake. Peak speed is only 1 / (1 - edge)
+// times the average, so the sweep never spikes the way a smoothstep does mid-way.
+function cruise(t: number, edge = .24) {
+  const top = 1 / (1 - edge);
+  if (t <= edge) return top * t * t / (2 * edge);
+  if (t >= 1 - edge) return 1 - top * (1 - t) * (1 - t) / (2 * edge);
+  return top * (t - edge / 2);
+}
+
 function sampleCrossing(bridge: Bridge, crossing: Crossing, scroll: number, reduced: boolean): GuideSample {
   const { from, to, start, end } = bridge;
   const { middle, low, high } = crossing;
   const progress = clamp((scroll - crossing.start) / (crossing.end - crossing.start));
-  const blend = ease(progress);
+  // Horizontal travel spans the whole bridge, including the shoulders where she steps
+  // down into (and up out of) the empty band. The eased ends keep those first and last
+  // steps inside her own lane, clear of the neighbouring copy.
+  const sweep = cruise(clamp((scroll - start) / (end - start)));
   const departure = ease(clamp((scroll - start) / (crossing.start - start)));
   const arrival = ease(clamp((scroll - crossing.end) / (end - crossing.end)));
+  const x = mix(from.x, to.x, sweep);
+  const walkCycle = Math.abs(x - from.x) / 36;
   const arc = reduced ? 0 : Math.sin(Math.PI * progress) ** 2;
-  const crossingY = clamp(middle - scroll, high, low) - arc * crossing.lift;
+  // Each stride adds a small hop on top of the arc, never exceeding the band's spare lift.
+  const hop = .7 + .3 * Math.abs(Math.sin(Math.PI * walkCycle / 1.5));
+  const crossingY = clamp(middle - scroll, high, low) - arc * crossing.lift * hop;
   const landing = reduced ? 0 : Math.sin(2 * Math.PI * arrival) * (1 - arrival);
   return {
     station: progress < .5 ? from : to,
-    x: mix(from.x, to.x, blend),
+    x,
     y: mix(mix(from.y, crossingY, departure), to.y, arrival) + landing * 4,
-    pixels: mix(from.pixels, to.pixels, blend) * (1 - .035 * arc),
+    pixels: mix(from.pixels, to.pixels, sweep) * (1 - .035 * arc),
     squash: 1 - landing * .11,
     travel: departure * (1 - arrival),
-    walkCycle: progress * Math.abs(to.x - from.x) / 36,
+    walkCycle,
     direction: Math.sign(to.x - from.x),
-    from: from.chapter, to: to.chapter, blend,
+    from: from.chapter, to: to.chapter, blend: ease(progress),
   };
 }
 

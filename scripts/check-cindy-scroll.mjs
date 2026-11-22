@@ -17,11 +17,13 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: reduced ? "reduce" : "no-preference" }]);
     await page.evaluateOnNewDocument(lang => localStorage.setItem("wz-lang", lang), chinese ? "zh" : "en");
     const response = await page.goto(URL, { waitUntil: "load" });
-    assert.ok(response?.ok(), "Homepage loads");
+    assert.ok(response?.ok() || response?.status() === 304, `Homepage loads (${response?.status()})`);
     await page.waitForSelector('.cindy-sprite[data-sprite="ready"][aria-hidden="false"]');
     await page.waitForSelector(".story-content > footer");
     await page.evaluate(() => document.fonts.ready);
-    const maxScroll = await page.evaluate(mobile => {
+    const maxScroll = await page.evaluate(async mobile => {
+      // Let the first rendered pose reach the screen before the opening sample.
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       const root = document.documentElement;
       const content = document.querySelector(".story-content");
       const scroller = mobile ? content : root;
@@ -45,6 +47,7 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
       const samples = [];
       const issues = [];
       const parked = {};
+      const sides = {};
       const chapterSamples = {};
       let previous = -1;
       let frame;
@@ -98,6 +101,9 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
         }
         if (getComputedStyle(note).visibility === "visible" && Number(getComputedStyle(note).opacity) > .01) {
           const box = note.getBoundingClientRect();
+          // The bubble's tail must point at Cindy, on whichever side of the page she stands.
+          const tip = box.left + note.clientLeft + Number.parseFloat(getComputedStyle(dock).getPropertyValue("--cindy-note-tip"));
+          if (!mobile && Number(getComputedStyle(note).opacity) === 1 && Math.abs(tip - hit.left - hit.width / 2) > 1.5) fail(`bubble tail ${tip.toFixed(1)} is not under Cindy`);
           parts.push(["bubble", box], ["bubble tip", mobile
             ? { left: box.left - 7, right: box.left, top: box.top, bottom: box.bottom }
             : { left: hit.left + hit.width / 2 - 6, right: hit.left + hit.width / 2 + 6, top: box.top - 7, bottom: box.top }]);
@@ -117,22 +123,30 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
         if (!moved) return;
         const scene = dock.dataset.scene;
         chapterSamples[scene] = (chapterSamples[scene] ?? 0) + 1;
-        if (dock.hasAttribute("data-parked")) parked[scene] = (parked[scene] ?? 0) + 1;
+        if (dock.hasAttribute("data-parked")) {
+          parked[scene] = (parked[scene] ?? 0) + 1;
+          (sides[scene] ??= new Set()).add(hit.left + hit.width / 2 > root.clientWidth / 2 ? "right" : "left");
+        }
         samples.push({
           scroll, width: hit.width, inset: Math.min(hit.left, ink.left, root.clientWidth - Math.max(hit.right, ink.right)),
           x: hit.left + hit.width / 2, y: hit.top + hit.height / 2,
         });
       }
 
-      function collect() {
-        sample();
-        frame = requestAnimationFrame(collect);
-      }
-      collect();
+      // Cindy schedules her render from her own scroll listener, registered at mount. Queuing
+      // the sample from a later listener puts it after her render in the same frame, so each
+      // sample pairs a scroll position with the pose drawn for it rather than the previous one.
+      const events = new AbortController();
+      (mobile ? content : window).addEventListener("scroll", () => {
+        if (!frame) frame = requestAnimationFrame(() => { frame = 0; sample(); });
+      }, { passive: true, signal: events.signal });
+      sample();
       window.finishCindyScroll = () => {
+        events.abort();
         cancelAnimationFrame(frame);
+        frame = 0;
         sample(true);
-        return { samples, issues, parked, chapterSamples };
+        return { samples, issues, parked, chapterSamples, sides: Object.fromEntries(Object.entries(sides).map(([key, set]) => [key, [...set]])) };
       };
       window.sampleCindyAtRest = () => sample(true);
       return scroller.scrollHeight - scroller.clientHeight;
@@ -148,7 +162,7 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     }
     await Promise.all(wheels);
     await page.waitForFunction((mobile, end) => (mobile ? document.querySelector(".story-content").scrollTop : window.scrollY) >= end - 1, {}, mobile, maxScroll);
-    const { samples, issues, parked, chapterSamples } = await page.evaluate(() => window.finishCindyScroll());
+    const { samples, issues, parked, chapterSamples, sides } = await page.evaluate(() => window.finishCindyScroll());
     assert.equal(samples[0].scroll, 0);
     assert.ok(samples.at(-1).scroll >= maxScroll - 1);
     assert.ok(samples.length >= Math.ceil(maxScroll / DELTA) * .75, "Wheel samples cover the page at the requested cadence");
@@ -157,9 +171,19 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     for (const chapter of CHAPTERS) {
       assert.ok(parked[chapter] / chapterSamples[chapter] > .5, `Cindy spends most of ${chapter} parked`);
     }
+    let fastest = 0;
     for (let index = 1; index < samples.length; index++) {
       const a = samples[index - 1], b = samples[index];
-      assert.ok(Math.hypot(b.x - a.x, b.y - a.y) <= 5 + Math.max(DELTA, b.scroll - a.scroll) * (mobile ? 1.25 : 8), `Continuous movement at scrollY=${b.scroll}`);
+      const moved = Math.hypot(b.x - a.x, b.y - a.y);
+      const step = Math.max(DELTA, b.scroll - a.scroll);
+      fastest = Math.max(fastest, (moved - 5) / step);
+      assert.ok(moved <= 5 + step * (mobile ? 1.25 : 4), `Continuous movement at scrollY=${b.scroll} (${moved.toFixed(1)}px over ${step}px)`);
+    }
+    if (!mobile) {
+      for (const chapter of CHAPTERS) assert.equal(sides[chapter]?.length, 1, `${chapter} parks on one side (${sides[chapter]})`);
+      for (let index = 1; index < CHAPTERS.length; index++) {
+        assert.notEqual(sides[CHAPTERS[index]][0], sides[CHAPTERS[index - 1]][0], `${CHAPTERS[index - 1]} → ${CHAPTERS[index]} switches sides`);
+      }
     }
     assert.ok(await page.$(".profile-chat-launcher__button"), "Global chat launcher remains available");
     await page.waitForFunction(() => Number(getComputedStyle(document.querySelector(".cindy-hint")).opacity) === 1);
@@ -181,14 +205,16 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     }
     const stopped = await page.evaluate(() => window.finishCindyScroll());
     assert.equal(stopped.issues.length, 0, stopped.issues.slice(0, 12).join("\n"));
-    console.log(`${width}×${height}: ${samples.length} wheel samples, width ${Math.min(...samples.map(item => item.width)).toFixed(1)}–${Math.max(...samples.map(item => item.width)).toFixed(1)}px, minimum inset ${Math.min(...samples.map(item => item.inset)).toFixed(1)}px`);
+    console.log(`${width}×${height}: ${samples.length} wheel samples, width ${Math.min(...samples.map(item => item.width)).toFixed(1)}–${Math.max(...samples.map(item => item.width)).toFixed(1)}px, minimum inset ${Math.min(...samples.map(item => item.inset)).toFixed(1)}px, peak travel ${fastest.toFixed(2)}px per scrolled px${mobile ? "" : `, sides ${CHAPTERS.map(chapter => sides[chapter][0][0].toUpperCase()).join("")}`}`);
   } finally {
     await page.close();
   }
 }
 
 (async () => {
-  const browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", headless: true });
+  const browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", headless: true,
+    args: ["--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
+  });
   try {
     await check(browser, 1440, 900);
     await check(browser, 390, 844, { mobile: true, chinese: true });

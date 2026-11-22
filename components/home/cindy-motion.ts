@@ -12,6 +12,11 @@ const TYPE_MS = 30;
 const MOUTH_MS = 105;
 const BLINK_CYCLE = 6_200;
 const BLINK_START = BLINK_CYCLE - 120;
+// An occasional tail wag, offset from the blink so the two never stack up.
+const WAG_CYCLE = 11_300;
+const WAG_BEAT = 150;
+const WAG_FRAMES = [1, 2, 1, 2, 0] as const;
+const WAG_START = WAG_CYCLE - WAG_FRAMES.length * WAG_BEAT;
 
 type Guide = {
   dock: HTMLDivElement;
@@ -105,6 +110,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
   let noteFits = true;
   let measuredLine = "";
   let noteBlockSize = 0;
+  let arrivals = 0;
 
   function scrollPosition() {
     return route.reader?.scrollTop ?? window.scrollY;
@@ -200,6 +206,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
       showActor(false);
       dialogue = { since: dialogue.since, typingMs: dialogue.typingMs, next: Infinity, visible: false };
       dock.removeAttribute("data-speaking");
+      dock.removeAttribute("data-typing");
       dock.setAttribute("data-travel", "");
       note.setAttribute("aria-hidden", "true");
       writeStyle(dock, "opacity", "0");
@@ -224,7 +231,7 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const walkingStep = Math.floor(sample.walkCycle) % 3;
     const pose = asleep ? "rest" : scene.pose;
     const expression = asleep ? "sleep" : hovered && parked ? "happy" : scene.expression;
-    const facing = station.reverse ? -1 : 1;
+    const facing = station.facing;
     const walkFacing = (sample.direction || 1) * scrollDirection;
     const x = Number(sample.x.toFixed(2));
     const y = Number(sample.y.toFixed(2));
@@ -254,6 +261,9 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     dock.setAttribute("data-scene", station.chapter);
     dock.toggleAttribute("data-parked", parked);
     dock.toggleAttribute("data-travel", traveling || firstFrameHere);
+    // The single-column layout has no crossing, so a small hop marks each new chapter instead.
+    // Alternating names restarts the CSS animation without touching the dock's opacity.
+    if (route.reader && firstFrameHere && drawnChapter && !isReduced) dock.dataset.arrive = ++arrivals % 2 ? "a" : "b";
 
     const lang = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
     const line = scene.line[lang];
@@ -282,7 +292,11 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const blinkPhase = time % BLINK_CYCLE;
     const canBlink = !isReduced && parked && !asleep && !typing;
     const blink = canBlink && blinkPhase >= BLINK_START;
+    const wagPhase = (time + 2_900) % WAG_CYCLE;
+    const canWag = canBlink && !compact && !preview;
+    const tail = canWag && wagPhase >= WAG_START ? WAG_FRAMES[Math.floor((wagPhase - WAG_START) / WAG_BEAT)] ?? 0 : 0;
     dock.toggleAttribute("data-speaking", speaking);
+    dock.toggleAttribute("data-typing", typing && !isReduced);
     dock.toggleAttribute("data-idle", canBlink && !preview);
     note.setAttribute("aria-hidden", String(!speaking));
     if (parked) {
@@ -298,23 +312,25 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
 
     const walkGaze = { x: 1, y: 0 };
     const nextKey = poseMix === 1 ? `walk:${walkingStep}:${walkFacing}`
-      : [pose, expression, gaze.x, gaze.y, step, compact, facing, blink, mouth, poseMix, poseMix ? walkingStep : 0, poseMix ? walkFacing : 0].join(":");
+      : [pose, expression, gaze.x, gaze.y, step, compact, facing, blink, mouth, tail, poseMix, poseMix ? walkingStep : 0].join(":");
     if (context && nextKey !== spriteKey) {
       const [resting, walking] = layers;
       const paintStation = (target: CanvasRenderingContext2D) => {
         target.setTransform(facing, 0, 0, 1, facing < 0 ? CINDY_BITMAP : 0, 0);
-        paintCindy(target, pose, expression, gaze, step, compact, { blink, mouth });
+        paintCindy(target, pose, expression, gaze, step, compact, { blink, mouth, tail });
         target.resetTransform();
       };
-      const paintWalk = (target: CanvasRenderingContext2D) => {
-        target.setTransform(walkFacing, 0, 0, 1, walkFacing < 0 ? CINDY_BITMAP : 0, 0);
+      // While the walk frame is still blending with the station pose, both share the
+      // station's facing; she turns toward the direction of travel once fully walking.
+      const paintWalk = (target: CanvasRenderingContext2D, turn: number) => {
+        target.setTransform(turn, 0, 0, 1, turn < 0 ? CINDY_BITMAP : 0, 0);
         paintCindy(target, "walk", "neutral", walkGaze, walkingStep, true);
         target.resetTransform();
       };
-      if (poseMix === 1) paintWalk(context);
+      if (poseMix === 1) paintWalk(context, walkFacing);
       else if (poseMix > 0 && resting && walking) {
         paintStation(resting);
-        paintWalk(walking);
+        paintWalk(walking, facing);
         context.clearRect(0, 0, CINDY_BITMAP, CINDY_BITMAP);
         // Add the two premultiplied frames so the shared body stays opaque through the pose blend.
         context.globalCompositeOperation = "lighter";
@@ -331,10 +347,13 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const nextToken = typing ? dialogue.since + POP_LEAD_MS + (shown + 1) * TYPE_MS : Infinity;
     const nextMouth = typing ? dialogue.since + POP_LEAD_MS + (Math.max(-1, mouthBeat) + 1) * MOUTH_MS : Infinity;
     const nextBlink = canBlink ? time + (blink ? BLINK_CYCLE : BLINK_START) - blinkPhase : Infinity;
+    const nextWag = !canWag ? Infinity : wagPhase >= WAG_START
+      ? time + WAG_BEAT - (wagPhase - WAG_START) % WAG_BEAT
+      : time + WAG_START - wagPhase;
     const gesture = preview ? (Math.floor(time / 180) + 1) * 180 : Infinity;
     const idle = parked && !asleep ? lastActivity + IDLE_MS : Infinity;
     const attention = preview ? attentionUntil : Infinity;
-    const next = Math.min(dialogue.next, nextToken, nextMouth, nextBlink, gesture, idle, attention);
+    const next = Math.min(dialogue.next, nextToken, nextMouth, nextBlink, nextWag, gesture, idle, attention);
     if (Number.isFinite(next)) timer = window.setTimeout(schedule, Math.max(1, next - time));
   }
 

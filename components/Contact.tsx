@@ -26,7 +26,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="story-chapter">
-      <CindyStation chapter="contact" reverse />
+      <CindyStation chapter="contact" />
       <div className="story-shell">
         <div>
 

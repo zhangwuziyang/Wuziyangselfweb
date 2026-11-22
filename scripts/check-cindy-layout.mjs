@@ -128,7 +128,7 @@ try {
     }
     for (const [index, chapter] of CHAPTERS.entries()) {
       const markup = html.querySelector(`#${chapter}`);
-      const stationMarkup = markup.querySelector(`[data-cindy-station="${chapter}"]`);
+      assert.ok(markup.querySelector(`[data-cindy-station="${chapter}"]`), `${chapter} renders a Cindy station`);
       if (index) cursor += crossingGap;
       const top = cursor;
       const sectionHeight = sectionHeights[index];
@@ -142,7 +142,6 @@ try {
       const padding = mobile ? 0 : 74;
       const copy = box(copyLeft, top + padding, shellWidth, sectionHeight - padding * 2);
       zone.parentElement.children.set(".story-shell", new Element(() => box(copy.left, copy.top - scroll(), copy.width, copy.height)));
-      if (stationMarkup.hasAttribute("data-cindy-reverse")) zone.setAttribute("data-cindy-reverse", "");
       const artHeight = pixels * 50 + 12;
       zone.children.set(".cindy-station__mark", new Element(() => box(laneLeft, top - scroll(), lane, artHeight)));
       zone.children.set(".cindy-station__hint", new Element(() => box(laneLeft, top - scroll() + artHeight + 5.6, lane, 20.8)));
@@ -286,7 +285,11 @@ try {
       assert.equal(dock.attrs.get("data-scene"), CHAPTERS[index]);
       assert.ok(dock.hasAttribute("data-hint"), `hint is visible at the ${CHAPTERS[index]} anchor (${width}×${height})`);
       assert.ok(dock.hasAttribute("data-speaking"), "every chapter shows a bubble when parked");
-      if (!mobile) assert.equal(check().x > width / 2, index % 2 === 1, "desktop chapters alternate sides");
+      if (!mobile) {
+        const parkedFrame = check();
+        assert.equal(parkedFrame.x > width / 2, index % 2 === 1, "desktop chapters alternate sides");
+        assert.equal(parkedFrame.facing, index % 2 === 1 ? -1 : 1, "parked Cindy faces the copy");
+      }
       const line = CINDY_SCENES[CHAPTERS[index]].line[lang === "en" ? "en" : "zh"];
       if (reduce) {
         assert.equal(noteText.textContent, line, "reduced motion reveals the entire line");

@@ -9,7 +9,7 @@ export default function Philosophy() {
 
   return (
     <section id="philosophy" className="story-chapter">
-      <CindyStation chapter="philosophy" reverse />
+      <CindyStation chapter="philosophy" />
       <div className="story-shell">
 
         <StoryHeading label={ph.label}>
