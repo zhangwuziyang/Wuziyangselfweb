@@ -180,11 +180,11 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     const scene = CINDY_SCENES[station.chapter];
     const isReduced = reduced.matches;
     const { caption, hint } = station;
-    const compact = station.pixels === 4;
+    const { compact } = station;
     const traveling = travel > TRAVEL_START;
-    const fullyVisible = Math.min(station.art.top, caption.top) - scroll >= route.nav
-      && Math.max(hint.bottom, caption.bottom) - scroll <= route.height;
-    const parked = !traveling && fullyVisible;
+    const parked = !traveling;
+    const captionVisible = sample.y + caption.y + caption.height / 2 <= route.height;
+    const hintVisible = parked && sample.y + hint.y + hint.height / 2 <= route.height;
     const phase = 1 - travel;
     const asleep = time - lastActivity >= IDLE_MS && parked;
     const preview = !isReduced && time < attentionUntil && station.chapter === "projects" && parked;
@@ -194,11 +194,11 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     const pose = asleep ? "rest" : scene.pose;
     const expression = asleep ? "sleep" : hovered && parked ? "happy" : scene.expression;
     const facing = station.reverse ? -1 : 1;
-    const x = Math.round(sample.x);
-    const y = Math.round(sample.y);
+    const x = Number(sample.x.toFixed(2));
+    const y = Number(sample.y.toFixed(2));
     const poseMix = isReduced ? 0 : Math.round(ease(clamp((travel - TRAVEL_START) * 1.9)) * 40) / 40;
-    const noteWidth = caption.right - caption.left - 4;
-    const noteHeight = caption.bottom - caption.top - 8;
+    const noteWidth = caption.width - 4;
+    const noteHeight = caption.height - 8;
     const gaze = isReduced || asleep ? { x: 0, y: 0 } : preview ? { x: 2, y: -1 } : {
       x: pointer ? Math.round(clamp((pointer.x - x) / 85, -1, 1)) * facing : 0,
       y: pointer ? Math.round(clamp((pointer.y - y) / 85, -1, 1)) : 0,
@@ -209,20 +209,20 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
     writeStyle(dock, "opacity", "1");
     writeVariable(dock, "--cindy-pixels", pixels.toFixed(4));
     if (!traveling) {
-      writeVariable(dock, "--cindy-note-x", `${caption.left + 2 - x}px`);
-      writeVariable(dock, "--cindy-note-y", `${(caption.top + caption.bottom) / 2 - y - scroll}px`);
+      writeVariable(dock, "--cindy-note-x", `${caption.x - noteWidth / 2 - x}px`);
+      writeVariable(dock, "--cindy-note-y", `${caption.y}px`);
       writeVariable(dock, "--cindy-note-width", `${Math.max(0, noteWidth).toFixed(2)}px`);
       writeVariable(dock, "--cindy-note-height", `${noteHeight}px`);
-      writeVariable(dock, "--cindy-hint-x", `${(hint.left + hint.right) / 2 - x}px`);
-      writeVariable(dock, "--cindy-hint-y", `${(hint.top + hint.bottom) / 2 - y - scroll}px`);
-      writeVariable(dock, "--cindy-hint-width", `${hint.right - hint.left - 4}px`);
-      dock.setAttribute("data-tail", station.tail);
+      writeVariable(dock, "--cindy-hint-x", `${hint.x - x}px`);
+      writeVariable(dock, "--cindy-hint-y", `${hint.y}px`);
+      writeVariable(dock, "--cindy-hint-width", `${hint.width - 4}px`);
     }
     dock.setAttribute("data-scene", station.chapter);
     dock.toggleAttribute("data-parked", parked);
+    dock.toggleAttribute("data-hint", hintVisible);
     dock.toggleAttribute("data-travel", traveling || firstFrameHere);
 
-    dialogue = updateCindyDialogue(dialogue, station.chapter, phase, visible && noteWidth >= 82, parked, time, lastScroll, fastUntil);
+    dialogue = updateCindyDialogue(dialogue, station.chapter, phase, visible && captionVisible && noteWidth >= 82, parked, time, lastScroll, fastUntil);
     if (dialogue.visible && dialogue.chapter) {
       const lang = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
       const line = CINDY_SCENES[dialogue.chapter].line[lang];
@@ -319,7 +319,7 @@ export function mountCindy({ dock, button, sprite, note }: Guide) {
   reduced.addEventListener("change", invalidate, { signal });
 
   const sizes = new ResizeObserver(invalidate);
-  for (const item of home.querySelectorAll("main > section, .story-nav, [data-cindy-station]")) sizes.observe(item);
+  for (const item of home.querySelectorAll("main > section, .story-nav, .cindy-station__layout")) sizes.observe(item);
   const language = new MutationObserver(invalidate);
   language.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   schedule();

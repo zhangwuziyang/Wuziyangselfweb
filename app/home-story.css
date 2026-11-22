@@ -12,7 +12,10 @@
   --story-media: #e8dfd1;
   --story-button: #493429;
   --story-button-ink: #fffaf1;
-  --story-wing: 3.375rem;
+  --story-wing: clamp(.625rem, 3vw, 1.125rem);
+  --cindy-lane: clamp(9.25rem, 40vw, 13rem);
+  --cindy-column-gap: clamp(.625rem, 2.5vw, 1.5rem);
+  --cindy-pixels: 3.65;
   position: relative;
   isolation: isolate;
   background: var(--story-base);
@@ -37,9 +40,19 @@
 
 .story-content { position: relative; }
 
+.story-content > main > section,
+.story-content > [data-cindy-finish] {
+  display: grid;
+  grid-template-columns: var(--cindy-lane) minmax(0, 1fr);
+  column-gap: var(--cindy-column-gap);
+  padding-inline: max(var(--story-wing), (100% - 76rem) / 2);
+}
+
 .story-shell {
-  inline-size: min(calc(100% - var(--story-wing) * 2), 72rem);
-  margin-inline: auto;
+  grid-column: 2;
+  min-inline-size: 0;
+  container: story-copy / inline-size;
+  overflow-wrap: anywhere;
 }
 
 .story-button-primary {
@@ -154,14 +167,13 @@
 
 .story-hero__track {
   display: grid;
+  align-content: center;
   align-items: center;
   gap: clamp(2rem, 6vw, 5rem);
   min-block-size: 100svh;
   padding-block: clamp(6rem, 14svh, 9.5rem) clamp(4.375rem, 9svh, 6.5rem);
-  grid-template-areas: "copy" "guide" "portrait";
+  grid-template-areas: "copy" "portrait";
 }
-
-.story-hero__track > .cindy-station { grid-area: guide; }
 
 .story-hero__portrait {
   grid-area: portrait;
@@ -176,7 +188,7 @@
 }
 
 .story-hero__name {
-  font-size: clamp(2.6rem, 8vw, 7.35rem);
+  font-size: clamp(2rem, 6vw, 6.35rem);
   display: block;
   inline-size: max-content;
   max-inline-size: 100%;
@@ -307,9 +319,10 @@
 
 .project-phone {
   inline-size: clamp(8.2rem, 32vw, 13.8rem);
+  max-inline-size: 100%;
 }
 
-@media (min-width: 52rem) {
+@container story-copy (min-width: 36rem) {
   .story-project { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); }
 
   .project-phone { inline-size: clamp(9rem, 15vw, 14rem); }
@@ -372,13 +385,15 @@
 .story-content [data-timeline-fill] { transform: scaleY(0); }
 
 @media (min-width: 48rem) {
-  .home-story { --story-wing: clamp(5rem, 10vw, 9.625rem); }
-  .story-hero__track {
-    grid-template-columns: minmax(0, 1fr) minmax(0, .93fr);
-    grid-template-areas: "copy portrait" "guide guide";
-    align-content: center;
-    row-gap: 1rem;
+  .home-story {
+    --story-wing: clamp(5rem, 8vw, 9.625rem);
+    --cindy-lane: clamp(17rem, 26vw, 22.5rem);
+    --cindy-column-gap: clamp(1.5rem, 3.5vw, 3.5rem);
+    --cindy-pixels: 5.6;
   }
+}
+
+@container story-copy (min-width: 34rem) {
   .story-about-media { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
 }
 
@@ -392,13 +407,12 @@
 
 @media (min-width: 72rem) {
   .story-hero__track {
-    grid-template-columns: minmax(0, 1.17fr) minmax(0, .83fr);
-    grid-template-areas: "copy portrait" "guide portrait";
-    column-gap: clamp(1.75rem, 4vw, 4rem);
-    row-gap: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+    grid-template-areas: "copy portrait";
+    column-gap: clamp(1.25rem, 3vw, 2.75rem);
   }
 
-  .story-hero__name { font-size: clamp(4.5rem, 7.3vw, 7rem); }
+  .story-hero__name { font-size: clamp(3.75rem, 5.2vw, 5.8rem); }
 }
 
 @media (max-width: 34rem) {
@@ -406,6 +420,7 @@
   .story-hero__name { line-height: .94; }
   .story-content h3 { overflow-wrap: anywhere; }
   .story-project__media { padding-inline: .65rem; }
+  #global .story-photo-label { max-inline-size: calc(100% - 1rem); }
 }
 
 @media (prefers-reduced-motion: no-preference) {

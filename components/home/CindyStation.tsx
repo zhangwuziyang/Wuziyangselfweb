@@ -4,10 +4,8 @@ export default function CindyStation({ chapter, reverse }: { chapter: Chapter; r
   return (
     <div className="cindy-station" data-cindy-station={chapter} data-cindy-reverse={reverse ? "" : undefined} aria-hidden="true">
       <div className="cindy-station__layout">
-        <div className="cindy-station__figure">
-          <div className="cindy-station__mark"><span className="cindy-station__floor" /></div>
-          <div className="cindy-station__hint" />
-        </div>
+        <div className="cindy-station__mark" />
+        <div className="cindy-station__hint" />
         <div className="cindy-station__caption" />
       </div>
     </div>

@@ -1,19 +1,16 @@
 import type { ReactNode } from "react";
 import { Localized } from "@/components/ui/Localized";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
-import CindyStation from "./CindyStation";
-import type { Chapter } from "./cindy-scenes";
 
-export default function StoryHeading({ label, children, station }: {
-  label: { en: string; zh: string }; children: ReactNode; station?: Chapter;
+export default function StoryHeading({ label, children }: {
+  label: { en: string; zh: string }; children: ReactNode;
 }) {
   return (
-    <header className={station ? "story-heading cindy-station-row" : "story-heading"}>
+    <header className="story-heading">
       <ScrollReveal>
         <p className="story-eyebrow"><Localized {...label} /></p>
         <h2 className="story-title">{children}</h2>
       </ScrollReveal>
-      {station && <CindyStation chapter={station} />}
     </header>
   );
 }

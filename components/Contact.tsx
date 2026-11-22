@@ -26,6 +26,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="story-chapter">
+      <CindyStation chapter="contact" reverse />
       <div className="story-shell">
         <div>
 
@@ -35,8 +36,7 @@ export default function Contact() {
             <br /><span className="story-title-accent"><Localized {...c.headline3} /></span>
           </StoryHeading>
 
-          <div className="cindy-station-row mb-10">
-            <CindyStation chapter="contact" reverse />
+          <div className="mb-10">
             <ScrollReveal>
               <p
                 className="story-body mb-8 max-w-xl"

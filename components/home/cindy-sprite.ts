@@ -223,9 +223,10 @@ function drawCindy(
         rect(x, 20, 8, 13, band);
         rect(x + 1, 22, 4, 9, "#7387a3");
       }
-      rect(51, 8 - step, 2, 6, brown);
-      rect(51, 8 - step, 5, 2, brown);
-      rect(49, 13 - step, 4, 2, brown);
+      const noteX = compact ? 46 : 51;
+      rect(noteX, 8 - step, 2, 6, brown);
+      rect(noteX, 8 - step, 5, 2, brown);
+      rect(noteX - 2, 13 - step, 4, 2, brown);
       break;
     }
     case "skills": {

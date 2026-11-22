@@ -9,6 +9,7 @@ export default function Hero() {
 
   return (
     <section id="hero" className="story-hero">
+      <CindyStation chapter="hero" />
       <div className="story-shell story-hero__track">
         <div className="story-hero__copy">
           <p className="story-eyebrow">
@@ -28,7 +29,6 @@ export default function Hero() {
             </a>
           </div>
         </div>
-        <CindyStation chapter="hero" />
         <div className="story-hero__portrait">
           <Image
             src="/photos/self-cutout.png"

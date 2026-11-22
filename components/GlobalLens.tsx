@@ -16,6 +16,7 @@ export default function GlobalLens() {
 
   return (
     <section id="global" className="story-chapter">
+      <CindyStation chapter="global" reverse />
       <div className="story-shell">
 
         <StoryHeading label={g.label}>
@@ -24,8 +25,7 @@ export default function GlobalLens() {
         </StoryHeading>
 
         {/* Stats */}
-        <div className="cindy-station-row mb-7">
-          <CindyStation chapter="global" reverse />
+        <div className="mb-7">
           <ScrollReveal className="flex flex-wrap gap-x-8 gap-y-4 sm:gap-x-14">
             {STATS.map((s) => (
               <div key={s.labelKey}>

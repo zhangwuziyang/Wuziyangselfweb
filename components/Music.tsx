@@ -10,6 +10,7 @@ export default function Music() {
 
   return (
     <section id="music" className="story-chapter">
+      <CindyStation chapter="music" />
       <div className="story-shell">
         <StoryHeading label={m.label}>
           <Localized {...m.headline1} /><br />
@@ -18,9 +19,6 @@ export default function Music() {
         </StoryHeading>
         <ScrollReveal className="grid grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-9 xl:gap-14">
           <div>
-            <div className="mb-6">
-              <CindyStation chapter="music" />
-            </div>
             <div className="space-y-4 font-light leading-[1.8] mb-10" style={{ fontSize: "clamp(1rem, 1.4vw, 1.125rem)", color: "var(--story-muted)" }}>
               <p><Localized {...m.p1} /></p>
               <p><Localized {...m.p2} /></p>

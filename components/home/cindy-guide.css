@@ -1,113 +1,26 @@
 .cindy-station {
-  --cindy-pixels: 4;
-  --cindy-ground: 1.25rem;
-  container: cindy-station / inline-size;
-  inline-size: 100%;
   min-inline-size: 0;
 }
 
 .cindy-station__layout {
   display: grid;
-  align-items: center;
-  gap: .5rem;
-  grid-template-areas: "figure" "caption";
-}
-
-.cindy-station__figure {
-  min-inline-size: 0;
-  grid-area: figure;
+  gap: .35rem;
 }
 
 .cindy-station__mark {
-  position: relative;
-  block-size: calc(var(--cindy-pixels) * 47px + 2.5rem);
-  background: radial-gradient(ellipse at 50% 61%, color-mix(in srgb, var(--story-panel) 68%, transparent), transparent 70%);
-}
-
-.cindy-station__floor {
-  position: absolute;
-  inset: auto auto var(--cindy-ground) 50%;
-  inline-size: min(72%, calc(var(--cindy-pixels) * 39px));
-  block-size: .45rem;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--story-tint) 14%, transparent);
-  transform: translate(-50%, 50%);
+  block-size: calc(var(--cindy-pixels) * 50px + 12px);
 }
 
 .cindy-station__hint { block-size: 1.3rem; }
 
 .cindy-station__caption {
-  grid-area: caption;
   justify-self: center;
-  inline-size: min(100%, 20rem);
-  block-size: 5.75rem;
-}
-
-.cindy-station-row {
-  --cindy-column-gap: clamp(1.5rem, 4vw, 3.5rem);
-  display: grid;
-  align-items: center;
-  gap: 1.25rem;
+  inline-size: min(100%, 19rem);
+  block-size: 6.5rem;
 }
 
 @media (min-width: 48rem) {
-  [data-cindy-station="music"] .cindy-station__floor { inset-inline-start: 58%; }
-}
-
-[data-cindy-station="about"] .cindy-station__floor,
-[data-cindy-station="music"] .cindy-station__floor,
-[data-cindy-station="skills"] .cindy-station__floor {
-  border-block-start: 1px solid var(--story-edge);
-  border-radius: .4rem;
-  background: linear-gradient(var(--story-soft), transparent);
-}
-
-@media (min-width: 64rem) {
-  .cindy-station { --cindy-pixels: 5; }
-  :is([data-cindy-station="hero"], [data-cindy-station="projects"], [data-cindy-station="global"]) { --cindy-pixels: 6; }
-  [data-cindy-station="philosophy"] { --cindy-pixels: 4; }
-
-  .cindy-station-row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, min(39%, 27rem));
-    column-gap: var(--cindy-column-gap);
-  }
-
-  .cindy-station-row--top { align-items: start; }
-  .cindy-station-row--leading { grid-template-columns: minmax(0, min(36%, 24rem)) minmax(0, 1fr); }
-
-  .cindy-station-row > .cindy-station { grid-column: 2; grid-row: 1; }
-  .cindy-station-row > :not(.cindy-station) { grid-column: 1; grid-row: 1; }
-  .cindy-station-row--leading > .cindy-station { grid-column: 1; }
-  .cindy-station-row--leading > :not(.cindy-station) { grid-column: 2; }
-
-  :is([data-cindy-station="experience"], [data-cindy-station="skills"]) .cindy-station__mark::after {
-    content: "";
-    position: absolute;
-    inset: auto calc(-1 * var(--cindy-column-gap) - 7px) var(--cindy-ground) 50%;
-    block-size: 1px;
-    background: linear-gradient(90deg, transparent, var(--story-edge) 58%);
-  }
-
-  [data-cindy-station="skills"] .cindy-station__mark::after {
-    inset-inline-end: calc(-1 * var(--cindy-column-gap) + .5rem);
-  }
-}
-
-@container cindy-station (min-width: 34rem) {
-  .cindy-station__layout {
-    grid-template-columns: minmax(17.75rem, 1fr) minmax(15.25rem, 1fr);
-    grid-template-areas: "figure caption";
-    gap: 1rem;
-  }
-
-  [data-cindy-reverse] > .cindy-station__layout {
-    grid-template-columns: minmax(15.25rem, 1fr) minmax(17.75rem, 1fr);
-    grid-template-areas: "caption figure";
-  }
-}
-
-@media (max-width: 24rem) {
-  .cindy-station__caption { block-size: 6.5rem; }
+  .cindy-station__caption { block-size: 5.75rem; }
 }
 
 .cindy-overlay {
@@ -197,7 +110,7 @@
   transition: opacity 160ms ease;
 }
 
-.cindy-dock[data-parked] .cindy-hint { opacity: 1; }
+.cindy-dock[data-hint] .cindy-hint { opacity: 1; }
 
 .cindy-note {
   position: absolute;
@@ -229,18 +142,6 @@
   border: solid var(--story-edge);
   border-width: 1px 0 0 1px;
   background: var(--story-panel);
-}
-
-.cindy-dock[data-tail="left"] .cindy-note::before,
-.cindy-dock[data-tail="right"] .cindy-note::before {
-  inset: 50% auto auto -5px;
-  transform: translateY(-50%) rotate(45deg);
-  border-width: 0 0 1px 1px;
-}
-
-.cindy-dock[data-tail="right"] .cindy-note::before {
-  inset-inline: auto -5px;
-  border-width: 1px 1px 0 0;
 }
 
 .cindy-dock[data-speaking] .cindy-note {

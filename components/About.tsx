@@ -1,3 +1,4 @@
+import CindyStation from "@/components/home/CindyStation";
 import StoryHeading from "@/components/home/StoryHeading";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,9 +22,10 @@ export default function About() {
 
   return (
     <section id="about" className="story-chapter">
+      <CindyStation chapter="about" />
       <div className="story-shell">
 
-        <StoryHeading label={a.label} station="about">
+        <StoryHeading label={a.label}>
           <Localized en={
             <>I turn messy<br />questions into<br /><span className="story-title-accent">working products.</span></>
           } zh={

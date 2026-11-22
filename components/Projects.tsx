@@ -35,52 +35,54 @@ export default function Projects() {
 
   return (
     <section id="projects" className="story-chapter story-projects">
-      <header className="story-projects__caption story-shell cindy-station-row">
-        <div>
-          <p className="story-eyebrow"><Localized {...p.label} /></p>
-          <h2 className="story-title"><Localized {...p.headline} /></h2>
-          <p className="story-body">
-            <Localized en={p.tagline.en.split("\n")[0]} zh={p.tagline.zh.split("\n")[0]} />
-          </p>
-        </div>
-        <CindyStation chapter="projects" />
-      </header>
+      <CindyStation chapter="projects" />
+      <div className="story-shell">
+        <header className="story-projects__caption">
+          <div>
+            <p className="story-eyebrow"><Localized {...p.label} /></p>
+            <h2 className="story-title"><Localized {...p.headline} /></h2>
+            <p className="story-body">
+              <Localized en={p.tagline.en.split("\n")[0]} zh={p.tagline.zh.split("\n")[0]} />
+            </p>
+          </div>
+        </header>
 
-      <div id="project-gallery" className="story-projects__gallery story-shell">
-        {projects.map(({ slug, card: { en, zh }, frames, device }) => (
-          <ScrollReveal key={slug}>
-            <article className="story-project story-panel">
-              <div className="flex min-w-0 flex-col justify-center p-3.5 sm:p-7 xl:p-8">
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-[var(--story-edge)] bg-[var(--story-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--story-tint)]">
-                    <Localized en={en.tag1} zh={zh.tag1} />
-                  </span>
-                  <span className="rounded-full border border-[var(--story-edge)] px-2.5 py-1 text-xs text-[var(--story-muted)]">
-                    <Localized en={en.tag2} zh={zh.tag2} />
-                  </span>
+        <div id="project-gallery" className="story-projects__gallery">
+          {projects.map(({ slug, card: { en, zh }, frames, device }) => (
+            <ScrollReveal key={slug}>
+              <article className="story-project story-panel">
+                <div className="flex min-w-0 flex-col justify-center p-3.5 sm:p-7 xl:p-8">
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full border border-[var(--story-edge)] bg-[var(--story-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--story-tint)]">
+                      <Localized en={en.tag1} zh={zh.tag1} />
+                    </span>
+                    <span className="rounded-full border border-[var(--story-edge)] px-2.5 py-1 text-xs text-[var(--story-muted)]">
+                      <Localized en={en.tag2} zh={zh.tag2} />
+                    </span>
+                  </div>
+                  <h3 className="mb-3 text-[clamp(1.7rem,3.3vw,3rem)] font-semibold leading-tight tracking-tight">
+                    <Localized en={en.title} zh={zh.title} />
+                  </h3>
+                  <p className="mb-5 text-sm leading-relaxed text-[var(--story-muted)]"><Localized en={en.desc} zh={zh.desc} /></p>
+                  <ul className="mb-5 space-y-2">
+                    <Localized en={renderPoints(en.points)} zh={renderPoints(zh.points)} />
+                  </ul>
+                  <div className="mb-5 flex flex-wrap gap-2">
+                    <Localized en={renderTechTags(en.techTags)} zh={renderTechTags(zh.techTags)} />
+                  </div>
+                  <Link href={`/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:underline">
+                    <Localized en={en.cta} zh={zh.cta} />
+                    <span className="sr-only"><Localized en={` ${en.title}`} zh={` ${zh.title}`} /></span>
+                    <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
+                  </Link>
                 </div>
-                <h3 className="mb-3 text-[clamp(1.7rem,3.3vw,3rem)] font-semibold leading-tight tracking-tight">
-                  <Localized en={en.title} zh={zh.title} />
-                </h3>
-                <p className="mb-5 text-sm leading-relaxed text-[var(--story-muted)]"><Localized en={en.desc} zh={zh.desc} /></p>
-                <ul className="mb-5 space-y-2">
-                  <Localized en={renderPoints(en.points)} zh={renderPoints(zh.points)} />
-                </ul>
-                <div className="mb-5 flex flex-wrap gap-2">
-                  <Localized en={renderTechTags(en.techTags)} zh={renderTechTags(zh.techTags)} />
+                <div className="story-project__media">
+                  <ProjectPreview frames={frames} phone={device === "phone"} name={{ en: en.title, zh: zh.title }} />
                 </div>
-                <Link href={`/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:underline">
-                  <Localized en={en.cta} zh={zh.cta} />
-                  <span className="sr-only"><Localized en={` ${en.title}`} zh={` ${zh.title}`} /></span>
-                  <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
-                </Link>
-              </div>
-              <div className="story-project__media">
-                <ProjectPreview frames={frames} phone={device === "phone"} name={{ en: en.title, zh: zh.title }} />
-              </div>
-            </article>
-          </ScrollReveal>
-        ))}
+              </article>
+            </ScrollReveal>
+          ))}
+        </div>
       </div>
     </section>
   );
