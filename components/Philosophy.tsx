@@ -35,7 +35,7 @@ export default function Philosophy() {
 
           <div className="mt-9 flex items-center gap-4">
             <div className="h-px w-10 bg-[var(--story-edge)]" />
-            <span className="text-xs font-medium tracking-[0.22em]" style={{ color: "var(--story-dim)" }}>
+            <span data-cindy-content="" className="text-xs font-medium tracking-[0.22em]" style={{ color: "var(--story-dim)" }}>
               <Localized {...ph.signature} />
             </span>
           </div>

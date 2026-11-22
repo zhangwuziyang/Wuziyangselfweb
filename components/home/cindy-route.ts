@@ -60,7 +60,7 @@ export function measureRoute(home: HTMLElement, large: boolean): Route {
   const finish = home.querySelector("[data-cindy-finish]");
   const nodes = Array.from(home.querySelectorAll<HTMLElement>("[data-cindy-node]"));
   const content = Array.from(home.querySelectorAll(
-    ".story-shell :is(img, .project-browser, .project-phone, .story-project, .story-panel, h1, h2, h3, p, blockquote, a, button, figcaption), #skills [data-cindy-anchor], [data-cindy-node]",
+    ".story-shell :is(img, .project-browser, .project-phone, .story-project, .story-panel, h1, h2, h3, p, blockquote, a, button, figcaption, [data-cindy-content]), #skills [data-cindy-anchor], [data-cindy-node]",
   ), element => {
     // The city image can enlarge on hover, but its rounded frame clips it.
     const frame = element.closest(".overflow-hidden");
