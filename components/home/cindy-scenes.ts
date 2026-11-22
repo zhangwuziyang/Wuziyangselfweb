@@ -19,7 +19,7 @@ export const CINDY_SCENES: Record<Chapter, Scene> = {
   },
   about: {
     pose: "book", expression: "neutral", entrance: "peek", color: [227, 216, 198],
-    line: { en: "He studies economics and information science, and carries analysis through to execution.", zh: "他主修经济学与信息科学，习惯把分析推进到落地。" },
+    line: { en: "Moving between internet, consulting, and finance taught him to weigh every problem by both its business logic and its data.", zh: "在互联网、咨询与金融之间切换，让他习惯同时从业务逻辑和数据两端判断问题。" },
   },
   experience: {
     pose: "timeline", expression: "happy", entrance: "slide", color: [246, 239, 229],
@@ -31,11 +31,11 @@ export const CINDY_SCENES: Record<Chapter, Scene> = {
   },
   global: {
     pose: "earth", expression: "surprise", entrance: "hop", color: [243, 239, 231],
-    line: { en: "He has traveled to 20+ countries, paying close attention to how people live and choose.", zh: "他走过二十多个国家，更关注当地人如何生活与选择。" },
+    line: { en: "He treats travel as field research, which taught him that the same product meets very different users in different places.", zh: "他把旅行当作田野调查，由此明白同一个产品在不同情境中会遇到截然不同的用户。" },
   },
   music: {
     pose: "music", expression: "happy", entrance: "sway", color: [225, 212, 192],
-    line: { en: "Grade 9 piano training gave him patience and restraint in every product detail.", zh: "钢琴九级的训练，让他在产品细节上更有耐心与分寸。" },
+    line: { en: "Music taught him structure and timing, and a sense of when a product should hold back.", zh: "音乐教会他结构与节奏，也让他懂得产品何时该克制。" },
   },
   skills: {
     pose: "skills", expression: "neutral", entrance: "peek", color: [245, 237, 223],
