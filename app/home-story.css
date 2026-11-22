@@ -60,7 +60,8 @@
   z-index: -1;
   inset: 0;
   pointer-events: none;
-  mask-image: linear-gradient(transparent, #000 16%, #000 80%, transparent);
+  --story-edge-fade: min(9svh, 12%);
+  mask-image: linear-gradient(transparent, #000 var(--story-edge-fade), #000 calc(100% - var(--story-edge-fade)), transparent);
 }
 
 .story-content > main > section::before,
@@ -482,6 +483,15 @@
 
 .story-project__controls button:hover {
   background: var(--story-soft);
+}
+
+.story-project__controls button:is(:active, .is-pressed) {
+  background: var(--story-media);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .story-project__controls button { transition: transform 120ms ease-out, background-color 120ms ease-out; }
+  .story-project__controls button:is(:active, .is-pressed) { transform: translateY(1px) scale(.92); }
 }
 
 .story-about-media {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import Image from "next/image";
 import { useLang } from "@/context/LangContext";
 
@@ -46,6 +46,9 @@ export default function ProjectPreview({ frames, phone, name }: {
 }) {
   const { lang } = useLang();
   const [index, setIndex] = useState(0);
+  const [pressed, setPressed] = useState(0);
+  const releaseTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(releaseTimer.current), []);
   const app = name[lang];
   const title = lang === "zh" ? `${app} 截图 ${index + 1} / ${frames.length}` :
     `${app} screenshot ${index + 1} of ${frames.length}`;
@@ -68,6 +71,9 @@ export default function ProjectPreview({ frames, phone, name }: {
     />
   );
   function step(event: MouseEvent<HTMLButtonElement>, direction: number) {
+    setPressed(direction);
+    window.clearTimeout(releaseTimer.current);
+    releaseTimer.current = window.setTimeout(() => setPressed(0), 120);
     setIndex(current => (current + direction + frames.length) % frames.length);
     event.currentTarget.dispatchEvent(new CustomEvent("cindy:preview", { bubbles: true }));
   }
@@ -89,9 +95,9 @@ export default function ProjectPreview({ frames, phone, name }: {
         )}
       </div>
       <div className="story-project__controls">
-        <button type="button" aria-label={lang === "zh" ? `${app} 上一张截图` : `Previous ${app} screenshot`} onClick={event => step(event, -1)}>←</button>
+        <button type="button" className={pressed === -1 ? "is-pressed" : undefined} aria-label={lang === "zh" ? `${app} 上一张截图` : `Previous ${app} screenshot`} onClick={event => step(event, -1)}>←</button>
         <span role="status" aria-label={title}>{index + 1} / {frames.length}</span>
-        <button type="button" aria-label={lang === "zh" ? `${app} 下一张截图` : `Next ${app} screenshot`} onClick={event => step(event, 1)}>→</button>
+        <button type="button" className={pressed === 1 ? "is-pressed" : undefined} aria-label={lang === "zh" ? `${app} 下一张截图` : `Next ${app} screenshot`} onClick={event => step(event, 1)}>→</button>
       </div>
     </>
   );

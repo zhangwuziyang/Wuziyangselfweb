@@ -61,19 +61,16 @@ try {
     const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } });
     await writeFile(join(directory, name + ".js"), compiled.outputText);
   }
-  const { mountCindy, updateCindyDialogue } = (await import(pathToFileURL(join(directory, "cindy-motion.js")))).default;
+  const { mountCindy } = (await import(pathToFileURL(join(directory, "cindy-motion.js")))).default;
+  const { measureRoute, sampleBackdrop, sampleGuide, TRAVEL_START } = (await import(pathToFileURL(join(directory, "cindy-route.js")))).default;
   const { CHAPTERS, CINDY_SCENES } = (await import(pathToFileURL(join(directory, "cindy-scenes.js")))).default;
+  const { paintCindy } = (await import(pathToFileURL(join(directory, "cindy-sprite.js")))).default;
   const html = htmlParser.parse(await readFile(new URL("../.next/server/app/index.html", import.meta.url), "utf8"));
   const guideCSS = await readFile(new URL("../components/home/cindy-guide.css", import.meta.url), "utf8");
   const storyCSS = await readFile(new URL("../app/home-story.css", import.meta.url), "utf8");
   assert.match(guideCSS, /\.cindy-hint\s*\{[^}]*transform:\s*translate\(-50%,/);
   assert.match(storyCSS, /@media \(width < 48rem\)\s*\{[\s\S]*?\.story-content\s*\{[^}]*overflow:\s*auto;/);
   assert.match(storyCSS, /section:nth-child\(even\) > \.cindy-station\s*\{ grid-area: 1 \/ 2;/);
-
-  const openLine = { chapter: "hero", since: 0 };
-  assert.equal(updateCindyDialogue(openLine, "hero", true, 16), openLine);
-  assert.equal(updateCindyDialogue(openLine, "hero", false, 16), undefined);
-  assert.deepEqual(updateCindyDialogue(openLine, "about", true, 32), { chapter: "about", since: 32 });
 
   function simulate(width, height, lang, reduce = false) {
     const mobile = width < 768;
@@ -207,6 +204,11 @@ try {
       target.dispatchEvent(new Event("scroll"));
       render(frameMs);
     };
+    const lineFor = chapter => CINDY_SCENES[chapter].line[lang === "en" ? "en" : "zh"];
+    const tokensFor = line => lang === "en" ? line.match(/\S+\s*/g) : Array.from(line);
+    const speaking = () => dock.hasAttribute("data-speaking");
+    const fading = () => dock.hasAttribute("data-note-leaving");
+    const dimmed = () => dock.hasAttribute("data-scroll-dim");
     const counts = { sprite: 0, hint: 0, bubble: 0 };
     let minWidth = Infinity, maxWidth = 0;
     function check() {
@@ -232,12 +234,12 @@ try {
         const hintWidth = Math.min(value("hint-width"), lang === "zh" ? 109 : 145);
         parts.push(["hint", box(x - hintWidth / 2, y + value("hint-y") - 8, hintWidth, 16)]);
       }
-      if (dock.hasAttribute("data-speaking")) {
+      if (speaking() || fading()) {
         const noteX = x + value("note-x");
         const noteTop = y + value("note-y") - (mobile ? note.offsetHeight / 2 : 0);
         const tip = mobile ? { x: 8, y: 0 } : { x: 0, y: 8 };
         parts.push(["bubble", box(noteX - tip.x, noteTop - tip.y, value("note-width") + tip.x, note.offsetHeight + tip.y)]);
-        if (!mobile) assert.ok(Math.abs(noteX + value("note-tip") - x) < .01);
+        if (!mobile && speaking()) assert.ok(Math.abs(noteX + value("note-tip") - x) < .01);
       }
       for (const [part, rect] of parts) {
         counts[part]++;
@@ -247,11 +249,118 @@ try {
           const top = Math.max(clip.top, bounds.top - scroll());
           const bottom = Math.min(clip.bottom, bounds.bottom - scroll());
           if (bottom <= top) continue;
-          assert.ok(!intersects(rect, box(bounds.left, top, bounds.width, bottom - top)), `${width}×${height} ${part} overlaps ${kind} at ${scroll()}`);
+          assert.ok(!intersects(rect, box(bounds.left, top, bounds.width, bottom - top)), `${width}×${height} ${dock.attrs.get("data-scene")} ${part} overlaps ${kind} at ${scroll()} (fade: ${fading()})`);
         }
       }
       if (mobile) assert.ok(clip.bottom <= height - 62, "launcher is below the reader");
       return { x, y, scale, squash, facing: bitmap.getContext().paintFacing };
+    }
+
+    const route = measureRoute(home);
+    for (const { from, to, seam, half } of route.boundaries) {
+      assert.deepEqual(sampleBackdrop(route, seam - half - 1, reduce), { from, to: from, blend: 0 });
+      assert.deepEqual(sampleBackdrop(route, seam + half + 1, reduce), { from: to, to, blend: 0 });
+      assert.deepEqual(sampleBackdrop(route, seam, reduce), reduce ? { from: to, to, blend: 0 } : { from, to, blend: .5 });
+      if (!reduce) {
+        assert.ok(sampleBackdrop(route, seam - half * .9, false).blend < .01, "blend eases in near the boundary");
+        assert.ok(sampleBackdrop(route, seam + half * .9, false).blend > .99, "blend eases out near the boundary");
+      }
+    }
+
+    render(0);
+    const hero = lineFor("hero");
+    const heroTokens = tokensFor(hero);
+    const prefix = count => heroTokens.slice(0, count).join("");
+    const heroFrame = (expression, blink) => {
+      const expected = canvas().getContext();
+      paintCindy(expected, CINDY_SCENES.hero.pose, expression, { x: 0, y: 0 }, 0, mobile, { blink, mouth: false, tail: 0 });
+      return expected.painted;
+    };
+    assert.equal(noteText.textContent, reduce ? hero : prefix(1));
+    render(30);
+    assert.equal(noteText.textContent, reduce ? hero : prefix(2));
+    const pausedText = noteText.textContent;
+    const hintY = value("hint-y");
+    jump(12, 8);
+    jump(24, 8);
+    assert.ok(speaking() && dimmed(), "fast scrolling within a chapter keeps its bubble and dims it");
+    assert.ok(!dock.hasAttribute("data-typing"), "typing pauses during the scroll");
+    assert.deepEqual(bitmap.getContext().painted, heroFrame("neutral", false), "scrolling holds a neutral face with the mouth closed");
+    assert.equal(noteText.textContent, pausedText, "same-section scroll never shortens or advances the existing text");
+    assert.equal(value("hint-y"), hintY, "the hint stays in place while the note dims");
+    assert.equal(note.attrs.get("aria-hidden"), "false");
+    render(111);
+    assert.ok(dimmed());
+    assert.equal(noteText.textContent, pausedText);
+    render(1);
+    assert.ok(speaking() && !dimmed());
+    assert.equal(noteText.textContent, pausedText);
+    if (!reduce) {
+      assert.ok(!dock.hasAttribute("data-typing"), "Cindy blinks once before resuming");
+      assert.deepEqual(bitmap.getContext().painted, heroFrame(CINDY_SCENES.hero.expression, true), "settling triggers a blink");
+      render(120);
+      render(29);
+      assert.equal(noteText.textContent, prefix(2));
+      render(1);
+      assert.equal(noteText.textContent, prefix(3), "typing resumes at the next token");
+      render(heroTokens.length * 30);
+    }
+    assert.equal(noteText.textContent, hero);
+
+    const firstDeparture = Array.from({ length: 600 }, (_, i) => Math.floor(route.bridges[0].start) + i)
+      .find(position => {
+        const { station, travel } = sampleGuide(route, position, reduce);
+        return station.chapter === "hero" && travel > TRAVEL_START;
+      });
+    assert.ok(firstDeparture);
+    const oldNoteX = check().x + value("note-x");
+    const oldNoteY = check().y + value("note-y");
+    jump(firstDeparture);
+    assert.ok(!speaking());
+    assert.equal(fading(), !reduce, "a visible departure fades unless motion is reduced");
+    assert.equal(noteText.textContent, hero, "the fading note keeps its original text");
+    if (!reduce) {
+      const { x, y } = check();
+      assert.ok(Math.abs(x + value("note-x") - oldNoteX) < .01, "the fading note stays in its own lane");
+      assert.ok(Math.abs(y + value("note-y") - oldNoteY) < .01, "the fading note stays vertically anchored");
+      render(199);
+      assert.ok(fading());
+      render(1);
+      assert.ok(!fading());
+    }
+    assert.equal(note.attrs.get("aria-hidden"), "true");
+
+    jump(chapterTops[1]);
+    render(183);
+    assert.ok(!speaking(), "a new bubble needs more idle time than the 120ms scroll-settle window");
+    render(1);
+    assert.ok(speaking(), "a new bubble opens at 200ms without another scroll event");
+    const about = lineFor("about");
+    assert.equal(noteText.textContent, reduce ? about : tokensFor(about)[0]);
+    if (mobile && !reduce) assert.ok(dock.dataset.arrive, "the mobile note appears after the arrival hop starts");
+    const aboutText = noteText.textContent;
+    for (const top of chapterTops.slice(2, 4)) {
+      jump(top);
+      assert.ok(!speaking() && !fading(), "a jump hides the old line immediately at the new station");
+      assert.equal(note.attrs.get("aria-hidden"), "true");
+      assert.equal(noteText.textContent, aboutText, "a hidden station never types a queued line");
+      render(54);
+      assert.ok(!speaking(), "fast scrolling through a brief park suppresses the bubble");
+    }
+    jump(0);
+    render(183);
+    assert.ok(!speaking());
+    render(1);
+    assert.ok(speaking());
+    assert.equal(noteText.textContent, hero, "a spoken chapter revisits with the full line immediately");
+    if (!reduce) {
+      jump(firstDeparture);
+      assert.ok(fading());
+      jump(chapterTops[1]);
+      assert.ok(!speaking() && !fading(), "a fast skip cancels a fade already in progress");
+      assert.equal(noteText.textContent, hero, "the hidden bubble still holds the old line");
+      jump(0);
+      render(184);
     }
 
     const positions = Array.from({ length: Math.ceil(end / 12) + 1 }, (_, index) => Math.min(index * 12, end));
@@ -260,7 +369,6 @@ try {
     for (const position of positions) {
       jump(position);
       const frame = check();
-      if (dock.hasAttribute("data-parked")) assert.ok(dock.hasAttribute("data-speaking"), "slow scrolling shows the bubble as soon as Cindy parks");
       if (previous) assert.ok(Math.hypot(frame.x - previous.x, frame.y - previous.y) < (mobile ? 12 : 90), "adjacent wheel steps stay continuous");
       forward.set(position, frame);
       previous = frame;
@@ -278,34 +386,22 @@ try {
       assert.ok([...forward.values()].some(({ squash }) => squash < .95));
       assert.ok([...forward.values()].some(({ squash }) => squash > 1.01));
     }
-    jump(12, 8);
-    jump(24, 8);
-    assert.ok(!dock.hasAttribute("data-speaking"), "speed also suppresses the bubble across smaller, high-frequency steps");
-    for (const top of chapterTops.slice(1, 4)) {
-      jump(top);
-      render(54);
-      assert.ok(dock.hasAttribute("data-parked"));
-      assert.ok(!dock.hasAttribute("data-speaking"), "fast scrolling through a brief park suppresses the bubble");
-    }
     for (const [index, top] of chapterTops.entries()) {
       jump(Math.min(top, end));
       assert.equal(dock.attrs.get("data-scene"), CHAPTERS[index]);
       assert.ok(dock.hasAttribute("data-hint"), `hint is visible at the ${CHAPTERS[index]} anchor (${width}×${height})`);
-      render(103);
-      assert.ok(!dock.hasAttribute("data-speaking"), "bubble stays hidden during the fast-scroll window");
-      render(1);
-      assert.ok(dock.hasAttribute("data-speaking"), "bubble appears when the fast-scroll window closes without another scroll event");
+      render(184);
+      assert.ok(speaking(), "bubble appears when the entrance idle window closes without another scroll event");
       if (!mobile) {
         const parkedFrame = check();
         assert.equal(parkedFrame.x > width / 2, index % 2 === 1, "desktop chapters alternate sides");
         assert.equal(parkedFrame.facing, index % 2 === 1 ? -1 : 1, "parked Cindy faces the copy");
       }
-      const line = CINDY_SCENES[CHAPTERS[index]].line[lang === "en" ? "en" : "zh"];
-      if (reduce) {
-        assert.equal(noteText.textContent, line, "reduced motion reveals the entire line");
-      } else {
-        const tokens = lang === "en" ? line.match(/\S+\s*/g) : Array.from(line);
-        assert.equal(noteText.textContent, tokens[0], "typewriter starts at the first token on arrival, including revisits");
+      const line = lineFor(CHAPTERS[index]);
+      if (noteText.textContent !== line && !reduce) {
+        const tokens = tokensFor(line);
+        assert.equal(noteText.textContent, tokens[0], "an unfinished chapter starts from its first token after a chapter change");
+        render(120);
         for (let shown = 1; shown < tokens.length; shown++) {
           render(29);
           check();
@@ -313,8 +409,8 @@ try {
           render(1);
           assert.equal(noteText.textContent, tokens.slice(0, shown + 1).join(""), "typewriter advances every 30ms without scrolling");
         }
-        assert.equal(noteText.textContent, line);
       }
+      assert.equal(noteText.textContent, line);
       check();
     }
     unmount();

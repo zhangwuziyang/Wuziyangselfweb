@@ -12,6 +12,8 @@ type Station = {
   sectionHeight: number;
   contentTop: number;
   contentBottom: number;
+  contentLeft: number;
+  contentRight: number;
   x: number;
   y: number;
   pixels: number;
@@ -27,6 +29,7 @@ type Bridge = { from: Station; to: Station; start: number; end: number; crossing
 type Route = {
   stations: Station[];
   bridges: Bridge[];
+  boundaries: { from: Chapter; to: Chapter; seam: number; half: number }[];
   height: number;
   nav: number;
   reader: HTMLElement | null;
@@ -42,9 +45,6 @@ type GuideSample = {
   squash: number;
   walkCycle: number;
   direction: number;
-  from: Chapter;
-  to: Chapter;
-  blend: number;
 };
 
 export const TRAVEL_START = ease(.22);
@@ -97,6 +97,7 @@ export function measureRoute(home: HTMLElement): Route {
       chapter, pixels, compact, facing: 1 as const,
       sectionTop: bounds.top + scroll, sectionHeight: bounds.height,
       contentTop: content.top + scroll, contentBottom: content.bottom + scroll,
+      contentLeft: content.left, contentRight: content.right,
     };
     if (reader && mobileArt && mobileCaption) {
       const art = mobileArt;
@@ -128,12 +129,17 @@ export function measureRoute(home: HTMLElement): Route {
     }];
   });
 
-  // The viewport's reading line crosses each real section boundary halfway through the move.
-  // Capping the window by both sections' heights keeps the rest of each chapter parked.
   const contentTop = reading?.top ?? 0;
   const contentBottom = reading?.bottom ?? height;
   const readingHeight = reading?.height ?? available;
   const readingLine = (reading?.top ?? nav) + readingHeight * .46;
+  const boundaries = stations.slice(1).map((to, index) => {
+    const from = stations[index];
+    // On desktop the empty gutters between sections belong half to each chapter.
+    const seam = (from.sectionTop + from.sectionHeight + to.sectionTop) / 2 - readingLine;
+    const half = Math.min(readingHeight * .18, from.sectionHeight * .18, to.sectionHeight * .18);
+    return { from: from.chapter, to: to.chapter, seam, half };
+  });
   const bridges = stations.slice(1).map((to, index) => {
     const from = stations[index];
     if (!reader) return desktopBridge(from, to, nav, height);
@@ -141,7 +147,20 @@ export function measureRoute(home: HTMLElement): Route {
     const half = Math.min(150, readingHeight * .19, from.sectionHeight * .18, to.sectionHeight * .18);
     return { from, to, start: seam - half, end: seam + half };
   });
-  return { stations, bridges, nav, height, reader, contentTop, contentBottom };
+  return { stations, bridges, boundaries, nav, height, reader, contentTop, contentBottom };
+}
+
+export function sampleBackdrop(route: Route, scroll: number, reduced: boolean) {
+  let chapter = route.stations[0]?.chapter;
+  if (!chapter) return;
+  for (const { from, to, seam, half } of route.boundaries) {
+    if (!reduced && scroll > seam - half && scroll < seam + half) {
+      return { from, to, blend: ease((scroll - seam + half) / (2 * half)) };
+    }
+    if (scroll < seam) break;
+    chapter = to;
+  }
+  return { from: chapter, to: chapter, blend: 0 };
 }
 
 function desktopBridge(from: Station, to: Station, nav: number, height: number): Bridge {
@@ -197,7 +216,6 @@ function sampleCrossing(bridge: Bridge, crossing: Crossing, scroll: number, redu
     travel: departure * (1 - arrival),
     walkCycle,
     direction: Math.sign(to.x - from.x),
-    from: from.chapter, to: to.chapter, blend: ease(progress),
   };
 }
 
@@ -226,9 +244,7 @@ export function sampleGuide(route: Route, scroll: number, reduced: boolean): Gui
       walkCycle: scroll / 18,
       direction: 0,
       travel: ease(clamp(Math.min(t, 1 - t) * 4)),
-      from: from.chapter, to: to.chapter, blend,
     };
   }
-  return { station, x: station.x, y: station.y, pixels: station.pixels, travel: 0, squash: 1, walkCycle: 0, direction: 0,
-    from: station.chapter, to: station.chapter, blend: 0 };
+  return { station, x: station.x, y: station.y, pixels: station.pixels, travel: 0, squash: 1, walkCycle: 0, direction: 0 };
 }

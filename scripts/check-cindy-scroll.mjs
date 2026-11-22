@@ -10,6 +10,150 @@ const DELTA = 12;
 const STEP_MS = 16;
 const CHAPTERS = ["hero", "about", "experience", "projects", "global", "music", "skills", "philosophy", "contact"];
 
+async function checkDialogue(page, mobile, reduced) {
+  const result = await page.evaluate(async ({ mobile, reduced }) => {
+    const reader = document.querySelector(".story-content");
+    const scroller = mobile ? reader : window;
+    const dock = document.querySelector(".cindy-dock");
+    const note = dock.querySelector(".cindy-note");
+    const measure = note.querySelector(".cindy-note__measure");
+    const text = note.querySelector(".cindy-note__text");
+    const hint = dock.querySelector(".cindy-hint");
+    const position = () => mobile ? reader.scrollTop : window.scrollY;
+    const frame = () => new Promise(resolve => requestAnimationFrame(resolve));
+    const until = async (label, condition) => {
+      const deadline = performance.now() + 4_000;
+      while (!condition()) {
+        if (performance.now() > deadline) throw new Error(label);
+        await frame();
+      }
+    };
+    const move = top => {
+      scroller.scrollTo({ top, behavior: "instant" });
+      scroller.dispatchEvent(new Event("scroll"));
+    };
+    const visit = chapter => move(position() + document.getElementById(chapter).getBoundingClientRect().top
+      - (mobile ? reader.getBoundingClientRect().top : 0));
+    const speaking = chapter => dock.dataset.scene === chapter && dock.hasAttribute("data-speaking");
+    const opacity = () => Number(getComputedStyle(note).opacity);
+
+    visit("experience");
+    await until("Experience bubble never appeared", () => speaking("experience")
+      && (reduced || dock.hasAttribute("data-typing")));
+    const prefix = text.textContent;
+    const full = measure.textContent;
+    const hintY = hint.getBoundingClientRect().top;
+    let pops = 0;
+    const onPop = event => { if (event.animationName === "cindy-note-in") pops++; };
+    note.addEventListener("animationstart", onPop);
+    move(position() + 64);
+    await until("The same-section bubble never dimmed", () => speaking("experience")
+      && dock.hasAttribute("data-scroll-dim") && Math.abs(opacity() - .4) < .03);
+    const dim = { text: text.textContent, hintY: hint.getBoundingClientRect().top,
+      ariaHidden: note.getAttribute("aria-hidden") };
+    await until("The bubble never returned to full opacity", () => opacity() === 1);
+    await until("Typing never resumed", () => text.textContent.length > prefix.length || reduced);
+    const resumed = text.textContent;
+    await until("The line never completed", () => text.textContent === full);
+    note.removeEventListener("animationstart", onPop);
+
+    visit("projects");
+    await until("Cindy never switched stations", () => dock.dataset.scene === "projects");
+    const jumped = { opacity: opacity(), text: text.textContent, ariaHidden: note.getAttribute("aria-hidden") };
+    visit("global");
+    await until("The final chapter never got a note", () => speaking("global"));
+    const landed = text.textContent;
+    visit("experience");
+    await until("The revisited chapter never got a note", () => speaking("experience"));
+    const revisit = text.textContent;
+    const phone = document.querySelector(".project-phone");
+    const screen = phone.querySelector(".phone-shell__screen");
+    const project = phone.closest(".story-project");
+    const next = project.querySelector(".story-project__controls button:last-child");
+    const counter = project.querySelector(".story-project__controls [role=status]");
+    const geometry = () => [phone, screen, screen.querySelector("img")].map(element => element.getBoundingClientRect().toJSON());
+    const before = geometry();
+    const index = counter.textContent;
+    const color = getComputedStyle(next).backgroundColor;
+    next.click();
+    await until("The preview did not register the press", () => next.classList.contains("is-pressed")
+      && getComputedStyle(next).backgroundColor !== color);
+    const press = { before, after: geometry(), changed: counter.textContent !== index, transform: getComputedStyle(next).transform };
+    await until("The press feedback did not clear", () => !next.classList.contains("is-pressed"));
+    visit("hero");
+    await until("Cindy never returned to the start", () => speaking("hero") && opacity() === 1);
+    return { prefix, full, hintY, dim, resumed, pops, jumped, landed, revisit, press };
+  }, { mobile, reduced });
+
+  assert.equal(result.dim.text, result.prefix, "Same-section scrolling preserves the visible prefix");
+  assert.equal(result.dim.ariaHidden, "false");
+  assert.ok(Math.abs(result.dim.hintY - result.hintY) < .5, "The hint stays in place as the bubble dims");
+  assert.equal(result.pops, 0, "Dimming and recovering opacity never replay the pop");
+  if (!reduced) assert.ok(result.resumed.startsWith(result.prefix) && result.resumed.length > result.prefix.length);
+  assert.deepEqual(result.jumped, { opacity: 0, text: result.full, ariaHidden: "true" },
+    "The first frame in the new station has a fully hidden note with the old text");
+  assert.ok(result.landed && !result.full.startsWith(result.landed), "The skip lands on the final chapter's line");
+  assert.equal(result.revisit, result.full, "A spoken chapter immediately revisits with the full line");
+  assert.ok(result.press.changed, "The preview advances on press");
+  assert.deepEqual(result.press.after, result.press.before, "Press feedback leaves the device and screenshot geometry in place");
+  assert.equal(result.press.transform === "none", reduced, "Press feedback moves only with motion enabled");
+}
+
+async function checkWheelEntrance(page, client, width, height) {
+  const arriving = chapter => {
+    const dock = document.querySelector(".cindy-dock");
+    return dock.dataset.scene === chapter && dock.hasAttribute("data-speaking");
+  };
+  const wheelDelta = 100;
+  const wheelInterval = 130;
+  await page.evaluate(() => window.scrollTo({
+    top: window.scrollY + document.getElementById("about").getBoundingClientRect().top, behavior: "instant",
+  }));
+  await page.waitForFunction(arriving, {}, "about");
+  const { steps, end } = await page.evaluate(wheelDelta => {
+    const dock = document.querySelector(".cindy-dock");
+    const parked = new Set();
+    const entrances = new Map();
+    const events = new AbortController();
+    let lastScroll = -Infinity;
+    window.addEventListener("scroll", () => { lastScroll = performance.now(); }, { passive: true, signal: events.signal });
+    const observer = new MutationObserver(() => {
+      const chapter = dock.dataset.scene;
+      if (dock.hasAttribute("data-parked")) parked.add(chapter);
+      if (chapter !== "about" && dock.hasAttribute("data-speaking") && !entrances.has(chapter)) {
+        entrances.set(chapter, performance.now() - lastScroll);
+      }
+    });
+    observer.observe(dock, { attributes: true, attributeFilter: ["data-scene", "data-parked", "data-speaking"] });
+    window.finishCindyWheelEntrance = () => {
+      observer.disconnect();
+      events.abort();
+      delete window.finishCindyWheelEntrance;
+      return { parked: [...parked], entrances: [...entrances] };
+    };
+    const steps = Math.ceil(document.getElementById("global").getBoundingClientRect().top / wheelDelta);
+    return { steps, end: window.scrollY + steps * wheelDelta };
+  }, wheelDelta);
+  const started = performance.now();
+  for (let index = 0; index < steps; index++) {
+    if (index > 0) await delay(Math.max(0, started + index * wheelInterval - performance.now()));
+    await client.send("Input.dispatchMouseEvent", {
+      type: "mouseWheel", x: width * .65, y: height / 2, deltaX: 0, deltaY: wheelDelta,
+    });
+  }
+  await page.waitForFunction(end => window.scrollY >= end - 1, {}, end);
+  await page.waitForFunction(arriving, {}, "global");
+  const { parked, entrances } = await page.evaluate(() => window.finishCindyWheelEntrance());
+  for (const chapter of ["experience", "projects", "global"]) {
+    assert.ok(parked.includes(chapter), `The wheel crossed a parked ${chapter} station`);
+  }
+  assert.deepEqual(entrances.map(([chapter]) => chapter), ["global"],
+    "100px wheel steps every 130ms never open a bubble at an intermediate station");
+  assert.ok(entrances[0][1] >= 198, `The final station waited for 200ms of scroll idle (${entrances[0][1]}ms)`);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForFunction(arriving, {}, "hero");
+}
+
 async function check(browser, width, height, { mobile = false, reduced = false, chinese = false } = {}) {
   const page = await browser.newPage();
   try {
@@ -21,6 +165,9 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     await page.waitForSelector('.cindy-sprite[data-sprite="ready"][aria-hidden="false"]');
     await page.waitForSelector(".story-content > footer");
     await page.evaluate(() => document.fonts.ready);
+    await checkDialogue(page, mobile, reduced);
+    const client = await page.createCDPSession();
+    if (!mobile) await checkWheelEntrance(page, client, width, height);
     const maxScroll = await page.evaluate(async mobile => {
       // Let the first rendered pose reach the screen before the opening sample.
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -49,6 +196,8 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
       const parked = {};
       const sides = {};
       const chapterSamples = {};
+      const sectionParked = {};
+      const sections = new Map([...content.querySelectorAll("main > section")].map(section => [section.id, section]));
       let previous = -1;
       let frame;
 
@@ -99,14 +248,15 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
           if (Math.abs(box.left + box.width / 2 - hit.left - hit.width / 2) > .5) fail("hint is off center");
           parts.push(["hint", box]);
         }
-        if (getComputedStyle(note).visibility === "visible" && Number(getComputedStyle(note).opacity) > .01) {
+        if (Number(getComputedStyle(note).opacity) > .01) {
           const box = note.getBoundingClientRect();
           // The bubble's tail must point at Cindy, on whichever side of the page she stands.
           const tip = box.left + note.clientLeft + Number.parseFloat(getComputedStyle(dock).getPropertyValue("--cindy-note-tip"));
-          if (!mobile && Number(getComputedStyle(note).opacity) === 1 && Math.abs(tip - hit.left - hit.width / 2) > 1.5) fail(`bubble tail ${tip.toFixed(1)} is not under Cindy`);
+          if (!mobile && dock.hasAttribute("data-speaking") && Number(getComputedStyle(note).opacity) === 1
+            && Math.abs(tip - hit.left - hit.width / 2) > 1.5) fail(`bubble tail ${tip.toFixed(1)} is not under Cindy`);
           parts.push(["bubble", box], ["bubble tip", mobile
             ? { left: box.left - 7, right: box.left, top: box.top, bottom: box.bottom }
-            : { left: hit.left + hit.width / 2 - 6, right: hit.left + hit.width / 2 + 6, top: box.top - 7, bottom: box.top }]);
+            : { left: tip - 6, right: tip + 6, top: box.top - 7, bottom: box.top }]);
         }
         if (mobile) parts.push(["launcher", launcher.getBoundingClientRect()]);
         const clip = mobile ? content.getBoundingClientRect() : { top: 0, bottom: root.clientHeight };
@@ -122,8 +272,16 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
         }
         if (!moved) return;
         const scene = dock.dataset.scene;
-        chapterSamples[scene] = (chapterSamples[scene] ?? 0) + 1;
-        if (dock.hasAttribute("data-parked")) {
+        const isParked = dock.hasAttribute("data-parked");
+        const section = sections.get(scene).getBoundingClientRect();
+        const readingTop = mobile ? clip.top : document.querySelector(".story-nav").getBoundingClientRect().bottom;
+        const readingLine = readingTop + (clip.bottom - readingTop) * .46;
+        // The desktop route also assigns the empty crossing gutters to its neighboring scenes.
+        if (section.top <= readingLine && readingLine < section.bottom) {
+          chapterSamples[scene] = (chapterSamples[scene] ?? 0) + 1;
+          if (isParked) sectionParked[scene] = (sectionParked[scene] ?? 0) + 1;
+        }
+        if (isParked) {
           parked[scene] = (parked[scene] ?? 0) + 1;
           (sides[scene] ??= new Set()).add(hit.left + hit.width / 2 > root.clientWidth / 2 ? "right" : "left");
         }
@@ -146,12 +304,11 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
         cancelAnimationFrame(frame);
         frame = 0;
         sample(true);
-        return { samples, issues, parked, chapterSamples, sides: Object.fromEntries(Object.entries(sides).map(([key, set]) => [key, [...set]])) };
+        return { samples, issues, parked, chapterSamples, sectionParked, sides: Object.fromEntries(Object.entries(sides).map(([key, set]) => [key, [...set]])) };
       };
       window.sampleCindyAtRest = () => sample(true);
       return scroller.scrollHeight - scroller.clientHeight;
     }, mobile);
-    const client = await page.createCDPSession();
     const started = performance.now();
     const wheels = [];
     for (let scroll = 0; scroll < maxScroll; scroll += DELTA) {
@@ -162,14 +319,15 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     }
     await Promise.all(wheels);
     await page.waitForFunction((mobile, end) => (mobile ? document.querySelector(".story-content").scrollTop : window.scrollY) >= end - 1, {}, mobile, maxScroll);
-    const { samples, issues, parked, chapterSamples, sides } = await page.evaluate(() => window.finishCindyScroll());
+    const { samples, issues, parked, chapterSamples, sectionParked, sides } = await page.evaluate(() => window.finishCindyScroll());
     assert.equal(samples[0].scroll, 0);
     assert.ok(samples.at(-1).scroll >= maxScroll - 1);
     assert.ok(samples.length >= Math.ceil(maxScroll / DELTA) * .75, "Wheel samples cover the page at the requested cadence");
     assert.equal(issues.length, 0, issues.slice(0, 12).join("\n"));
     assert.deepEqual(Object.keys(parked), CHAPTERS);
     for (const chapter of CHAPTERS) {
-      assert.ok(parked[chapter] / chapterSamples[chapter] > .5, `Cindy spends most of ${chapter} parked`);
+      assert.ok(sectionParked[chapter] / chapterSamples[chapter] > .5,
+        `Cindy spends most of ${chapter} parked (${sectionParked[chapter]}/${chapterSamples[chapter]} frames within the section)`);
     }
     let fastest = 0;
     for (let index = 1; index < samples.length; index++) {
