@@ -350,12 +350,14 @@
   border-color: transparent;
 }
 
+/* Geometry (size, padding, radii, screen ratio) is set inline in
+   components/home/ProjectPreview.tsx; this only paints the titanium shell. */
 .phone-shell {
-  --phone-bezel: clamp(.22rem, .5vw, .47rem);
   position: relative;
-  aspect-ratio: 560 / 1217;
+  box-sizing: border-box;
+  padding: 7px;
   border: 1px solid #a99e8f;
-  border-radius: 15% / 7%;
+  border-radius: 2.6rem;
   background: linear-gradient(140deg, #c2b7a8, #645b51 21%, #292623 52%, #8f8275 83%, #494038);
   box-shadow: inset 0 0 0 2px #24201c, 0 1.1rem 2.6rem rgb(50 35 24 / 24%);
 }
@@ -377,11 +379,11 @@
 }
 
 .phone-shell__screen {
-  position: absolute;
-  inset: var(--phone-bezel);
+  position: relative;
+  aspect-ratio: 560 / 1217;
   overflow: clip;
-  border-radius: 13% / 6%;
-  background: #282522;
+  border-radius: 2.1rem;
+  background: #f3efe8;
 }
 
 .story-projects__caption .story-body {
@@ -440,14 +442,13 @@
 }
 
 .project-phone {
-  inline-size: clamp(8.2rem, 32vw, 13.8rem);
+  inline-size: min(100%, 72vw, calc((var(--phone-max-h, min(600px, 64svh)) - 16px) * .46015 + 16px));
   max-inline-size: 100%;
+  container-type: inline-size;
 }
 
 @container story-copy (min-width: 36rem) {
   .story-project { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); }
-
-  .project-phone { inline-size: clamp(9rem, 15vw, 14rem); }
 }
 
 .story-projects__caption {
@@ -531,6 +532,11 @@
   .story-content > main > section,
   .story-content > [data-cindy-finish] { display: block; }
   .cindy-station { display: none; }
+
+  /* Keep the whole project phone + pager inside the mobile scrollport. */
+  .project-phone {
+    --phone-max-h: clamp(13.5rem, calc(100svh - var(--story-mobile-nav) - var(--story-mobile-stage) - var(--story-mobile-bottom) - 7rem), min(600px, 64svh));
+  }
 
   .story-content .story-hero__track {
     min-block-size: auto;

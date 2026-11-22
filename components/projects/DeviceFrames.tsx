@@ -7,9 +7,9 @@ import type { Lang } from "@/lib/i18n";
 import type { DeviceKind, StoryScreen } from "@/lib/projectData/storyTypes";
 import styles from "./projectStory.module.css";
 
-/* Intrinsic screenshot dimensions. Screenshots render at their true aspect
-   ratio (object-fit: contain), never `fill` + `object-cover`, so a missing or
-   late stylesheet can never stretch them to the viewport. */
+/* Intrinsic screenshot dimensions. Viewports use exactly these ratios, so
+   object-fit: cover fills the screen edge to edge without cropping (and with
+   explicit width/height a missing stylesheet can never stretch them). */
 const IPHONE_SHOT = { width: 560, height: 1217 } as const;
 const MACBOOK_SHOT = { width: 1800, height: 1125 } as const;
 
@@ -51,8 +51,8 @@ const SHOT_IMG_STYLE: CSSProperties = {
   width: "100%",
   height: "100%",
   maxWidth: "100%",
-  objectFit: "contain",
-  objectPosition: "top center",
+  objectFit: "cover",
+  objectPosition: "center",
 };
 
 interface ScreenSlideProps {
@@ -103,20 +103,18 @@ function ScreenSlide({
       ? [0, 0, 1, 1, 0, 0]
       : [0, 0, 1, 1];
 
-  const yRange = isFirst ? [0, 1] : [0, inStart, inEnd, 1];
-  const yOutput = isFirst ? [0, 0] : [16, 16, 0, 0];
-
+  /* Scale-only settle (no vertical slide) so an entering screenshot always
+     covers the whole screen: a translate would expose a band at the edge. */
   const scaleRange = isFirst ? [0, 1] : [0, inStart, inEnd, 1];
-  const scaleOutput = isFirst ? [1, 1] : [1.02, 1.02, 1, 1];
+  const scaleOutput = isFirst ? [1, 1] : [1.035, 1.035, 1, 1];
 
   const opacity = useTransform(progress, opacityRange, opacityOutput);
-  const y = useTransform(progress, yRange, yOutput);
   const scale = useTransform(progress, scaleRange, scaleOutput);
 
   return (
     <motion.div
       className="absolute inset-0 will-change-transform"
-      style={{ position: "absolute", inset: 0, opacity, y, scale, zIndex: index + 1 }}
+      style={{ position: "absolute", inset: 0, opacity, scale, zIndex: index + 1 }}
     >
       <Image
         src={screen.src}
