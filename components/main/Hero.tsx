@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LangContext";
 import { i18n, tx } from "@/lib/main/i18n";
-import SiteSwitchLink from "@/components/SiteSwitchLink";
+import HeroSwitch from "@/components/main/HeroSwitch";
 
 const EASE = [0.25, 0.1, 0.25, 1.0] as const;
 const fade = (delay: number) => ({
@@ -135,15 +135,8 @@ export default function Hero() {
           >
             {tx(h.cta2, lang)}
           </button>
-          {/* Third-tier entry to the Cindy tour: quiet ghost button, never louder than the two above. */}
-          <SiteSwitchLink
-            to="cindy"
-            className="flex items-center justify-center gap-2 text-sm font-normal rounded-full transition-[background,border-color,color] duration-300 px-[24px] py-[11px] text-[#f5ede0]/85 hover:text-[#f5ede0] bg-transparent hover:bg-white/[0.06]"
-            style={{ border: "1px solid rgba(255,255,255,0.35)" }}
-          >
-            <span aria-hidden className="block w-1.5 h-1.5 rounded-full bg-[#f5ede0]/70" />
-            {tx(h.switchTour, lang)}
-          </SiteSwitchLink>
+          {/* Third-tier entry to the Cindy tour; variants and states live in app/(main)/main.css. */}
+          <HeroSwitch label={tx(h.switchTour, lang)} />
         </motion.div>
       </div>
 

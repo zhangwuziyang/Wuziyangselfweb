@@ -40,11 +40,14 @@ export default function SiteSwitchLink({
   to,
   className,
   style,
+  variant,
   children,
 }: {
   to: Site;
   className?: string;
   style?: CSSProperties;
+  /** Rendered as data-variant (design variants of the same entry; see components/main/HeroSwitch.tsx). */
+  variant?: string;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -67,7 +70,7 @@ export default function SiteSwitchLink({
   }
 
   return (
-    <Link href={href} onClick={onClick} className={className} style={style} data-site-switch={to}>
+    <Link href={href} onClick={onClick} className={className} style={style} data-site-switch={to} data-variant={variant}>
       {children}
     </Link>
   );
