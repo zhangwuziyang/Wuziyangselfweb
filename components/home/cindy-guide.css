@@ -1,0 +1,289 @@
+.cindy-station {
+  min-inline-size: 0;
+}
+
+.cindy-station__layout {
+  display: grid;
+  gap: .35rem;
+}
+
+.cindy-station__mark {
+  block-size: calc(var(--cindy-pixels) * 50px + 12px);
+}
+
+.cindy-station__hint { block-size: 1.3rem; }
+
+.cindy-station__caption {
+  justify-self: center;
+  inline-size: min(100%, 19rem);
+  block-size: 6.5rem;
+}
+
+@media (min-width: 48rem) {
+  .cindy-station__caption { block-size: 7.5rem; }
+}
+
+.cindy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.cindy-mobile-stage { display: none; }
+
+@media (width < 48rem) {
+  .cindy-mobile-stage {
+    position: absolute;
+    inset: var(--story-mobile-nav) 0 auto;
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: .625rem;
+    align-items: center;
+    block-size: var(--story-mobile-stage);
+    padding-inline: calc(var(--story-wing) + max(0px, (100% - 32rem) / 2));
+    background: linear-gradient(var(--story-nav) calc(100% - .75rem), #f1e8db);
+  }
+
+  .cindy-mobile-stage__art { align-self: stretch; }
+  .cindy-mobile-stage__caption { block-size: 9rem; }
+}
+
+.cindy-dock {
+  --cindy-pixels: 4;
+  --cindy-scale: calc(var(--cindy-pixels) / 6);
+  --cindy-art: 384px;
+  --cindy-hit: 240px;
+  position: absolute;
+  inset: 0 auto auto 0;
+  opacity: 0;
+}
+
+.cindy-sprite {
+  position: absolute;
+  inset: 0 auto auto 0;
+  z-index: 1;
+  inline-size: var(--cindy-hit);
+  block-size: var(--cindy-hit);
+  border-radius: .8rem;
+  transform: translate(-50%, -50%) scale(var(--cindy-scale));
+  cursor: pointer;
+  user-select: none;
+}
+
+.cindy-sprite[aria-hidden="false"] { pointer-events: auto; }
+.cindy-sprite:focus-visible { outline: 2px solid var(--story-control); outline-offset: 2px; }
+
+.cindy-sprite__art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  scale: 1 var(--cindy-squash, 1);
+}
+
+.cindy-sprite canvas {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  inline-size: var(--cindy-art);
+  block-size: var(--cindy-art);
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  opacity: 0;
+}
+
+.cindy-sprite[data-sprite="ready"] canvas { opacity: 1; }
+.cindy-sprite[data-sprite="ready"] .cindy-sprite__fallback { display: none; }
+
+.cindy-sprite__fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.cindy-sprite__fallback svg { inline-size: 92%; block-size: 92%; }
+
+.cindy-shadow {
+  position: absolute;
+  inset: 0 auto auto 0;
+  inline-size: calc(var(--cindy-hit) * .56);
+  block-size: calc(var(--cindy-hit) * .12);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(55 33 22 / 19%), transparent 74%);
+  transform: translate(-50%, calc(var(--cindy-hit) * .41 * var(--cindy-scale))) scale(var(--cindy-scale));
+  transform-origin: center top;
+}
+
+.cindy-hint {
+  position: absolute;
+  inset: 0 auto auto 0;
+  inline-size: max-content;
+  max-inline-size: var(--cindy-hint-width);
+  transform: translate(-50%, calc(var(--cindy-hint-y) - 50%));
+  color: color-mix(in srgb, var(--story-muted) 77%, var(--story-soft));
+  font-size: .75rem;
+  line-height: 1.15;
+  text-align: center;
+  text-wrap: balance;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.cindy-dock[data-hint] .cindy-hint { opacity: 1; }
+
+.cindy-note {
+  --cindy-note-position: translate(var(--cindy-note-x), var(--cindy-note-y));
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: grid;
+  inline-size: var(--cindy-note-width);
+  transform: var(--cindy-note-position);
+  transform-origin: var(--cindy-note-tip) 0;
+  max-block-size: var(--cindy-note-height);
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  padding: .56rem .8rem;
+  border: 1px solid var(--story-edge);
+  border-radius: .75rem;
+  background: var(--story-panel);
+  color: var(--story-ink);
+  font-size: .9375rem;
+  line-height: 1.38;
+  overflow-wrap: anywhere;
+  box-shadow: 0 5px 12px rgb(58 34 24 / 6%);
+}
+
+.cindy-note > span { grid-area: 1 / 1; min-inline-size: 0; }
+.cindy-note__measure { visibility: hidden; }
+
+/* The bubble opens empty and full-size (the hidden measure holds the whole line), with a quiet
+   three-dot cue until the first word lands. Reduced motion skips straight to the full line. */
+.cindy-dock[data-note-pending] .cindy-note__text::after {
+  content: "";
+  display: inline-block;
+  inline-size: 1.5rem;
+  block-size: .375rem;
+  vertical-align: middle;
+  background:
+    radial-gradient(circle closest-side, var(--story-muted) 90%, transparent) 0 50% / .375rem .375rem no-repeat,
+    radial-gradient(circle closest-side, var(--story-muted) 90%, transparent) 50% 50% / .375rem .375rem no-repeat,
+    radial-gradient(circle closest-side, var(--story-muted) 90%, transparent) 100% 50% / .375rem .375rem no-repeat;
+  opacity: .55;
+}
+
+.cindy-note::before {
+  content: "";
+  position: absolute;
+  inset: -5px auto auto var(--cindy-note-tip);
+  inline-size: 8px;
+  block-size: 8px;
+  transform: translateX(-50%) rotate(45deg);
+  border: solid var(--story-edge);
+  border-width: 1px 0 0 1px;
+  background: var(--story-panel);
+}
+
+@media (width < 48rem) {
+  .cindy-note {
+    --cindy-note-position: translate(var(--cindy-note-x), calc(var(--cindy-note-y) - 50%));
+    transform-origin: 0 50%;
+    padding: .56rem .6rem;
+    font-size: .875rem;
+    line-height: 1.35;
+  }
+
+  .cindy-note::before {
+    inset: 50% auto auto -5px;
+    transform: translateY(-50%) rotate(45deg);
+    border-width: 0 0 1px 1px;
+  }
+}
+
+/* The narrowest phones leave little room beside Cindy; tighten the type so longer lines still fit. */
+@media (width < 22.5rem) {
+  .cindy-note { padding: .5rem .55rem; font-size: .8125rem; line-height: 1.34; }
+  .cindy-mobile-stage__caption { block-size: 9.75rem; }
+}
+
+.cindy-dock[data-speaking] .cindy-note { opacity: 1; }
+.cindy-dock[data-speaking][data-scroll-dim] .cindy-note { opacity: .4; }
+
+.cindy-dock[data-travel] .cindy-hint {
+  opacity: 0;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cindy-dock[data-parked] .cindy-sprite__art { animation: cindy-breathe 4.8s ease-in-out infinite; }
+  .cindy-dock[data-idle] .cindy-sprite__art {
+    animation: cindy-breathe 4.8s ease-in-out infinite, cindy-tilt 17s ease-in-out infinite;
+  }
+  /* A quick little bob while the words type out, kept inside the breathing range. */
+  .cindy-dock[data-typing] .cindy-sprite__art { animation: cindy-talk 260ms ease-in-out infinite; }
+  .cindy-dock[data-speaking] .cindy-note { transition: opacity 150ms ease-out; }
+  .cindy-dock[data-speaking][data-scroll-dim] .cindy-note { transition-duration: 60ms; }
+  .cindy-dock[data-note-leaving] .cindy-note { transition: opacity 200ms ease-out; }
+  .cindy-dock:is([data-speaking], [data-note-leaving]) .cindy-note {
+    animation: cindy-note-in 140ms ease-out;
+  }
+  .cindy-dock[data-note-pending] .cindy-note__text::after { animation: cindy-note-cue 600ms ease-out infinite alternate; }
+}
+
+/* The single-column layout skips the crossing, so it only gets a light entrance and a hop
+   between chapters. Only the canvas moves; the dock and hit box stay put. */
+@media (width < 48rem) and (prefers-reduced-motion: no-preference) {
+  .cindy-sprite[data-sprite="ready"] canvas { animation: cindy-enter 360ms cubic-bezier(.2, .7, .2, 1) both; }
+  .cindy-dock[data-arrive="a"] canvas { animation: cindy-hop-a 420ms ease-out; }
+  .cindy-dock[data-arrive="b"] canvas { animation: cindy-hop-b 420ms ease-out; }
+}
+
+@keyframes cindy-breathe { 50% { transform: translateY(-2px); } }
+@keyframes cindy-talk { 50% { transform: translateY(-1.5px); } }
+
+/* One small head tilt with a wiggle back, about once every 17 seconds of idling. */
+@keyframes cindy-tilt {
+  0%, 82%, 95%, 100% { rotate: 0deg; }
+  86% { rotate: -2deg; }
+  89% { rotate: 1deg; }
+  92% { rotate: -1deg; }
+}
+
+/* Cindy keeps her full size on the way in; only a short rise and fade. */
+@keyframes cindy-enter {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes cindy-note-cue {
+  from { opacity: .3; }
+  to { opacity: .7; }
+}
+
+@keyframes cindy-hop-a {
+  40% { transform: translate(-50%, calc(-50% - 7px)); }
+  75% { transform: translate(-50%, -50%) scale(1.03, .96); }
+}
+
+@keyframes cindy-hop-b {
+  40% { transform: translate(-50%, calc(-50% - 7px)); }
+  75% { transform: translate(-50%, -50%) scale(1.03, .96); }
+}
+
+@keyframes cindy-note-in {
+  from { transform: var(--cindy-note-position) scale(.94); }
+  to { transform: var(--cindy-note-position) scale(1); }
+}
+
+@media (min-width: 64rem) {
+  .cindy-note { font-size: 1rem; }
+  .cindy-hint { font-size: .8125rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cindy-hint { transition: none; }
+}
+
+.home-story:has(.mobile-nav) .cindy-overlay { visibility: hidden; }

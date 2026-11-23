@@ -1,0 +1,98 @@
+{
+  "card": {
+    "zh": {
+      "tag1": "iOS · AI 产品",
+      "tag2": "准备上架 App Store",
+      "title": "健康助理",
+      "desc": "读得懂 Apple Watch 的健康助理。打开就是对话，把日常身体数据变成每天用得上的安排。",
+      "points": [
+        "先算后说：分数与热量安全范围先在手机算好，再交给 AI 解读",
+        "把十几项手表指标合成「身体电量、运动、睡眠」三个大白话分数",
+        "AI 结合目标、饮食与长期记忆排定每日计划，早晚主动复盘",
+        "计算在本地、国内数据不出境；双区域分流，国内通义千问、海外 Claude"
+      ],
+      "techTags": [
+        "SwiftUI",
+        "HealthKit",
+        "FastAPI",
+        "PostgreSQL",
+        "通义千问 / Claude"
+      ],
+      "cta": "查看项目"
+    },
+    "en": {
+      "tag1": "iOS · AI",
+      "tag2": "Preparing for App Store",
+      "title": "My Health Agent",
+      "desc": "An AI health coach for Apple Watch. It opens straight into chat, turning health metrics into clear guidance for your day.",
+      "points": [
+        "Computes scores and safe calorie bounds on-device first, so AI interprets real numbers",
+        "Distills over a dozen Watch metrics into three plain-language scores: Energy, Activity, and Sleep",
+        "Combines your goals, logged meals, and long-term memory so AI can build concrete daily plans",
+        "Keeps computation local and mainland data in-country: Qwen in China, Claude abroad"
+      ],
+      "techTags": [
+        "SwiftUI",
+        "HealthKit",
+        "FastAPI",
+        "PostgreSQL",
+        "Qwen / Claude"
+      ],
+      "cta": "View Project"
+    }
+  },
+  "detail": {
+    "zh": {
+      "tag1": "iOS · AI 产品",
+      "tag2": "准备上架 App Store",
+      "title": "健康助理",
+      "subtitle": "读得懂 Apple Watch 的健康助理。打开就是对话，把日常身体数据变成每天用得上的安排。",
+      "meta": [
+        "iOS · iPhone + Apple Watch",
+        "中文 / English",
+        "国内：通义千问",
+        "海外：Claude"
+      ],
+      "overview": "很多 Apple Watch 用户每天记录心率、睡眠和运动，却看不懂满屏指标，也不知道今天怎么安排；问通用 AI，它既不了解你的身体，又容易编数字。\n\n「健康助理」打开就是对话，不是一堆图表。它坚持「先算后说」：手机端只读「健康」数据，对照自己过去 60 天，把十几项指标合成「身体电量、运动、睡眠」三个大白话分数，并按安全规则算好热量范围；再交给 AI，结合目标、饮食和长期记忆给出每日计划与主动复盘。遇到进食障碍、孕期等敏感场景自动隐藏热量，识别急症关键词则直接给出当地急救电话。\n\n算分与加密对话均留在本地，FastAPI 后端只转发摘要、不存内容；双区域接入国内通义千问（数据不出境）与海外 Claude。目前核心功能已完成，准备上架 App Store。",
+      "paragraphs": [
+        "很多 Apple Watch 用户每天记录心率、睡眠和运动，却看不懂满屏指标，也不知道今天怎么安排；问通用 AI，它既不了解你的身体，又容易编数字。",
+        "「健康助理」打开就是对话，不是一堆图表。它坚持「先算后说」：手机端只读「健康」数据，对照自己过去 60 天，把十几项指标合成「身体电量、运动、睡眠」三个大白话分数，并按安全规则算好热量范围；再交给 AI，结合目标、饮食和长期记忆给出每日计划与主动复盘。遇到进食障碍、孕期等敏感场景自动隐藏热量，识别急症关键词则直接给出当地急救电话。",
+        "算分与加密对话均留在本地，FastAPI 后端只转发摘要、不存内容；双区域接入国内通义千问（数据不出境）与海外 Claude。目前核心功能已完成，准备上架 App Store。"
+      ],
+      "techTags": [
+        "SwiftUI",
+        "HealthKit",
+        "FastAPI",
+        "PostgreSQL",
+        "通义千问 / Claude"
+      ],
+      "disclaimer": "分数和建议仅供参考，不是医疗诊断。文中截图均来自模拟器测试数据或 App 内置的「示例数据」模式，不含真实用户数据。"
+    },
+    "en": {
+      "tag1": "iOS · AI",
+      "tag2": "Preparing for App Store",
+      "title": "My Health Agent",
+      "subtitle": "An AI health coach for Apple Watch. It opens straight into chat, turning health metrics into clear guidance for your day.",
+      "meta": [
+        "iOS · iPhone + Apple Watch",
+        "Chinese / English",
+        "Mainland China: Qwen",
+        "Overseas: Claude"
+      ],
+      "overview": "Many Apple Watch owners track heart rate, sleep, and workouts every day without knowing what those metrics mean for today's decisions. Generic AI chats miss the mark too: they lack your personal baseline and easily invent numbers.\n\nMy Health Agent is an iOS app that opens straight into conversation. Its core principle is compute first, coach second. On the iPhone, the app accesses HealthKit read-only, compares it against your own 60-day baseline rather than other users, and distills over a dozen signals into three plain-language scores: Energy, Activity, and Sleep. Safe daily calorie bounds are also calculated locally under strict rules. Only then does AI step in, combining those grounded figures with your goals, logged meals, and long-term memory to build daily plans and proactive check-ins. Safeguards automatically hide calorie numbers for sensitive groups and surface local emergency hotlines directly when urgent keywords appear.\n\nAll scoring and encrypted chat history remain on-device. The FastAPI and PostgreSQL backend handles auth, quotas, and prompt versioning while forwarding requests without storing health or conversation data, routing mainland China users to Qwen in-country and overseas users to Claude. Core features are complete, and the app is preparing for App Store release.",
+      "paragraphs": [
+        "Many Apple Watch owners track heart rate, sleep, and workouts every day without knowing what those metrics mean for today's decisions. Generic AI chats miss the mark too: they lack your personal baseline and easily invent numbers.",
+        "My Health Agent is an iOS app that opens straight into conversation. Its core principle is compute first, coach second. On the iPhone, the app accesses HealthKit read-only, compares it against your own 60-day baseline rather than other users, and distills over a dozen signals into three plain-language scores: Energy, Activity, and Sleep. Safe daily calorie bounds are also calculated locally under strict rules. Only then does AI step in, combining those grounded figures with your goals, logged meals, and long-term memory to build daily plans and proactive check-ins. Safeguards automatically hide calorie numbers for sensitive groups and surface local emergency hotlines directly when urgent keywords appear.",
+        "All scoring and encrypted chat history remain on-device. The FastAPI and PostgreSQL backend handles auth, quotas, and prompt versioning while forwarding requests without storing health or conversation data, routing mainland China users to Qwen in-country and overseas users to Claude. Core features are complete, and the app is preparing for App Store release."
+      ],
+      "techTags": [
+        "SwiftUI",
+        "HealthKit",
+        "FastAPI",
+        "PostgreSQL",
+        "Qwen / Claude"
+      ],
+      "disclaimer": "Scores and recommendations are for reference only and are not a medical diagnosis. All screenshots come from simulator test data or the app's built-in sample-data mode, with no real user data."
+    }
+  }
+}

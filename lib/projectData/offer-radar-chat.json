@@ -1,0 +1,539 @@
+[
+  {
+    "id": "offer-radar-overview",
+    "keywords": {
+      "zh": [
+        "offer雷达是什么",
+        "offer radar是什么",
+        "介绍一下offer雷达",
+        "校招ai求职助手",
+        "offer雷达给谁用",
+        "offer雷达解决什么问题",
+        "校招项目介绍"
+      ],
+      "en": [
+        "what is offer radar",
+        "tell me about offer radar",
+        "offer radar overview",
+        "who is offer radar for",
+        "campus recruiting ai assistant",
+        "what problem does offer radar solve",
+        "offer radar summary"
+      ]
+    },
+    "answer": {
+      "zh": "Offer 雷达是我面向中国在校大学生做的校招 AI 求职助手，第一期聚焦校招、暑期实习和日常实习，不做社招。它会长期记住学生的背景与求职进度，围绕校招时间线把找公司、改简历、跟进度和备面试收进同一个 Web 工作台。简单说，就是每天告诉学生今天最该做什么，并把每件事要用到的简历和面试材料先准备好。",
+      "en": "Offer Radar is a web-based AI recruiting assistant I built for university students in China, focused on campus recruiting, summer internships, and daily internships rather than experienced hires. It remembers a student's background and timeline so company research, tailored resumes, application tracking, and interview prep all live in one place. Each day it points out what matters most next and prepares the materials needed for that step."
+    },
+    "facts": [
+      {
+        "zh": "Offer 雷达定位为校招 AI 求职助手，覆盖找公司、改简历、跟进度、备面试。",
+        "en": "Offer Radar is positioned as a campus-recruiting AI assistant covering company picks, resume tailoring, tracking, and interview prep.",
+        "source": "PDF 第1页"
+      },
+      {
+        "zh": "产品面向中国在校大学生，长期记住学生是谁并围绕校招时间线安排每日行动。",
+        "en": "Built for enrolled university students in China, remembering their profile across the campus-recruiting timeline.",
+        "source": "PDF 第3页"
+      },
+      {
+        "zh": "第一期面向在校学生的校招、暑期实习和日常实习，不做社招。",
+        "en": "Phase 1 targets campus recruiting, summer internships, and daily internships for enrolled students, not experienced hires.",
+        "source": "PDF 第4页"
+      },
+      {
+        "zh": "产品形态为 Web 端，支持电脑和手机浏览器。",
+        "en": "Delivered as a web application supporting both desktop and mobile browsers.",
+        "source": "PDF 第4页"
+      },
+      {
+        "zh": "上传 PDF、Word 或粘贴文字的已有简历，约 20 秒整理成母版简历。",
+        "en": "Uploading an existing PDF/Word resume or pasted text parses it into a structured master resume in about 20 seconds.",
+        "source": "PDF 第5页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-vs-general-ai",
+    "keywords": {
+      "zh": [
+        "offer雷达和通用ai有什么区别",
+        "为什么不直接用chatgpt改简历",
+        "offer雷达的产品原则",
+        "会帮学生自动代投吗",
+        "如何防止ai瞎编简历",
+        "确认才写入是什么意思"
+      ],
+      "en": [
+        "offer radar vs chatgpt",
+        "how is offer radar different from generic ai",
+        "offer radar product principles",
+        "does offer radar auto apply",
+        "how do you stop ai from making up numbers",
+        "human in the loop confirmation"
+      ]
+    },
+    "answer": {
+      "zh": "直接问通用 AI，每次都要重新交代背景，而且它不熟校招节奏、也容易替学生编数字。我做 Offer 雷达时定了几条硬规矩：长期存下档案、母版简历和投递记录，只推荐不代投，简历和补充说明里没有的数字绝不编造，所有改动必须先展示给学生、点确认才生效。它交付的也不是泛泛的聊天文本，而是能直接投递的一页纸 Word 或 PDF 简历、海投清单和校招日历。",
+      "en": "Generic AI chats force students to repeat their background every session, miss campus recruiting timelines, and readily invent metrics. I designed Offer Radar around persistent memory and firm boundaries: it never auto-applies on recruiting sites, never fabricates missing numbers, and shows every proposed write for explicit confirmation before saving. Instead of raw chat paragraphs, it produces concrete deliverables like one-page Word or PDF resumes, filterable batch-apply sheets, and synced recruiting schedules."
+    },
+    "facts": [
+      {
+        "zh": "档案、母版简历、投递记录和面试准备都会持久化保存，小雷每次对话都掌握学生情况。",
+        "en": "Profiles, master resumes, application logs, and interview prep persist across sessions so Xiao Lei keeps full context.",
+        "source": "PDF 第3页"
+      },
+      {
+        "zh": "遵循只推荐、不代投原则，不在任何招聘网站替学生操作，最后一步投递由学生在公司官网完成。",
+        "en": "Follows a recommend-only rule and never auto-applies on recruiting websites, leaving final submission to the student on official portals.",
+        "source": "PDF 第4页"
+      },
+      {
+        "zh": "小雷对档案、简历、看板、日程的任何改动都先以卡片或草稿展示，由学生点确认才生效。",
+        "en": "Every proposed edit to profiles, resumes, boards, or calendars appears as a card or draft and takes effect only after confirmation.",
+        "source": "PDF 第3页"
+      },
+      {
+        "zh": "简历和回答中没有的数字不编造，统一留【X1】占位让学生自己填，没填完不允许导出。",
+        "en": "Missing numbers are never invented; placeholders like [X1] remain for the student to fill in and block export until completed.",
+        "source": "PDF 第4页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-company-db",
+    "keywords": {
+      "zh": [
+        "offer雷达公司库有多少家",
+        "岗位雷达怎么推荐公司",
+        "海投清单是什么",
+        "冲稳保怎么划分",
+        "jd匹配度分析怎么打分",
+        "公司库数据可靠吗"
+      ],
+      "en": [
+        "offer radar company database",
+        "how many companies in offer radar",
+        "batch apply list",
+        "reach match safety tiers",
+        "jd match scoring",
+        "how does job radar recommend companies"
+      ]
+    },
+    "answer": {
+      "zh": "我给岗位雷达整理了一套真实公司库，覆盖 13 个行业的 839 个招聘主体，其中 340 个带官网校招入口，并标明了分层依据、2027 届招聘季和核对日期。找公司走「偏好 → 行业 → 公司」三步漏斗，按学生竞争力与公司层级映射「冲一冲 / 比较稳 / 保底」，既给最多 30 家的精选推荐，也提供可一次收藏最多 100 家或导出 Excel 的海投清单。粘贴岗位描述还能做 0 到 100 分的五维匹配分析，如果届别、学历或专业等硬门槛不符，总分会直接封顶在 60 分。",
+      "en": "I built Job Radar on a verified database of 839 hiring entities across 13 industries, including 340 official campus-portal links along with tier rationale, 2027 recruiting dates, and verification timestamps. Discovery runs through a preference-to-industry-to-company funnel that maps reach, match, and safety tiers, pairing up to 30 curated picks with a batch-apply list that supports bookmarking up to 100 companies at once or exporting to Excel. Students can also paste any job description for a 0–100 five-dimension match analysis that caps the total score at 60 whenever hard requirements like graduation year, degree, or major do not match."
+    },
+    "facts": [
+      {
+        "zh": "公司库由 15 个 JSON 文件构成，包含 13 个行业的 839 个招聘主体。",
+        "en": "The company database comprises 15 JSON files covering 839 hiring entities across 13 industries.",
+        "source": "PDF 第23页"
+      },
+      {
+        "zh": "839 个招聘主体中有 340 个配有官网校招入口。",
+        "en": "340 of the 839 hiring entities include direct official campus-recruiting portal links.",
+        "source": "PDF 第23页"
+      },
+      {
+        "zh": "精选推荐总数最多 30 家，每个行业 5–6 家，同一集团最多 2 个招聘主体。",
+        "en": "Curated recommendations cap at 30 employers total, with 5–6 per industry and at most 2 hiring entities per corporate group.",
+        "source": "PDF 第13页"
+      },
+      {
+        "zh": "海投清单支持按行业、冲稳保和「只看开放中」筛选，一次最多勾选 100 家收藏到看板或导出 Excel。",
+        "en": "The batch-apply list filters by industry, tier, and open status, bookmarking up to 100 companies at once or exporting to Excel.",
+        "source": "PDF 第14页"
+      },
+      {
+        "zh": "匹配度分析按五维证据打 0–100 分，届别、学历、专业等硬门槛不符时总分封顶 60。",
+        "en": "JD match analysis scores 0–100 across five evidence dimensions and caps the total at 60 if hard requirements fail.",
+        "source": "PDF 第15页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-resume",
+    "keywords": {
+      "zh": [
+        "简历工作室怎么改简历",
+        "标黄靠拢设计是什么",
+        "简历怎么保证一页纸",
+        "三层简历是什么意思",
+        "offer雷达简历导出格式",
+        "怎么防止简历造假"
+      ],
+      "en": [
+        "offer radar resume studio",
+        "yellow highlighted stretch edits",
+        "how does one page resume layout work",
+        "three layer resume architecture",
+        "resume export word pdf",
+        "honest ai resume tailoring"
+      ]
+    },
+    "answer": {
+      "zh": "我把简历工作室分成原件、母版和定制版三层：原件只读留底，母版收纳完整经历，每家目标公司再生成始终一页的定制版。定制前先支持打字或语音聊清每段经历背景并长期复用，后台生成后直接用 LibreOffice 实测排版量页数来决定补充还是精简。为了贴合岗位而设计的「靠拢写法」一律标黄并附上 2 到 4 步真实做法，同时用代码规则兜底防模型漏标；所有未填完【X】数字占位符的简历都会被拦下禁止导出，确保改简历既贴岗又守住真实底线。",
+      "en": "I structured the Resume Studio into three layers: a read-only original upload, an unlimited-length master resume, and a tailored one-page edition for each target company. Before rewriting, students share experience context by typing or voice—saved for reuse across applications—and the backend measures exact page fit through real LibreOffice rendering to expand or trim content. Stretch phrasing written to fit a role is always flagged in yellow with 2–4 concrete steps to actually do the work, backed by rule-based checks so the model cannot slip unflagged edits past the user. Any remaining numeric placeholders block Word or PDF export until filled, keeping resumes sharp without crossing into fabrication."
+    },
+    "facts": [
+      {
+        "zh": "简历分为原件（只读）、母版（完整版不限页数）和定制版（每家公司一份、始终一页）三层。",
+        "en": "Resumes use three layers: a read-only original, an unconstrained structured master, and a one-page tailored version per company.",
+        "source": "PDF 第15页"
+      },
+      {
+        "zh": "定制简历后台生成约 1–3 分钟，并用 LibreOffice 实际排版量尺判断写满程度。",
+        "en": "Tailored resume generation takes about 1–3 minutes in the background and uses real LibreOffice rendering to measure exact page fit.",
+        "source": "PDF 第16页"
+      },
+      {
+        "zh": "靠拢设计内容一律标黄，并附业务逻辑、2–4 步做法、交付物和预计耗时。",
+        "en": "Stretch edits are highlighted in yellow alongside business logic, 2–4 concrete steps, deliverables, and time estimates.",
+        "source": "PDF 第16页"
+      },
+      {
+        "zh": "代码规则兜底会比对英文技术词、抬高分量说法及约 60 个方法工具词，漏标也会自动标黄。",
+        "en": "Rule-based fallback checks for new English technical terms, inflated ownership verbs, and roughly 60 method/tool terms to auto-flag missed stretch edits.",
+        "source": "PDF 第23页"
+      },
+      {
+        "zh": "支持导出 Word 或 PDF，只包含已采纳修改，且存在未填【X】数字占位符时禁止导出。",
+        "en": "Exports to Word or PDF include only accepted edits and are blocked whenever unfilled [X] numeric placeholders remain.",
+        "source": "PDF 第16页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-board-mail",
+    "keywords": {
+      "zh": [
+        "投递看板怎么用",
+        "邮箱自动识别笔面试通知",
+        "offer雷达支持哪些邮箱",
+        "校招日历怎么同步",
+        "看板批量操作",
+        "邮箱授权码安全吗"
+      ],
+      "en": [
+        "application kanban board",
+        "recruiting email parsing",
+        "which email providers are supported",
+        "imap email sync security",
+        "bulk status updates undo",
+        "campus recruiting calendar"
+      ]
+    },
+    "answer": {
+      "zh": "秋招海投几十家很容易漏掉测评和笔试，所以我把投递看板和校招日历做在同一页，按收藏、已网申、测评、笔试、面试、HR 面到 Offer 或未通过流转，单列超 8 张自动折叠，批量改状态还留了 8 秒撤销窗口。邮箱识别支持用授权码绑定 QQ、163、126 等邮箱，通过加密存储的 IMAP 993 端口只读拉取疑似招聘邮件，提取公司、环节、时间和链接。识别出的进度不会擅自覆盖，而是先放进待确认队列，学生点确认后才更新看板和日历。",
+      "en": "Mass-applying during autumn recruiting makes it easy to miss online tests, so I unified the Kanban tracker and calendar across every stage from bookmarked to offer, auto-collapsing columns past eight cards and adding an 8-second undo window for batch updates. Students can link QQ, 163, or 126 mailboxes with encrypted IMAP authorization codes over certificate-verified port 993 so the backend pulls likely recruiting emails and parses company names, stages, dates, and links. Parsed updates always pause in a pending queue and only move board cards or create calendar entries after student confirmation."
+    },
+    "facts": [
+      {
+        "zh": "投递状态流覆盖收藏 → 已网申 → 测评 → 笔试 → 面试 → HR 面 → Offer / 未通过，单列超过 8 张先折叠。",
+        "en": "Application statuses flow from Bookmarked through Applied, Assessment, Written Test, Interview, and HR Interview to Offer or Rejected, collapsing columns after 8 cards.",
+        "source": "PDF 第17页"
+      },
+      {
+        "zh": "看板批量修改状态后 8 秒内可撤销。",
+        "en": "Batch status updates on the Kanban board include an 8-second undo window.",
+        "source": "PDF 第17页"
+      },
+      {
+        "zh": "邮箱识别支持 QQ、163、126 等邮箱，只连公网 993 端口并校验证书，结果需学生确认后才更新看板与日历。",
+        "en": "Email parsing supports QQ, 163, and 126 over certificate-verified public port 993 and queues events for student confirmation before updating the board or calendar.",
+        "source": "PDF 第17页"
+      },
+      {
+        "zh": "IMAP 采用只读拉取（首次 30 天，之后按 UID 增量），授权码使用 ENCRYPTION_KEY 加密存储。",
+        "en": "IMAP sync runs read-only (initial 30-day window, then incremental by UID) with authorization codes encrypted via ENCRYPTION_KEY.",
+        "source": "PDF 第24页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-interview",
+    "keywords": {
+      "zh": [
+        "面试准备模块有什么功能",
+        "offer雷达能模拟面试吗",
+        "自我介绍口语稿怎么生成",
+        "覆盖多少类岗位面经",
+        "简历深挖追问清单",
+        "靠拢内容在面试里怎么办"
+      ],
+      "en": [
+        "offer radar interview prep",
+        "mock interview feature",
+        "self introduction script",
+        "how many job tracks for interview notes",
+        "resume deep dive questions",
+        "interview preparation plan"
+      ]
+    },
+    "answer": {
+      "zh": "在面试准备模块里，我设计了一套 2 到 3 分钟生成的备面方案：包括 400 到 550 字的 2–3 分钟自我介绍口语稿、每段经历 3 到 6 个深挖追问、逐条技能对照以及按距面试天数排好的准备计划。为了防止学生在面试现场露馅，我特意限定自我介绍只用真做过的内容，标黄的靠拢写法会自动退回原文或不放，而在深挖清单里专门追问「这条准备怎么做出来」。另外我还整理了覆盖 30 类岗位的公开面经要点，并支持让小雷扮面试官一问一评、结束后保存复盘。",
+      "en": "I built the interview prep module to generate a full kit in two to three minutes: a 400–550-character spoken self-introduction with a timer, three to six deep-dive questions per experience, a skill-by-skill JD check, and a day-by-day plan. To keep candidates from getting tripped up live, I restricted the spoken intro to real experience—reverting or dropping yellow stretch edits—while the deep-dive list specifically asks how the student plans to complete those stretch items. I also compiled public interview notes across 30 job tracks and added one-question-at-a-time mock rounds with Xiao Lei that save a recap at the end."
+    },
+    "facts": [
+      {
+        "zh": "每场面试准备材料后台生成约 2–3 分钟，包含 400–550 字的 2–3 分钟自我介绍口语稿，且只用真做过的内容。",
+        "en": "Interview prep packs generate in 2–3 minutes and include a 400–550-character (2–3 minute) spoken intro strictly limited to real experience.",
+        "source": "PDF 第18页"
+      },
+      {
+        "zh": "深挖清单为每段经历提供 3–6 个追问与答题要点，靠拢内容改问「这条你准备怎么做出来」。",
+        "en": "Deep-dive lists include 3–6 follow-up questions per experience, reframing stretch edits around how the candidate plans to execute them.",
+        "source": "PDF 第18页"
+      },
+      {
+        "zh": "面经要点覆盖 30 类岗位（含后端、算法、数据分析、产品、投行、四大、咨询、芯片等），按岗位自动匹配。",
+        "en": "Curated public interview notes cover 30 job tracks—including backend, algorithms, data analytics, product, IB, Big 4, consulting, and semiconductors.",
+        "source": "PDF 第18页"
+      },
+      {
+        "zh": "小雷模拟面试按一次问一题、逐题点评方式进行，结束后保存复盘。",
+        "en": "Xiao Lei conducts mock interviews one question at a time with per-question feedback and saves a recap afterward.",
+        "source": "PDF 第18页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-agent",
+    "keywords": {
+      "zh": [
+        "小雷是谁",
+        "小雷对话助手怎么设计的",
+        "langgraph 21个工具",
+        "怎么防提示词注入",
+        "小雷能看到我在看什么吗",
+        "语音输入会保存录音吗"
+      ],
+      "en": [
+        "who is xiao lei",
+        "how does the ai agent work",
+        "langgraph 21 tools",
+        "prompt injection defense",
+        "does the assistant see page context",
+        "voice input privacy"
+      ]
+    },
+    "answer": {
+      "zh": "「小雷」是贯穿全产品的对话助手，基于 LangGraph 状态图搭建，在每个页面右侧随时唤起，能感知学生当下正在看哪家公司或哪份简历的哪一行。我给它接入了 21 个工具，涵盖读写档案、起草简历修改、记录投递与日程、发起面试准备、匹配分析和联网搜索，并且所有写入都通过可编辑的确认卡片或青色标记的简历草稿卡来执行。安全上，我把网页、邮件、上传文件和 JD 都当不可信资料隔离来防提示注入，语音输入不保存录音，管理后台也只看话题统计、没有查看对话原文的接口。",
+      "en": "Xiao Lei is the product-wide assistant built on a LangGraph state graph, accessible from the right side of every page with context on the exact company, resume, or bullet currently open. I equipped it with 21 tools covering profiles, resume drafting, board and calendar updates, interview prep, JD matching, and web search, with every write gated behind editable confirmation cards or inline cyan-marked resume draft cards. For safety and privacy, external webpages, emails, uploads, and JDs are treated strictly as data against prompt injection, voice recordings are never stored, and the admin panel tracks only topic counts with no endpoint to read raw chats."
+    },
+    "facts": [
+      {
+        "zh": "小雷在每个页面右侧随时唤起并感知当前页面上下文，通过 21 个工具完成具体业务操作。",
+        "en": "Xiao Lei opens from the right side of any page with live page context and operates through 21 specialized tools.",
+        "source": "PDF 第11页"
+      },
+      {
+        "zh": "小雷基于 LangGraph 状态图、工具节点与持久化检查点构建，页面刷新后可恢复确认卡片。",
+        "en": "Built on a LangGraph state graph with tool nodes and persisted checkpoints so confirmation cards survive page refreshes.",
+        "source": "PDF 第22页"
+      },
+      {
+        "zh": "对话起草的简历修改通过草稿卡提出，并在简历纸面用青色底和竖线标出待确认位置。",
+        "en": "Chat-drafted resume edits appear as draft cards and highlight pending lines on the resume sheet with cyan shading and a vertical bar.",
+        "source": "PDF 第12页"
+      },
+      {
+        "zh": "语音输入调用百炼语音识别转文字，录音不保存。",
+        "en": "Voice input uses Bailian speech recognition to transcribe text and never stores audio recordings.",
+        "source": "PDF 第12页"
+      },
+      {
+        "zh": "网页、上传文件、邮件与岗位描述中的指令类文字一律当资料处理、不执行，以防提示注入。",
+        "en": "Instruction-like text inside webpages, uploads, emails, or job descriptions is treated strictly as data to defend against prompt injection.",
+        "source": "PDF 第12页"
+      },
+      {
+        "zh": "对话只按主题统计次数，管理后台没有查看对话原文的接口。",
+        "en": "Chats are counted by topic only, with no admin API endpoint to view raw conversation text.",
+        "source": "PDF 第12页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-architecture",
+    "keywords": {
+      "zh": [
+        "offer雷达技术栈",
+        "前后端用了什么框架",
+        "代码量和测试覆盖率",
+        "怎么部署的",
+        "工程亮点有哪些",
+        "用了哪些数据库和工具"
+      ],
+      "en": [
+        "offer radar tech stack",
+        "system architecture",
+        "how many tests does offer radar have",
+        "codebase size and ci",
+        "how is offer radar deployed",
+        "engineering highlights"
+      ]
+    },
+    "answer": {
+      "zh": "前端采用 Next.js 16.4、React 19.2 和 Tailwind CSS v4（约 2.2 万行 TypeScript），后端是异步 FastAPI 加 SQLAlchemy 2（约 2 万行 Python、111 个接口），正式库用 PostgreSQL 17 共 28 张表，并由 Docker Compose 编排 Postgres、后端、前端和自动 HTTPS 的 Caddy 四个容器。为了把一页简历排准，容器内集成了 python-docx、LibreOffice 与思源宋体，官网只读抓取则用 Playwright 无头 Chromium，并固定解析 IP（IP Pinning）防 DNS 重绑定。质量上我配了 718 个后端 pytest 用例（覆盖率门槛 80%）和 114 个前端 vitest 用例，每次推送跑三路 CI，还写了端到端真模型简历评测脚本来对比不同模型的写满程度和成本。",
+      "en": "I built the frontend with Next.js 16.4, React 19.2, and Tailwind CSS v4 (~22,000 lines of TypeScript) and the backend with async FastAPI and SQLAlchemy 2 (~20,000 lines of Python, 111 API endpoints) on PostgreSQL 17 with 28 tables, deployed via Docker Compose alongside Caddy for automatic HTTPS. Inside the container, I paired python-docx, LibreOffice, and Source Han Serif to measure exact one-page PDF fit, while read-only portal checks use headless Chromium via Playwright with IP pinning against DNS rebinding. For reliability, I wrote 718 backend pytest tests (80% coverage gate), 114 frontend vitest tests, a three-job CI pipeline, and an end-to-end real-model resume benchmark."
+    },
+    "facts": [
+      {
+        "zh": "前端采用 Next.js 16.4、React 19.2 与 Tailwind CSS v4，约 2.2 万行 TypeScript。",
+        "en": "Frontend uses Next.js 16.4, React 19.2, and Tailwind CSS v4 across roughly 22,000 lines of TypeScript.",
+        "source": "PDF 第22页"
+      },
+      {
+        "zh": "后端采用异步 FastAPI、SQLAlchemy 2 与 Pydantic，约 2 万行 Python，提供 111 个接口。",
+        "en": "Backend uses async FastAPI, SQLAlchemy 2, and Pydantic across roughly 20,000 lines of Python and 111 endpoints.",
+        "source": "PDF 第22页"
+      },
+      {
+        "zh": "正式数据库为 PostgreSQL 17，包含 28 张表并由 Alembic 管理 13 个迁移版本。",
+        "en": "Production uses PostgreSQL 17 with 28 tables managed across 13 Alembic migrations.",
+        "source": "PDF 第22页"
+      },
+      {
+        "zh": "生产部署使用 Docker Compose 编排 Postgres、后端、前端和自动 HTTPS 的 Caddy 四个非 root 容器。",
+        "en": "Production runs 4 non-root Docker Compose containers: Postgres, backend, frontend, and Caddy with automatic HTTPS.",
+        "source": "PDF 第22页"
+      },
+      {
+        "zh": "后端配有 718 个 pytest 测试用例，覆盖率门槛 80%，模型调用全部打桩。",
+        "en": "Backend quality is verified by 718 pytest cases with an 80% coverage threshold and fully stubbed LLM calls.",
+        "source": "PDF 第29页"
+      },
+      {
+        "zh": "前端配有 114 个 vitest + Testing Library 测试用例。",
+        "en": "Frontend quality is verified by 114 vitest + Testing Library test cases.",
+        "source": "PDF 第29页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-cost-pricing",
+    "keywords": {
+      "zh": [
+        "offer雷达收费吗",
+        "会员多少钱",
+        "用的什么大模型",
+        "模型调用成本高吗",
+        "免费额度有多少",
+        "怎么控制ai费用不超支"
+      ],
+      "en": [
+        "offer radar pricing",
+        "is offer radar free",
+        "which llm models does it use",
+        "ai inference cost",
+        "daily free quotas",
+        "how do you control llm budget"
+      ]
+    },
+    "answer": {
+      "zh": "我在模型层用 LiteLLM 网关统一接阿里云百炼，按任务分 strong、chat、fast 三档，默认都走 qwen3.8-flash，在限流或 150 秒超时时自动切到备用 qwen-plus，并把固定系统提示词前置以命中提示词缓存。按百炼标价测算，单次对话约 0.02 元、定制一份简历约 0.05 元、一套面试准备约 0.03 元，2026 年 10 月开发和测试期间模型总花费不到 10 元，线上我也加了默认每日 50 元的全站预算封顶。商业化上我计划先带每日免费额度免费上线，后续开启收费后提供免费版加 29 元 / 30 天一次性会员月卡，不自动续费且按剩余天数退款。",
+      "en": "I routed all model calls through LiteLLM to Alibaba Bailian across strong, chat, and fast tiers—defaulting to qwen3.8-flash with automatic failover to qwen-plus on rate limits or a 150-second timeout—and placed static system prompts first to hit prompt caching. At Bailian list rates, a chat turn costs roughly 0.02 CNY, a tailored resume about 0.05 CNY, and an interview pack about 0.03 CNY; total model spend during October 2026 development and testing stayed under 10 CNY, and I added a default 50 CNY daily site-wide budget cap in production. I plan to launch free with daily per-account quotas, then later add an optional 29 CNY / 30-day one-time pass that never auto-renews and refunds proportionally by remaining days."
+    },
+    "facts": [
+      {
+        "zh": "LiteLLM 统一网关接入阿里云百炼，strong、chat、fast 三档默认使用 qwen3.8-flash，备用 qwen-plus。",
+        "en": "LiteLLM routes to Alibaba Bailian with qwen3.8-flash as the default across all three tiers and qwen-plus as fallback.",
+        "source": "PDF 第22页"
+      },
+      {
+        "zh": "主模型限流、不可用或超时 150 秒时自动切换备用模型。",
+        "en": "Automatic failover to the backup model triggers on rate limits, unavailability, or a 150-second timeout.",
+        "source": "PDF 第23页"
+      },
+      {
+        "zh": "全站每日花费封顶参数 LLM_DAILY_BUDGET_CNY 默认为 50 元，北京时间零点重算，到顶后拦截所有模型调用。",
+        "en": "Site-wide daily LLM spend is capped by LLM_DAILY_BUDGET_CNY at 50 CNY by default, resetting at midnight Beijing time.",
+        "source": "PDF 第23页"
+      },
+      {
+        "zh": "按百炼标价，一条对话约 0.02 元、定制一份简历约 0.05 元、一套面试准备约 0.03 元、重度用户一天约 0.7 元。",
+        "en": "At Bailian list rates, costs run about 0.02 CNY per chat turn, 0.05 CNY per tailored resume, 0.03 CNY per interview pack, and 0.7 CNY per heavy-user day.",
+        "source": "PDF 第30页"
+      },
+      {
+        "zh": "2026 年 10 月开发和测试期间，模型总花费不到 10 元。",
+        "en": "Total model spend during October 2026 development and testing stayed under 10 CNY.",
+        "source": "PDF 第30页"
+      },
+      {
+        "zh": "开启收费后会员月卡为 ¥29 / 30 天，一次性购买、不自动续费，支持按剩余天数退款。",
+        "en": "Once billing is enabled, monthly passes cost 29 CNY / 30 days as a one-time purchase with no auto-renewal and pro-rata refunds.",
+        "source": "PDF 第21页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  },
+  {
+    "id": "offer-radar-compliance-status",
+    "keywords": {
+      "zh": [
+        "offer雷达上线了吗",
+        "现在能用offer雷达吗",
+        "目前做到哪一步了",
+        "合规和数据隐私怎么做的",
+        "纯工具版是什么",
+        "为什么还在等上线手续"
+      ],
+      "en": [
+        "is offer radar live",
+        "current launch status of offer radar",
+        "can i try offer radar now",
+        "compliance and data residency",
+        "what is pure tool mode",
+        "what is blocking launch"
+      ]
+    },
+    "answer": {
+      "zh": "目前 Offer 雷达 v1.0（2026 年 10 月 27 日）的功能开发已经全部完成，正处于等待上线手续的阶段，主要是境内服务器和域名的 ICP 备案、阿里云短信签名与模板，以及上线后 30 日内补齐公安联网备案。我把合规直接做进了代码门禁：模型、搜索、语音与短信全走境内服务且启动时拦截境外地址，调用 AI 前必须过手机号实名和协议同意「两道门」，关闭个性化推荐后接口会直接拒绝推荐，导出文件也带隐式 AI 标识。在收到人社局关于网络招聘服务许可的答复之前，它会先以「公司目录 + 岗位匹配分析」的纯工具版免费上线。",
+      "en": "Offer Radar v1.0 (dated October 27, 2026) is feature-complete and awaiting launch filings, specifically China ICP registration, Alibaba Cloud SMS signature and template approval, and public-security filing within 30 days of launch. I enforced compliance directly in code: all models, search, speech, and SMS services run onshore in China with foreign endpoints blocked on startup, AI access requires verified phone login and policy consent, turning off personalized recommendations disables them at the API layer, and exports carry implicit AI metadata. Ahead of guidance from the local HRSSB on online recruitment licensing, it will launch free in pure-tool mode with the company directory and JD match analyzer only."
+    },
+    "facts": [
+      {
+        "zh": "版本 v1.0（2026 年 10 月 27 日）当前状态为功能开发完成，等待上线手续（ICP 备案、短信签名）。",
+        "en": "Version v1.0 (October 27, 2026) is feature-complete and awaiting launch filings including ICP registration and SMS signature approval.",
+        "source": "PDF 第1页"
+      },
+      {
+        "zh": "正式环境没有配置 ICP_RECORD_NO 时后端拒绝启动，公安联网备案须在上线后 30 日内补上。",
+        "en": "Production refuses to boot without ICP_RECORD_NO, and public-security filing must be completed within 30 days of launch.",
+        "source": "PDF 第28页"
+      },
+      {
+        "zh": "启动检查拦截境外模型、境外搜索与阅读服务及国际站地址，确保数据不出境。",
+        "en": "Startup checks block foreign models, search/reader services, and international endpoints to keep all data onshore in China.",
+        "source": "PDF 第28页"
+      },
+      {
+        "zh": "设置里关闭个性化推荐后接口直接拒绝按档案推荐，导出文件均写入隐式 AI 标识。",
+        "en": "Disabling personalized recommendations blocks profile-based recommendations at the API level, and exported files embed implicit AI provenance markers.",
+        "source": "PDF 第28页"
+      },
+      {
+        "zh": "人社局关于网络招聘服务许可答复前，通过开关关闭推荐，按「公司目录 + 粘贴岗位描述分析」的纯工具版免费上线。",
+        "en": "Before receiving HRSSB guidance on online recruitment licensing, feature flags launch Offer Radar free in pure-tool mode (company directory plus JD match analysis).",
+        "source": "PDF 第4页"
+      },
+      {
+        "zh": "用户可导出全部个人数据、注销后删除全部数据，且阿里云百炼承诺不使用调用数据训练。",
+        "en": "Users can export all personal data or delete everything on account closure, and Alibaba Bailian commits not to train on API call data.",
+        "source": "PDF 第27页"
+      }
+    ],
+    "link": "/projects/offer-radar"
+  }
+]

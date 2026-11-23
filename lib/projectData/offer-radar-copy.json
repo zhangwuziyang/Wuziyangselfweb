@@ -1,0 +1,78 @@
+{
+  "card": {
+    "zh": {
+      "tag1": "Web · AI 产品",
+      "tag2": "功能完成 · 等待上线手续",
+      "title": "Offer 雷达",
+      "desc": "面向中国大学生的校招 AI 助手。记住你的经历与时间线，找公司、改简历、跟进度、备面试一处搞定。",
+      "points": [
+        "内置覆盖 13 个行业、839 个招聘主体的公司库，支持冲稳保、海投清单与岗位匹配分析",
+        "每家公司定制一页简历：先聊背景、绝不编数字，靠拢写法一律标黄并附做法",
+        "投递看板联动邮件识别，确认即更新日程；覆盖 30 类岗位面经与模拟面试",
+        "内置 21 工具对话助手：只推荐不代投、改动先确认，模型与数据均在境内"
+      ],
+      "techTags": [
+        "Next.js",
+        "FastAPI",
+        "LangGraph",
+        "PostgreSQL",
+        "阿里云百炼"
+      ],
+      "cta": "查看项目"
+    },
+    "en": {
+      "tag1": "Web · AI",
+      "tag2": "Built · Pending Filings",
+      "title": "Offer Radar",
+      "desc": "An AI campus-recruiting assistant for students in China. One workspace for company picks, resumes, tracking, and interviews.",
+      "points": [
+        "839 hiring entities across 13 industries, with tiered batch-apply lists and JD match scoring",
+        "One-page resumes with no invented numbers; stretch edits turn yellow with concrete how-to steps",
+        "Board tracking via confirmed email alerts, plus prep packs and mock rounds for 30 job tracks",
+        "21-tool LangGraph agent: confirms every edit, never auto-applies, and keeps all data in China"
+      ],
+      "techTags": [
+        "Next.js",
+        "FastAPI",
+        "LangGraph",
+        "PostgreSQL",
+        "Qwen / Bailian"
+      ],
+      "cta": "View Project"
+    }
+  },
+  "detail": {
+    "zh": {
+      "title": "Offer 雷达",
+      "subtitle": "校招 AI 求职助手：找公司、改简历、跟进度、备面试，一站完成",
+      "status": "功能开发完成，等待上线手续（ICP 备案、短信签名）",
+      "paragraphs": [
+        "校招季，大学生常要同时盯几十上百家官网、按岗位改简历，还要记测评和笔面试时间；问通用 AI，它既记不住你的经历，又容易编数字。",
+        "「Offer 雷达」围绕校招时间线，用 21 个工具的对话助手「小雷」串起找公司、改简历、跟进度和备面试：内置覆盖 13 个行业、839 个招聘主体的公司库与海投清单；每家公司先聊背景、用 LibreOffice 实测排版定制一页简历，不编数字、靠拢写法一律标黄并附做法，改动须先确认才写入；看板联动邮件识别更新日程，面试模块覆盖 30 类岗位面经与模拟面试。",
+        "系统基于 Next.js、FastAPI、LangGraph 与 PostgreSQL 构建，模型与数据全部留在境内，配 718 项后端与 114 项前端测试。目前功能开发完成，等待上线手续（ICP 备案、短信签名）。"
+      ],
+      "highlights": [
+        "13 个行业 · 839 个招聘主体",
+        "21 个工具的 LangGraph 对话助手",
+        "30 类岗位面经与模拟面试",
+        "718 项后端 + 114 项前端自动化测试"
+      ]
+    },
+    "en": {
+      "title": "Offer Radar",
+      "subtitle": "An AI campus-recruiting workspace covering company picks, one-page resumes, tracking, and interview prep.",
+      "status": "Feature development complete; awaiting launch filings (ICP registration and SMS signature approval)",
+      "paragraphs": [
+        "Campus recruiting in China pulls students in four directions at once: hunting through scattered company portals, rewriting resumes for every role, tracking test dates, and prepping under tight deadlines. Generic AI chats forget your background between sessions and readily invent metrics you never earned.",
+        "Offer Radar brings that whole timeline into one web workspace for Chinese university students. Its persistent assistant, Xiao Lei, uses 21 tools across four stages. Students start from a curated database of 839 hiring entities across 13 industries, complete with reach/match/safety tiers, batch-apply lists, and 0–100 JD match scoring. Each target company gets a one-page resume measured through real LibreOffice layout: missing numbers stay placeholders, and stretch edits are yellow-flagged with steps to actually do the work. A Kanban board and calendar update from user-confirmed recruiting emails, while interview prep covers 30 job tracks with mock rounds. The product never auto-applies, and every write waits for confirmation.",
+        "Built on Next.js, FastAPI, LangGraph, and PostgreSQL, Offer Radar runs fully onshore in China via Alibaba Bailian, backed by 718 backend and 114 frontend tests. Feature development is complete; launch awaits regulatory filings, including ICP registration and SMS signature approval."
+      ],
+      "highlights": [
+        "839 hiring entities across 13 industries",
+        "21-tool LangGraph persistent assistant",
+        "Interview prep & mock rounds across 30 job tracks",
+        "718 backend + 114 frontend automated tests"
+      ]
+    }
+  }
+}

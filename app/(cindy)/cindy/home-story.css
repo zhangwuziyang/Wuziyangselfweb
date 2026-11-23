@@ -1,0 +1,716 @@
+.home-story {
+  --story-base: #f9f4eb;
+  --story-ink: #28241f;
+  --story-muted: #443a31;
+  --story-dim: #48392d;
+  --story-tint: #553321;
+  --story-edge: #8b70534d;
+  --story-control: #665443;
+  --story-panel: #fdf9f1;
+  --story-soft: #eee5d8;
+  --story-nav: #fbf6ed;
+  --story-media: #e8dfd1;
+  --story-button: #493429;
+  --story-button-ink: #fffaf1;
+  --story-motif-ink: #705443;
+  --story-wing: clamp(.625rem, 3vw, 1.125rem);
+  /* Set by next/font in HomeStory.tsx; scoped to the homepage. */
+  --font-story-display: var(--font-story-latin, "Source Serif 4"), var(--font-story-han, "Noto Serif SC"), "Songti SC", serif;
+  --cindy-pixels: 3;
+  position: relative;
+  isolation: isolate;
+  background: var(--story-base);
+  color: var(--story-ink);
+}
+
+.story-backdrop,
+.story-backdrop > div {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.story-backdrop { z-index: -1; }
+[data-story-base] { background: var(--story-base); }
+[data-story-blend] { opacity: 0; }
+
+[data-story-wash] {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.55'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 62% 16%, #fffbf4, transparent 74%);
+  opacity: .18;
+}
+
+.story-content { position: relative; }
+
+.story-content > main > section,
+.story-content > [data-cindy-finish] {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: var(--cindy-lane) minmax(0, 1fr);
+  column-gap: var(--cindy-column-gap);
+  padding-inline: max(var(--story-wing), (100% - 76rem) / 2);
+}
+
+.story-content > main > section::before,
+.story-content > main > section::after,
+.story-content > [data-cindy-finish]::before,
+.story-content > [data-cindy-finish]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  --story-edge-fade: min(9svh, 12%);
+  mask-image: linear-gradient(transparent, #000 var(--story-edge-fade), #000 calc(100% - var(--story-edge-fade)), transparent);
+}
+
+.story-content > main > section::before,
+.story-content > [data-cindy-finish]::before {
+  background:
+    radial-gradient(ellipse 79% 67% at var(--story-wash-origin), var(--story-wash-tint), transparent 100%),
+    radial-gradient(ellipse 58% 61% at var(--story-glow-origin), var(--story-glow-tint), transparent 100%);
+}
+
+.story-content > main > section::after,
+.story-content > [data-cindy-finish]::after {
+  background: var(--story-motif);
+  opacity: var(--story-motif-opacity, .06);
+}
+
+.story-content > main > #hero {
+  --story-wash-origin: 77% 36%;
+  --story-wash-tint: rgb(245 181 126 / 48%);
+  --story-glow-origin: 13% 70%;
+  --story-glow-tint: rgb(250 216 158 / 29%);
+  --story-motif: repeating-radial-gradient(ellipse at 77% 36%, transparent 0 2.5rem, var(--story-motif-ink) 2.5rem calc(2.5rem + 1px));
+}
+
+.story-content > main > #about {
+  --story-wash-origin: 14% 45%;
+  --story-wash-tint: rgb(179 197 173 / 55%);
+  --story-glow-origin: 80% 63%;
+  --story-glow-tint: rgb(203 214 188 / 32%);
+  --story-motif: repeating-linear-gradient(132deg, transparent 0 1.125rem, var(--story-motif-ink) 1.125rem calc(1.125rem + 1px));
+}
+
+.story-content > main > #experience {
+  --story-wash-origin: 24% 34%;
+  --story-wash-tint: rgb(231 159 139 / 47%);
+  --story-glow-origin: 83% 67%;
+  --story-glow-tint: rgb(245 190 175 / 30%);
+  --story-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='40'%3E%3Cpath d='M.5 0v40' stroke='%23705443' stroke-dasharray='3 7'/%3E%3C/svg%3E");
+}
+
+.story-content > main > #projects {
+  --story-wash-origin: 20% 59%;
+  --story-wash-tint: rgb(244 190 126 / 52%);
+  --story-glow-origin: 78% 29%;
+  --story-glow-tint: rgb(245 213 159 / 36%);
+  --story-motif:
+    linear-gradient(to right, var(--story-motif-ink) 1px, transparent 1px) 0 0 / 2.75rem 2.75rem,
+    linear-gradient(var(--story-motif-ink) 1px, transparent 1px) 0 0 / 2.75rem 2.75rem;
+}
+
+.story-content > main > #global {
+  --story-wash-origin: 83% 44%;
+  --story-wash-tint: rgb(165 191 163 / 55%);
+  --story-glow-origin: 16% 72%;
+  --story-glow-tint: rgb(198 210 184 / 38%);
+  --story-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 190' width='240' height='190'%3E%3Cg fill='none' stroke='%23705443'%3E%3Cpath d='M0 23C70 23 75 62 150 62S211 23 240 23M0 49C70 49 75 88 150 88S211 49 240 49M0 75C70 75 75 114 150 114S211 75 240 75M0 101C70 101 75 140 150 140S211 101 240 101M0 127C70 127 75 166 150 166S211 127 240 127'/%3E%3C/g%3E%3C/svg%3E");
+  --story-motif-opacity: .07;
+}
+
+.story-content > main > #music {
+  --story-wash-origin: 31% 46%;
+  --story-wash-tint: rgb(232 153 141 / 49%);
+  --story-glow-origin: 89% 70%;
+  --story-glow-tint: rgb(247 190 168 / 30%);
+  --story-motif: repeating-linear-gradient(
+    var(--story-motif-ink) 0 1px, transparent 1px 7px,
+    var(--story-motif-ink) 7px 8px, transparent 8px 14px,
+    var(--story-motif-ink) 14px 15px, transparent 15px 21px,
+    var(--story-motif-ink) 21px 22px, transparent 22px 28px,
+    var(--story-motif-ink) 28px 29px, transparent 29px 6rem
+  );
+}
+
+.story-content > main > #skills {
+  --story-wash-origin: 70% 31%;
+  --story-wash-tint: rgb(239 193 128 / 49%);
+  --story-glow-origin: 19% 68%;
+  --story-glow-tint: rgb(249 218 168 / 31%);
+  --story-motif: radial-gradient(circle, var(--story-motif-ink) 1px, transparent 1.5px) 0 0 / 1.25rem 1.25rem;
+  --story-motif-opacity: .08;
+}
+
+.story-content > main > #philosophy {
+  --story-wash-origin: 48% 53%;
+  --story-wash-tint: rgb(180 192 167 / 54%);
+  --story-glow-origin: 87% 25%;
+  --story-glow-tint: rgb(212 220 188 / 34%);
+  --story-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='127' height='113'%3E%3Cpath d='M18 28h4m63 47h3m18 30h2' stroke='%23705443' stroke-linecap='round'/%3E%3C/svg%3E");
+  --story-motif-opacity: .05;
+}
+
+.story-content > main > #contact {
+  --story-wash-origin: 66% 59%;
+  --story-wash-tint: rgb(228 153 132 / 46%);
+  --story-glow-origin: 14% 29%;
+  --story-glow-tint: rgb(248 196 175 / 31%);
+  --story-motif:
+    linear-gradient(to right, transparent calc(12% - 1px), var(--story-motif-ink) calc(12% - 1px) 12%, transparent 12%),
+    repeating-linear-gradient(var(--story-motif-ink) 0 1px, transparent 1px 1.875rem);
+}
+
+.story-content > [data-cindy-finish] {
+  --story-wash-origin: 79% 70%;
+  --story-wash-tint: rgb(228 194 140 / 46%);
+  --story-glow-origin: 16% 43%;
+  --story-glow-tint: rgb(245 217 173 / 32%);
+  --story-motif: repeating-linear-gradient(to right, transparent 0 2.75rem, var(--story-motif-ink) 2.75rem calc(2.75rem + 1px));
+  --story-motif-opacity: .05;
+  border-block-start-color: transparent;
+}
+
+.story-shell {
+  grid-column: 2;
+  min-inline-size: 0;
+  container: story-copy / inline-size;
+  overflow-wrap: anywhere;
+}
+
+.story-button-primary {
+  background: var(--story-button);
+  color: var(--story-button-ink);
+}
+
+.story-button-secondary {
+  border: 1px solid var(--story-control);
+  background: var(--story-panel);
+  color: var(--story-ink);
+}
+
+.story-button-primary:hover { opacity: .88; }
+.story-button-secondary:hover { background: var(--story-soft); }
+.story-interactive:hover { border-color: var(--story-control); }
+.story-photo-shadow { box-shadow: 0 .9rem 2.75rem rgb(56 39 26 / 12%); }
+
+.story-photo-label {
+  max-inline-size: calc(100% - 1rem);
+  padding: .28rem .5rem;
+  border-radius: .35rem;
+  background: #2c251f;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.story-experience-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .2rem .55rem;
+  min-block-size: 1.85rem;
+  margin-block-end: .5rem;
+  color: var(--story-muted);
+  font-size: .8rem;
+}
+
+.story-experience-year { color: var(--story-ink); font-weight: 700; }
+
+.story-timeline-node {
+  flex: none;
+  inline-size: .65rem;
+  block-size: .65rem;
+  border: 1px solid var(--story-control);
+  border-radius: 50%;
+  background: var(--story-panel);
+  box-shadow: 0 0 0 4px var(--story-panel);
+}
+
+.story-timeline-node[data-lit] {
+  background: var(--story-tint);
+  box-shadow: 0 0 0 4px var(--story-panel), 0 0 .85rem var(--story-tint);
+}
+
+.story-chapter {
+  padding-block: clamp(4.375rem, 8.5vw, 8.75rem);
+}
+
+.story-content :is(#experience, #skills, #philosophy) {
+  padding-block-end: clamp(2.5rem, 5.2vw, 4rem);
+}
+
+.story-content :is(#projects, #philosophy, #contact) {
+  padding-block-start: clamp(2.5rem, 5.2vw, 4rem);
+}
+
+.story-heading {
+  position: relative;
+  margin-block-end: clamp(1.7rem, 4vw, 3.5rem);
+}
+
+.story-eyebrow {
+  margin-block-end: 1.05rem;
+  color: var(--story-tint);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.story-title {
+  color: var(--story-ink);
+  font-family: var(--font-story-display);
+  font-size: clamp(1.9rem, 4.8vw, 4.25rem);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -.02em;
+  overflow-wrap: break-word;
+}
+
+.story-title-accent {
+  color: var(--story-tint);
+}
+
+.story-body {
+  color: var(--story-muted);
+  font-size: clamp(1rem, 1.27vw, 1.13rem);
+  line-height: 1.72;
+}
+
+.story-panel {
+  border: 1px solid var(--story-edge);
+  background: var(--story-panel);
+}
+
+.story-content a:focus-visible,
+.story-content button:focus-visible {
+  outline: 2px solid var(--story-tint);
+  outline-offset: 4px;
+}
+
+.story-hero__track {
+  display: grid;
+  align-content: center;
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5rem);
+  min-block-size: 100svh;
+  padding-block: clamp(6rem, 14svh, 9.5rem) clamp(4.375rem, 9svh, 6.5rem);
+  grid-template-areas: "copy" "portrait";
+}
+
+.story-hero__portrait {
+  grid-area: portrait;
+  position: relative;
+  inline-size: min(100%, 33rem);
+  aspect-ratio: 1;
+  justify-self: center;
+  overflow: clip;
+  border: 1px solid var(--story-edge);
+  border-radius: clamp(1.5rem, 3vw, 3rem);
+  background: var(--story-soft);
+}
+
+.story-hero__name {
+  font-family: var(--font-story-display);
+  font-size: clamp(2rem, 6vw, 6rem);
+  display: block;
+  inline-size: max-content;
+  max-inline-size: 100%;
+  font-weight: 500;
+  line-height: .98;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+}
+
+.story-hero__name span {
+  display: block;
+  color: var(--story-tint);
+}
+
+.story-hero__copy {
+  grid-area: copy;
+  position: relative;
+  max-inline-size: 42rem;
+}
+
+.story-hero__sub {
+  margin-block-start: clamp(1.45rem, 4svh, 2.75rem);
+  max-inline-size: 31rem;
+  color: var(--story-muted);
+  font-size: clamp(1rem, 1.6vw, 1.27rem);
+  line-height: 1.5;
+}
+
+.story-nav {
+  color: var(--story-ink);
+  background: var(--story-nav);
+  border-block-end: 1px solid var(--story-edge);
+}
+
+.story-nav[data-menu-open="true"] {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Desktop chapter links: one row from 768px up, tightened until there is room. */
+.story-nav__links {
+  /* display comes from the hidden md:flex utilities */
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(.7rem, 1.6vw, 1.75rem);
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+
+.story-nav__link {
+  position: relative;
+  padding-block: .875rem;
+  color: var(--story-muted);
+  font-size: .78rem;
+  letter-spacing: 0;
+  transition: color 160ms ease-out;
+}
+
+.story-nav__link:hover,
+.story-nav__link[aria-current] { color: var(--story-ink); }
+
+.story-nav__link:focus-visible {
+  outline: 2px solid var(--story-tint);
+  outline-offset: 2px;
+  border-radius: .25rem;
+}
+
+/* A single hairline that slides to the current chapter. */
+.story-nav__marker {
+  position: absolute;
+  inset: auto auto .5rem 0;
+  block-size: 1.5px;
+  inline-size: 1px;
+  border-radius: 1px;
+  background: var(--story-tint);
+  transform-origin: 0 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.story-nav__marker[data-active] { opacity: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .story-nav__marker[data-ready] {
+    transition: transform 280ms cubic-bezier(.2, .7, .2, 1), opacity 180ms ease-out;
+  }
+}
+
+@media (min-width: 64rem) {
+  .story-nav__link { font-size: .8125rem; }
+}
+
+.mobile-nav a[aria-current] { color: var(--story-tint); }
+
+/* Geometry (size, padding, radii, screen ratio) is set inline in
+   components/home/ProjectPreview.tsx; this only paints the titanium shell. */
+.phone-shell {
+  position: relative;
+  box-sizing: border-box;
+  padding: 7px;
+  border: 1px solid #a99e8f;
+  border-radius: 2.6rem;
+  background: linear-gradient(140deg, #c2b7a8, #645b51 21%, #292623 52%, #8f8275 83%, #494038);
+  box-shadow: inset 0 0 0 2px #24201c, 0 1.1rem 2.6rem rgb(50 35 24 / 24%);
+}
+
+.phone-shell::before,
+.phone-shell::after {
+  content: "";
+  position: absolute;
+  inset: 21% auto auto -.16rem;
+  inline-size: .16rem;
+  block-size: 12%;
+  border-radius: .16rem 0 0 .16rem;
+  background: linear-gradient(#ab9e90, #4e453c);
+}
+
+.phone-shell::after {
+  inset: 27% -.16rem auto auto;
+  border-radius: 0 .16rem .16rem 0;
+}
+
+.phone-shell__screen {
+  position: relative;
+  aspect-ratio: 560 / 1217;
+  overflow: clip;
+  border-radius: 2.1rem;
+  background: #f3efe8;
+}
+
+.story-projects__caption .story-body {
+  max-inline-size: 31rem;
+  margin-block-start: .8rem;
+  text-wrap: pretty;
+}
+
+.story-projects__gallery {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.story-project {
+  display: grid;
+  align-items: stretch;
+  overflow: clip;
+  border-radius: clamp(1.25rem, 2.6vw, 2.1rem);
+}
+
+.story-project__media {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-block-size: clamp(15rem, 38vw, 33rem);
+  place-items: center;
+  overflow: clip;
+  gap: .75rem;
+  padding: clamp(1rem, 2.45vw, 2.75rem);
+  background: var(--story-media);
+}
+
+.project-browser {
+  inline-size: 100%;
+  overflow: clip;
+  border: 1px solid #b9aa97;
+  border-radius: clamp(.6rem, 1.25vw, .97rem);
+  background: #fcf8ef;
+  box-shadow: 0 1.1rem 3.5rem rgb(57 40 25 / 20%);
+}
+
+.project-browser__chrome {
+  display: flex;
+  block-size: clamp(1.2rem, 2.8vw, 2rem);
+  align-items: center;
+  gap: .33rem;
+  padding-inline: .7rem;
+  border-bottom: 1px solid #d6c8b7;
+  background: linear-gradient(#f6eee1, #ede3d4);
+}
+
+.project-browser__chrome span {
+  inline-size: .31rem;
+  block-size: .31rem;
+  border-radius: 50%;
+  background: #867b6e;
+}
+
+.project-phone {
+  inline-size: min(100%, 72vw, calc((var(--phone-max-h, min(600px, 64svh)) - 16px) * .46015 + 16px));
+  max-inline-size: 100%;
+  container-type: inline-size;
+}
+
+@container story-copy (min-width: 36rem) {
+  .story-project { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); }
+}
+
+.story-projects__caption {
+  margin-block-end: clamp(1.7rem, 4vw, 3.5rem);
+}
+
+.story-project__screen {
+  display: grid;
+  inline-size: 100%;
+  min-inline-size: 0;
+  place-items: center;
+}
+
+.story-project__controls {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--story-ink);
+  font-size: .76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.story-project__controls button {
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border: 1px solid var(--story-control);
+  border-radius: 50%;
+  background: var(--story-panel);
+  cursor: pointer;
+}
+
+.story-project__controls button:hover {
+  background: var(--story-soft);
+}
+
+.story-project__controls button:is(:active, .is-pressed) {
+  background: var(--story-media);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .story-project__controls button { transition: transform 120ms ease-out, background-color 120ms ease-out; }
+  .story-project__controls button:is(:active, .is-pressed) { transform: translateY(1px) scale(.92); }
+}
+
+.story-about-media {
+  display: grid;
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-block-start: clamp(2rem, 6vw, 4rem);
+}
+
+.story-about-media__image {
+  position: relative;
+  block-size: clamp(10rem, 22vw, 16rem);
+  overflow: clip;
+  border: 1px solid var(--story-edge);
+  border-radius: 1.25rem;
+  background: var(--story-panel);
+}
+
+.story-about-media figcaption {
+  margin-block-start: .55rem;
+  color: var(--story-dim);
+  font-size: .8rem;
+}
+
+.story-content [data-timeline-fill] { transform: scaleY(0); }
+
+@media (width < 48rem) {
+  .home-story {
+    --story-wing: clamp(1rem, 4.5vw, 2rem);
+    --story-mobile-nav: calc(3rem + 1px);
+    --story-mobile-stage: 10rem;
+    /* Match the launcher's 42px button and 20px bottom inset, plus breathing space. */
+    --story-mobile-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+    block-size: 100dvh;
+  }
+
+  .story-content {
+    position: absolute;
+    inset: calc(var(--story-mobile-nav) + var(--story-mobile-stage)) 0 var(--story-mobile-bottom);
+    overflow: auto;
+    overscroll-behavior-y: contain;
+    scroll-padding-block-start: 1rem;
+    scroll-padding-block-end: .75rem;
+    scroll-behavior: smooth;
+    border-block-end: 1px solid var(--story-edge);
+  }
+
+  .home-story:has(.mobile-nav) .story-content { overflow: hidden; }
+  .story-content > main > section,
+  .story-content > [data-cindy-finish] { display: block; }
+  .cindy-station { display: none; }
+
+  /* Keep the whole project phone + pager inside the mobile scrollport. */
+  .project-phone {
+    --phone-max-h: clamp(13.5rem, calc(100svh - var(--story-mobile-nav) - var(--story-mobile-stage) - var(--story-mobile-bottom) - 7rem), min(600px, 64svh));
+  }
+
+  .story-content .story-hero__track {
+    min-block-size: auto;
+    padding-block: clamp(2.5rem, 6svh, 4.5rem) 3.5rem;
+  }
+
+  .story-hero__name { font-size: clamp(2.75rem, 10vw, 5.25rem); }
+}
+
+@media (width < 48rem) and (prefers-reduced-motion: reduce) {
+  .story-content { scroll-behavior: auto; }
+}
+
+@media (min-width: 48rem) {
+  .home-story {
+    --story-wing: clamp(5rem, 8vw, 9.625rem);
+    --cindy-lane: clamp(17rem, 26vw, 22.5rem);
+    --cindy-column-gap: clamp(1.5rem, 3.5vw, 3.5rem);
+    --cindy-pixels: 5.6;
+  }
+
+  /* Keep the chapter columns the same width on either side of the crossing. */
+  .story-content > main > section + section {
+    margin-block-start: clamp(12rem, calc(28rem - 16vw), 17rem);
+  }
+
+  .story-content > main > section:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr) var(--cindy-lane);
+  }
+
+  .story-content > main > section:nth-child(even) > .story-shell { grid-area: 1 / 1; }
+  .story-content > main > section:nth-child(even) > .cindy-station { grid-area: 1 / 2; }
+}
+
+@container story-copy (min-width: 34rem) {
+  .story-about-media { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+}
+
+@media (min-width: 70rem) and (min-height: 34rem) {
+  .home-story { --story-wing: clamp(4.75rem, 7vw, 9.625rem); }
+  .story-chapter { padding-block: clamp(6rem, 8.5vw, 9rem); }
+  .story-content :is(#experience, #skills, #philosophy) { padding-block-end: clamp(4.625rem, 5.1vw, 5rem); }
+  .story-content :is(#projects, #philosophy, #contact) { padding-block-start: clamp(4.625rem, 5.1vw, 5rem); }
+  .story-hero__track { padding-block-end: clamp(6rem, 10svh, 8rem); }
+}
+
+@media (min-width: 72rem) {
+  .story-hero__track {
+    grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+    grid-template-areas: "copy portrait";
+    column-gap: clamp(1.25rem, 3vw, 2.75rem);
+  }
+
+  .story-hero__name { font-size: clamp(3.75rem, 5vw, 5.5rem); }
+}
+
+@media (max-width: 34rem) {
+  .story-hero__track { min-block-size: 92svh; gap: 1.65rem; }
+  .story-hero__name { line-height: 1; }
+  .story-content h3 { overflow-wrap: anywhere; }
+  .story-project__media { padding-inline: .65rem; }
+  #global .story-photo-label { max-inline-size: calc(100% - 1rem); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-story [data-cindy-intro] {
+    opacity: 1;
+    transform: translateY(calc((1 - var(--cindy-intro, 0)) * 10px));
+  }
+
+  .home-story [data-cindy-intro]:focus-within,
+  .home-story :target [data-cindy-intro] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* First-visit opening: name, subtitle, Cindy, then the hint, all inside ~1s. The hook is set by
+   the inline script in HomeStory.tsx; no hash, a repeat visit or reduced motion skips it. Only text
+   and Cindy move: the portrait loads and paints untouched, and Cindy never scales. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-intro="play"] .story-hero__copy > * {
+    animation: story-intro-rise 380ms cubic-bezier(.2, .7, .2, 1) backwards;
+  }
+
+  html[data-intro="play"] .story-hero__copy > :nth-child(2) { animation-delay: 60ms; }
+  html[data-intro="play"] .story-hero__copy > :nth-child(3) { animation-delay: 180ms; }
+  html[data-intro="play"] .story-hero__copy > :nth-child(4) { animation-delay: 260ms; }
+
+  /* filter: opacity() and translate leave the JS-driven opacity and transform alone. */
+  html[data-intro="play"] .cindy-sprite,
+  html[data-intro="play"] .cindy-shadow {
+    animation: story-intro-arrive 360ms cubic-bezier(.2, .7, .2, 1) 380ms backwards;
+  }
+
+  html[data-intro="play"] .cindy-hint {
+    animation: story-intro-arrive 300ms cubic-bezier(.2, .7, .2, 1) 640ms backwards;
+  }
+}
+
+@keyframes story-intro-rise {
+  from { opacity: 0; translate: 0 12px; }
+}
+
+@keyframes story-intro-arrive {
+  from { filter: opacity(0); translate: 0 8px; }
+}

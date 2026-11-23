@@ -1,4 +1,8 @@
 import type { Lang } from "@/lib/i18n";
+import healthAgentChat from "@/lib/projectData/health-agent-chat.json";
+import healthAgentCopy from "@/lib/projectData/health-agent-copy.json";
+import offerRadarChat from "@/lib/projectData/offer-radar-chat.json";
+import offerRadarCopy from "@/lib/projectData/offer-radar-copy.json";
 
 type LocalizedText = Record<Lang, string>;
 
@@ -6,6 +10,8 @@ interface ProfileChatIntent {
   id: string;
   keywords: string[];
   answer: LocalizedText;
+  facts?: Array<LocalizedText & { source: string }>;
+  verbatim?: boolean;
 }
 
 export interface ProfileChatAction {
@@ -25,30 +31,69 @@ export interface ProfileChatResponse {
   context: string;
   mode: ProfileChatAnswerMode;
   intentId?: string;
+  verbatim?: boolean;
   useConversationContext: boolean;
-  action?: ProfileChatAction;
+  actions?: ProfileChatAction[];
 }
 
 type DestinationKey =
   | "about"
   | "university"
   | "experience"
+  | "projects"
   | "alibaba"
   | "bytedance"
   | "rolandBerger"
   | "guoyuan"
-  | "chartCreator"
-  | "codeAndPower"
+  | "offerRadar"
+  | "healthAgent"
   | "skills"
   | "global"
   | "music"
   | "philosophy"
   | "contact";
 
+const PROJECT_TOPICS = [
+  {
+    destination: "offerRadar",
+    pattern: /offer[\s-]*(?:雷达|radar\b)/i,
+    copy: offerRadarCopy.card,
+    questions: offerRadarChat,
+  },
+  {
+    destination: "healthAgent",
+    pattern: /健康助理|\b(?:my[\s-]+)?health[\s-]*agent\b/i,
+    copy: healthAgentCopy.card,
+    questions: healthAgentChat,
+  },
+] as const;
+
+const PROJECT_INTENTS = PROJECT_TOPICS.flatMap(({ questions, destination }) =>
+  questions.map(({ id, keywords, answer, facts }) => ({
+    id,
+    keywords: [...keywords.zh, ...keywords.en],
+    answer,
+    facts,
+    destination,
+    verbatim: true,
+  })),
+);
+
+const SCOPED_PROJECT_KEYWORDS: Record<string, RegExp> = {
+  "offer-radar-resume": /简历|\b(?:résumés?|resumes?)\b/i,
+  "offer-radar-board-mail": /投递看板|邮件|\b(?:kanban|e-?mails?)\b/i,
+  "health-agent-privacy": /隐私|保存.*聊天|存.*数据|聊天.*保存|\b(?:privacy|stor(?:e|es|ed|ing))\b/i,
+};
+
+const PROJECTS_OVERVIEW = {
+  en: PROJECT_TOPICS.map(({ copy: { en } }) => `${en.title}\n${en.desc}`).join("\n\n"),
+  zh: PROJECT_TOPICS.map(({ copy: { zh } }) => `${zh.title}\n${zh.desc}`).join("\n\n"),
+};
+
 export const PROFILE_CHAT_COPY = {
-  title: { en: "Ask Wuziyang", zh: "问问梓洋" },
-  subtitle: { en: "About me", zh: "关于我" },
-  status: { en: "Portfolio assistant", zh: "个人网站助手" },
+  title: { en: "Cindy", zh: "Cindy" },
+  subtitle: { en: "About Wuziyang Zhang", zh: "了解张吴梓洋" },
+  status: { en: "Wuziyang Zhang’s pixel guide", zh: "张吴梓洋的像素小管家" },
   aiLoading: { en: "Ask now · Local AI warming up", zh: "可直接提问 · 本地 AI 后台准备中" },
   aiReady: { en: "Local AI ready", zh: "本地 AI 已就绪" },
   aiFallback: { en: "Instant knowledge mode", zh: "即时知识模式" },
@@ -89,12 +134,11 @@ export const PROFILE_CHAT_COPY = {
     zh: "低置信度或未命中 → 停止生成，并明确说明知识库暂无对应信息。",
   },
   greeting: {
-    en: "Hi — I’m Wuziyang, and you can also think of me as this portfolio’s interactive guide. I can introduce who I am, unpack my experience and projects, compare my skills, recommend what to explore, or help you find the right way to contact me.",
-    zh: "你好，我是梓洋，也可以把我当作这份个人网站的互动向导。我可以介绍我是谁、讲清每段经历与项目、总结能力特点、推荐浏览路线，也能帮你找到合适的联系方式。",
+    en: "Hi, I’m Cindy, Wuziyang Zhang’s pixel guide. Ask me about his internships, projects, skills, or how to reach him.",
+    zh: "你好，我是张吴梓洋的小管家 Cindy。想了解他的实习、项目、技能或联系方式，都可以问我。",
   },
   placeholder: { en: "Ask a question…", zh: "输入你想问的问题…" },
   send: { en: "Send", zh: "发送" },
-  open: { en: "Ask me", zh: "问问我" },
   close: { en: "Close chat", zh: "关闭对话" },
   suggestionsLabel: { en: "Try asking", zh: "可以试着问" },
   suggestions: {
@@ -103,17 +147,21 @@ export const PROFILE_CHAT_COPY = {
       "What did you do at Alibaba?",
       "What are your strongest skills?",
       "Where should I start?",
+      "What is Offer Radar?",
+      "What is My Health Agent?",
     ],
     zh: [
       "用一句话介绍自己",
       "你在阿里巴巴做了什么？",
       "你最擅长什么？",
       "我应该从哪里开始看？",
+      "Offer 雷达是什么？",
+      "健康助理是什么？",
     ],
   },
   fallback: {
-    en: "Here’s how I work: I first search this portfolio’s knowledge base for relevant information, then a WebLLM running locally in your browser turns the retrieved facts into a conversational answer. I couldn’t find this question in the knowledge base, so I can’t give you a reliable answer yet. You can rephrase it or ask about my education, experience, projects, skills, or contact details.",
-    zh: "我的工作方式是先在这份个人网站的知识库中检索相关资料，再由浏览器本地运行的 WebLLM 把找到的事实整理成对话式回答。这个问题目前没有在知识库中找到对应信息，因此我暂时无法给出可靠答案。你可以换一种问法，或询问我的教育、经历、项目、能力与联系方式。",
+    en: "Here’s how I work: I first search this portfolio’s knowledge base for relevant facts, and when local AI is enabled, WebLLM running in your browser turns them into a natural reply. I couldn’t find this question in the knowledge base, so I can’t give a reliable answer yet. Try rephrasing, or ask about Wuziyang Zhang’s education, experience, projects, skills, or contact details.",
+    zh: "我会先在这个网站的知识库里查找相关资料，启用本地 AI 后再由浏览器里的 WebLLM 整理成自然回答。这个问题目前在知识库里查不到，所以我没法乱猜。你可以换种问法，或者问我张吴梓洋的教育背景、实习经历、项目、能力和联系方式。",
   },
 } as const;
 
@@ -131,15 +179,19 @@ export function detectProfileChatLanguage(question: string, fallback: Lang): Lan
 const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText }> = {
   about: {
     href: "/#about",
-    label: { en: "View About me", zh: "查看关于我" },
+    label: { en: "View About Wuziyang Zhang", zh: "查看关于张吴梓洋" },
   },
   university: {
     href: "/university",
-    label: { en: "View my education", zh: "查看教育背景" },
+    label: { en: "View education", zh: "查看教育背景" },
   },
   experience: {
     href: "/#experience",
-    label: { en: "View my experience", zh: "查看工作经历" },
+    label: { en: "View experience", zh: "查看实习经历" },
+  },
+  projects: {
+    href: "/#projects",
+    label: { en: "View projects", zh: "查看项目" },
   },
   alibaba: {
     href: "/experience/alibaba-international",
@@ -157,17 +209,17 @@ const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText 
     href: "/experience/guoyuan-securities",
     label: { en: "View Guoyuan experience", zh: "查看国元证券经历" },
   },
-  chartCreator: {
-    href: "/experience/chartcreator",
-    label: { en: "Explore ChartCreator", zh: "查看 ChartCreator" },
+  offerRadar: {
+    href: offerRadarChat[0].link,
+    label: { en: offerRadarCopy.card.en.title, zh: offerRadarCopy.card.zh.title },
   },
-  codeAndPower: {
-    href: "/projects/codeandpower",
-    label: { en: "Explore Code and Power", zh: "查看 Code and Power" },
+  healthAgent: {
+    href: healthAgentChat[0].link,
+    label: { en: healthAgentCopy.card.en.title, zh: healthAgentCopy.card.zh.title },
   },
   skills: {
     href: "/#skills",
-    label: { en: "View my capabilities", zh: "查看能力图谱" },
+    label: { en: "View capabilities", zh: "查看能力图谱" },
   },
   global: {
     href: "/#global",
@@ -179,7 +231,7 @@ const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText 
   },
   philosophy: {
     href: "/#philosophy",
-    label: { en: "View how I think", zh: "查看我的思维方式" },
+    label: { en: "View how he thinks", zh: "查看他的思考方式" },
   },
   contact: {
     href: "/#contact",
@@ -188,6 +240,7 @@ const DESTINATIONS: Record<DestinationKey, { href: string; label: LocalizedText 
 };
 
 const DESTINATION_BY_INTENT: Record<string, DestinationKey> = {
+  ...Object.fromEntries(PROJECT_INTENTS.map(({ id, destination }) => [id, destination])),
   intro: "about",
   education: "university",
   majors: "university",
@@ -195,7 +248,7 @@ const DESTINATION_BY_INTENT: Record<string, DestinationKey> = {
   courses: "university",
   location: "university",
   "experience-overview": "experience",
-  "projects-overview": "experience",
+  "projects-overview": "projects",
   "experience-timeline": "experience",
   alibaba: "alibaba",
   "alibaba-view": "alibaba",
@@ -217,14 +270,8 @@ const DESTINATION_BY_INTENT: Record<string, DestinationKey> = {
   "guoyuan-view": "guoyuan",
   "guoyuan-learning": "guoyuan",
   "guoyuan-methods": "guoyuan",
-  chartcreator: "chartCreator",
-  "chartcreator-view": "chartCreator",
-  "chartcreator-learning": "chartCreator",
-  "chartcreator-origin": "chartCreator",
-  "chartcreator-process": "chartCreator",
-  "vibe-coding": "chartCreator",
+  "vibe-coding": "skills",
   "ai-collaboration": "skills",
-  "code-and-power": "codeAndPower",
   "skills-overview": "skills",
   "measurable-results": "experience",
   "data-skills": "skills",
@@ -251,7 +298,6 @@ const DESTINATION_BY_INTENT: Record<string, DestinationKey> = {
   "quick-summary": "about",
   "where-to-start": "experience",
   "why-hire-me": "skills",
-  "proudest-work": "chartCreator",
   "interesting-fact": "music",
   "current-focus": "experience",
   "collaboration-style": "skills",
@@ -273,41 +319,37 @@ const DESTINATION_BY_INTENT: Record<string, DestinationKey> = {
   "roland-segments": "rolandBerger",
   "roland-impact": "rolandBerger",
   "guoyuan-thesis": "guoyuan",
-  "chartcreator-audience": "chartCreator",
-  "chartcreator-stack": "chartCreator",
-  "chartcreator-ownership": "chartCreator",
-  "code-and-power-ml": "codeAndPower",
-  "code-and-power-learning": "codeAndPower",
   "consulting-fit": "skills",
   "product-fit": "skills",
   "analytics-fit": "skills",
-  "independent-building": "chartCreator",
+  "independent-building": "alibaba",
   "global-detail": "global",
 };
 
 const INTENTS: ProfileChatIntent[] = [
+  ...PROJECT_INTENTS,
   {
     id: "greeting",
     keywords: ["你好", "您好", "嗨", "哈喽", "在吗", "hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
     answer: {
-      en: "Hi, nice to meet you. I’m Wuziyang, speaking through this interactive portfolio guide. You can treat this as a conversation rather than a menu — ask naturally about who I am, what I’ve built, where I’ve worked, or what I’m looking for next.",
-      zh: "你好，很高兴认识你。我是梓洋，正在通过这个互动向导和你交流。你不必把这里当成菜单，可以像聊天一样自然地问我是谁、做过什么、有哪些项目，或者接下来想寻找什么机会。",
+      en: "Hi, I’m Cindy. Ask me about Wuziyang Zhang’s projects, internships, or what he’s looking for next.",
+      zh: "你好，我是 Cindy。关于张吴梓洋的项目、实习经历或求职方向，都可以问我。",
     },
   },
   {
     id: "assistant-identity",
     keywords: ["你是ai吗", "你是机器人吗", "你是真人吗", "你是什么助手", "这是ai吗", "are you ai", "are you a robot", "are you real", "what kind of assistant are you"],
     answer: {
-      en: "I’m Wuziyang’s interactive presence inside this portfolio. I answer questions about my experience, skills, and projects using the information on this site, then point you to the most relevant page. Think of me as a conversational guide to my work, not a general-purpose chatbot.",
-      zh: "我是梓洋在这份个人网站里的互动分身，会基于站内信息回答关于我的经历、能力和项目，再把你带到最相关的页面。可以把我理解为一个会对话的作品集向导，而不是通用聊天机器人。",
+      en: "I’m Cindy, Wuziyang Zhang’s pixel guide. I answer questions about his experience, projects, and skills from what’s on this site, and point you to the right page.",
+      zh: "我是张吴梓洋的像素小管家 Cindy。我会根据网站上的资料介绍他的经历、项目和技能，并带你找到对应页面。",
     },
   },
   {
     id: "assistant-capabilities",
     keywords: ["你能做什么", "你会做什么", "能问你什么", "你可以回答什么", "怎么用", "帮助", "帮帮我", "what can you do", "what can i ask", "how can you help", "help", "how do i use this"],
     answer: {
-      en: "I can give a quick introduction, explain any experience or project, summarize skills and measurable results, describe how I work with AI, recommend where to start, discuss role fit, and guide you to the exact page or contact channel behind each answer.",
-      zh: "我可以快速自我介绍，解释任意一段经历或项目，总结技能与量化成果，说明我如何与 AI 协作，推荐浏览顺序，讨论适合的岗位，并在回答后带你前往对应页面或联系方式。",
+      en: "I can give a quick intro to Wuziyang Zhang, walk through any internship or project, summarize his skills and measurable results, explain how he works with AI, suggest where to start, discuss role fit, and point you straight to the matching section or contact link.",
+      zh: "我可以快速介绍张吴梓洋，展开讲他的任意一段实习或项目，汇总技能与量化成果，说说他怎么和 AI 协作、适合哪些岗位，也能按你的关注点指路到对应页面或联系方式。",
     },
   },
   {
@@ -315,15 +357,15 @@ const INTENTS: ProfileChatIntent[] = [
     keywords: ["一句话介绍", "用一句话介绍自己", "简短介绍", "快速介绍", "30秒介绍", "电梯陈述", "one sentence", "short introduction", "quick intro", "elevator pitch", "summarize yourself"],
     answer: {
       en: "I’m Wuziyang Zhang, a UW–Madison Economics and Information Science student who combines strategy, data, and AI product building to turn complex business questions into measurable decisions and usable systems.",
-      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，主修经济学与信息科学，专注于结合战略、数据与 AI 产品能力，把复杂商业问题转化为可量化的决策和可使用的系统。",
+      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，主修经济学与信息科学，专注于结合战略、数据与 AI 产品能力，把复杂商业问题转化为可量化的决策和好用的系统。",
     },
   },
   {
     id: "where-to-start",
     keywords: ["从哪里开始", "先看什么", "推荐看什么", "怎么浏览", "浏览顺序", "先了解什么", "where should i start", "what should i see first", "recommend something", "show me around", "guide me"],
     answer: {
-      en: "If you have two minutes, start with my experience timeline, then open Alibaba for analytics and AI agents, Roland Berger for consulting impact, and ChartCreator for end-to-end product building. Together, those three show the range most clearly.",
-      zh: "如果只有两分钟，建议先看我的经历时间线，再分别打开阿里经历了解数据分析与 AI Agent、罗兰贝格经历了解咨询影响，以及 ChartCreator 了解端到端产品构建。这三部分最能完整呈现我的能力跨度。",
+      en: "If you have two minutes, start with my experience timeline, then open Alibaba for analytics and AI agents, Roland Berger for consulting impact, and the Projects section for Offer Radar and My Health Agent. Together, those three show the range most clearly.",
+      zh: "如果只有两分钟，建议先看我的经历时间线，再分别打开阿里经历了解数据分析与 AI Agent、罗兰贝格经历了解咨询影响，以及项目区查看 Offer 雷达和健康助理。这三部分最能完整呈现我的能力跨度。",
     },
   },
   {
@@ -332,14 +374,6 @@ const INTENTS: ProfileChatIntent[] = [
     answer: {
       en: "My edge is range with follow-through. I can move from market research and quantitative analysis to product structure, communication, and implementation without losing the business question. That lets me connect teams that often speak different languages — strategy, data, design, and technology.",
       zh: "我的差异化在于能力跨度和落地闭环。我能从市场研究与定量分析继续推进到产品结构、表达和实现，同时不丢失最初的业务问题。这让我可以连接战略、数据、设计与技术这些常常使用不同语言的团队。",
-    },
-  },
-  {
-    id: "proudest-work",
-    keywords: ["最自豪的项目", "最喜欢的项目", "最有代表性的项目", "哪个项目最能代表你", "代表作", "proudest project", "favorite project", "best project", "most representative project"],
-    answer: {
-      en: "ChartCreator best represents how I like to work. I found a real user pain point, researched the market, designed the product flow and architecture, used AI-assisted development, and moved from idea to a deployed MVP in four weeks.",
-      zh: "ChartCreator 最能代表我的工作方式。我从真实用户痛点出发，完成市场调研、产品流程与架构设计，再通过 AI 辅助开发，在四周内把想法推进到可使用的 MVP。",
     },
   },
   {
@@ -394,15 +428,15 @@ const INTENTS: ProfileChatIntent[] = [
     id: "assistant-technology",
     keywords: ["这个机器人怎么做的", "用了什么模型", "什么模型", "webllm", "本地模型", "技术原理", "机器人技术", "how does this chatbot work", "what model", "local model", "chatbot technology"],
     answer: {
-      en: "This assistant combines a structured portfolio knowledge base with a 4-bit Qwen2.5 0.5B model running locally through WebLLM. The knowledge base supplies the facts; the model turns them into a more natural first-person answer and streams it into the conversation.",
-      zh: "这个助手把结构化个人知识库与通过 WebLLM 本地运行的 4-bit Qwen2.5 0.5B 模型结合起来。知识库负责提供准确事实，小模型负责把它组织成自然的第一人称回答并流式输出。",
+      en: "This assistant pairs a structured portfolio knowledge base with a 4-bit Qwen3.5 model (0.8B or 2B depending on your GPU) running locally through WebLLM. The knowledge base supplies the verified facts, and the local model turns them into a natural reply streamed straight in your browser.",
+      zh: "这个助手把结构化站内知识库与通过 WebLLM 在本地运行的 4-bit Qwen3.5 模型（按设备显存自动选择 0.8B 或 2B）结合起来。知识库负责提供核实过的事实，本地小模型负责把它整理成自然回答并流式输出。",
     },
   },
   {
     id: "assistant-privacy",
     keywords: ["隐私", "数据会上传吗", "会发送数据吗", "问题发到哪里", "本地运行", "离线", "privacy", "data transfer", "where does my question go", "runs locally", "on device"],
     answer: {
-      en: "My questions are processed on the visitor’s device once the local model is ready; they are not sent to a hosted AI API. The browser downloads and caches the model files, while the portfolio knowledge and generation stay inside the browser session.",
+      en: "Your questions are processed directly on your device once the local model is ready; they are not sent to a hosted AI API. The browser downloads and caches the model files, while the portfolio knowledge and generation stay inside your browser session.",
       zh: "本地模型准备好后，你的问题会直接在访问设备上处理，不会发送到托管式 AI API。浏览器只需下载并缓存模型文件，个人知识与生成过程都留在浏览器会话中。",
     },
   },
@@ -419,7 +453,7 @@ const INTENTS: ProfileChatIntent[] = [
     keywords: ["你是谁", "他是谁", "介绍一下你自己", "介绍一下自己", "介绍梓洋", "介绍张吴梓洋", "自我介绍", "个人简介", "关于梓洋", "who is wuziyang", "introduce yourself", "introduce wuziyang", "about him", "personal profile", "personal background"],
     answer: {
       en: "I’m Wuziyang Zhang, a UW–Madison student and builder working where business strategy, data analysis, and AI products meet. I like turning ambiguous questions into structured, usable outcomes — with equal attention to logic and experience.",
-      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，关注商业战略、数据分析与 AI 产品的交叉地带。我擅长把模糊问题拆成清晰结构，并进一步做成可执行、好使用的成果。",
+      zh: "我是张吴梓洋，就读于威斯康星大学麦迪逊分校，关注商业战略、数据分析与 AI 产品的交叉地带。我擅长把模糊问题拆成清晰结构，并进一步做成可执行、好用的成果。",
     },
   },
   {
@@ -474,48 +508,46 @@ const INTENTS: ProfileChatIntent[] = [
     id: "experience-overview",
     keywords: ["工作经历", "实习经历", "经历概览", "做过什么", "所有经历", "experience", "work history", "internships", "career history", "where has he worked"],
     answer: {
-      en: "My selected experience spans Alibaba International, ByteDance, Roland Berger, and Guoyuan Securities, plus building ChartCreator. The common thread is using research, data, and product thinking to turn complex business questions into decisions or working systems.",
-      zh: "我的代表经历包括阿里国际、字节跳动、罗兰贝格、国元证券，以及独立构建 ChartCreator。共同主线是用研究、数据与产品思维，把复杂商业问题转化为决策依据或可运行的系统。",
+      en: "My selected experience spans Alibaba International, ByteDance, Roland Berger, and Guoyuan Securities. The common thread is using research, data, and product thinking to turn complex business questions into decisions or working systems.",
+      zh: "我的代表经历包括阿里国际、字节跳动、罗兰贝格和国元证券。共同主线是用研究、数据与产品思维，把复杂商业问题转化为决策依据或可运行的系统。",
     },
   },
   {
     id: "projects-overview",
-    keywords: ["你的项目", "做过哪些项目", "项目概览", "项目经历", "介绍你的项目", "有哪些项目", "your projects", "project overview", "what projects have you built", "tell me about your projects"],
-    answer: {
-      en: "My two clearest independent projects are ChartCreator, an AI-assisted visualization product I took from research to a deployed MVP, and Code and Power, an educational site examining implicit bias and equity in digital systems. My internships also included project-based work in logistics analytics, platform strategy, user growth, and financial research.",
-      zh: "我最具代表性的两个独立项目是 ChartCreator——一款从调研推进到 MVP 上线的 AI 数据可视化产品，以及 Code and Power——一个讨论数字系统中隐性偏见与公平议题的教育网站。除此之外，我的实习也覆盖物流分析、平台战略、用户增长与金融研究等项目型工作。",
-    },
+    keywords: ["你的项目", "做过哪些项目", "项目概览", "项目经历", "介绍你的项目", "有哪些项目", "your projects", "project overview", "what projects have you built", "tell me about your projects", "最自豪的项目", "最喜欢的项目", "最有代表性的项目", "哪个项目最能代表你", "代表作", "proudest project", "favorite project", "best project", "most representative project"],
+    answer: PROJECTS_OVERVIEW,
+    verbatim: true,
   },
   {
     id: "experience-timeline",
     keywords: ["经历顺序", "实习时间", "工作时间线", "哪年实习", "先后顺序", "timeline", "when did you work", "internship dates", "experience order"],
     answer: {
-      en: "My selected timeline runs from Guoyuan Securities in summer 2024, Roland Berger in May–August 2025, ChartCreator from August 2025 to April 2026, ByteDance from December 2025 to February 2026, and Alibaba International from May to August 2026.",
-      zh: "我的代表经历时间线是：2024 年暑期国元证券，2025 年 5–8 月罗兰贝格，2025 年 8 月至 2026 年 4 月构建 ChartCreator，2025 年 12 月至 2026 年 2 月字节跳动，以及 2026 年 5–8 月阿里国际。",
+      en: "My selected timeline runs from Guoyuan Securities in summer 2024, Roland Berger in May–August 2025, ByteDance from December 2025 to February 2026, and Alibaba International from May to August 2026.",
+      zh: "我的代表经历时间线是：2024 年暑期国元证券，2025 年 5–8 月罗兰贝格，2025 年 12 月至 2026 年 2 月字节跳动，以及 2026 年 5–8 月阿里国际。",
     },
   },
   {
     id: "career-arc",
     keywords: ["经历主线", "职业路径", "经历之间有什么联系", "为什么跨度这么大", "从金融到咨询到科技", "成长路径", "career arc", "career path", "connect your experiences", "finance consulting technology"],
     answer: {
-      en: "My path moves from financial research at Guoyuan, to data-driven consulting at Roland Berger, to platform strategy at ByteDance, and then to AI-enabled business analytics at Alibaba — while ChartCreator gave me direct product ownership. Each step added a layer: evaluate markets, shape decisions, understand platforms, build intelligent workflows, and ship products.",
-      zh: "我的路径从国元证券的金融研究，走到罗兰贝格的数据驱动咨询、字节的平台战略，再到阿里的 AI 商业分析；与此同时，ChartCreator 让我获得了直接的产品所有权。每一步都增加了一层能力：判断市场、支持决策、理解平台、构建智能工作流，再把产品真正做出来。",
+      en: "My path moves from financial research at Guoyuan, to data-driven consulting at Roland Berger, to platform strategy at ByteDance, and then to AI-enabled business analytics at Alibaba. Each step added a layer: evaluate markets, shape decisions, understand platforms, and build intelligent workflows.",
+      zh: "我的路径从国元证券的金融研究，走到罗兰贝格的数据驱动咨询、字节的平台战略，再到阿里的 AI 商业分析。每一步都增加了一层能力：判断市场、支持决策、理解平台、构建智能工作流。",
     },
   },
   {
     id: "overall-learning",
     keywords: ["你学到了什么", "你最大的收获", "总体学到了什么", "这些经历学到了什么", "整体收获", "what have you learned", "biggest overall lesson", "overall takeaway", "what did these experiences teach you"],
     answer: {
-      en: "My biggest overall lesson is that analysis creates value only when it enters a real decision or user workflow. Guoyuan built my research discipline; Roland Berger taught me to turn models into client action; ByteDance trained me to judge platforms under uncertainty; Alibaba connected analytics with AI workflows; and ChartCreator gave me end-to-end product ownership. Together, they shaped how I work now: clarify the problem and criteria, use evidence to move forward, and finish with something people can actually use.",
-      zh: "总体来说，我最重要的收获是：分析只有进入真实决策或使用场景，才真正产生价值。国元训练了我的研究纪律，罗兰贝格让我把模型转成客户行动，字节让我在不完整信息中判断平台机会，阿里让我把分析连接到 AI 工作流，而 ChartCreator 让我完整承担从问题定义到产品上线。它们共同塑造了我现在的工作方式：先明确问题与标准，再用证据推进，最后交付真正可使用的结果。",
+      en: "My biggest overall lesson is that analysis creates value only when it enters a real decision or user workflow. Guoyuan built my research discipline; Roland Berger taught me to turn models into client action; ByteDance trained me to judge platforms under uncertainty; Alibaba connected analytics with AI workflows. Together, they shaped how I work now: clarify the problem and criteria, use evidence to move forward, and finish with something people can actually use.",
+      zh: "总体来说，我最重要的收获是：分析只有进入真实决策或使用场景，才真正产生价值。国元训练了我的研究纪律，罗兰贝格让我把模型转成客户行动，字节让我在不完整信息中判断平台机会，阿里让我把分析连接到 AI 工作流。它们共同塑造了我现在的工作方式：先明确问题与标准，再用证据推进，最后交付真正可使用的结果。",
     },
   },
   {
     id: "experience-compare",
     keywords: ["比较这些经历", "这些经历有什么不同", "阿里和罗兰贝格", "字节和阿里", "咨询和科技", "哪段经历最偏战略", "哪段最偏数据", "compare your experiences", "alibaba versus roland berger", "bytedance versus alibaba", "consulting versus tech"],
     answer: {
-      en: "The experiences emphasize different parts of the same operating system. Guoyuan is strongest in financial and industry research; Roland Berger in analytical strategy and client-ready systems; ByteDance in platform and competitive strategy; Alibaba in causal analytics and AI agents; ChartCreator in end-to-end product ownership.",
-      zh: "这些经历对应同一套能力体系的不同侧面：国元证券更偏金融与行业研究，罗兰贝格更偏定量战略与客户交付，字节更偏平台与竞品战略，阿里更偏因果分析与 AI Agent，而 ChartCreator 最能体现端到端产品所有权。",
+      en: "The experiences emphasize different parts of the same operating system. Guoyuan is strongest in financial and industry research; Roland Berger in analytical strategy and client-ready systems; ByteDance in platform and competitive strategy; and Alibaba in causal analytics and AI agents.",
+      zh: "这些经历对应同一套能力体系的不同侧面：国元证券更偏金融与行业研究，罗兰贝格更偏定量战略与客户交付，字节更偏平台与竞品战略，阿里更偏因果分析与 AI Agent。",
     },
   },
   {
@@ -554,7 +586,7 @@ const INTENTS: ProfileChatIntent[] = [
     id: "alibaba-agent",
     keywords: ["物流agent", "物流智能体", "物流异常", "物流异常怎么监测", "怎么监测", "异常监测", "异常定位", "指标库", "语义层", "血缘", "agent", "metrics library", "logistics sentinel", "monitoring", "lineage", "yaml"],
     answer: {
-      en: "I built an AI-readable logistics metrics layer in Markdown and YAML, plus reusable workflows for definition extraction and SQL lineage. My daily sentinel monitored six fulfilment stages and supported country → route → carrier drill-down, bringing root-cause diagnosis to roughly 30 seconds.",
+      en: "I built an AI-readable logistics metrics layer in Markdown and YAML, plus reusable workflows for definition extraction and SQL lineage. My daily sentinel monitored six fulfillment stages and supported country → route → carrier drill-down, bringing root-cause diagnosis to roughly 30 seconds.",
       zh: "我用 Markdown 与 YAML 搭建 AI 可读的物流指标语义层，并制作指标抽取与 SQL 血缘追踪流程。每日监测 Agent 覆盖六段履约，可从国家下钻到线路与承运商，将根因定位缩短至约 30 秒。",
     },
   },
@@ -562,7 +594,7 @@ const INTENTS: ProfileChatIntent[] = [
     id: "alibaba-workbench",
     keywords: ["ai应用台", "workbench", "操作指南", "灰度上线", "odps连接", "团队赋能", "部署分析", "deployment guide"],
     answer: {
-      en: "I wrote an AI Workbench operations guide covering repository setup, ODPS connectivity, dependency installation, debugging, and grey-release deployment. The goal was to help the team turn one-off analyses into reusable, maintainable capabilities.",
+      en: "I wrote an AI Workbench operations guide covering repository setup, ODPS connectivity, dependency installation, debugging, and gray-release deployment. The goal was to help the team turn one-off analyses into reusable, maintainable capabilities.",
       zh: "我编写了《AI 应用台操作指南》，覆盖代码建仓、ODPS 数据源连接、依赖安装、调试与灰度上线，目标是帮助团队把一次性分析沉淀为可复用、可维护的能力。",
     },
   },
@@ -682,7 +714,7 @@ const INTENTS: ProfileChatIntent[] = [
     id: "roland-deliverables",
     keywords: ["罗兰贝格产出", "97页", "运营体系", "体系文件", "客户交付", "consulting deliverables", "97 pages", "operation manual"],
     answer: {
-      en: "Beyond the analysis, I helped translate the project into a 97-page Dongfeng Honda KOC digital-operation system and a 15-page Word operating guide. The point was to make the strategy trainable and repeatable after the consulting engagement ended.",
+      en: "Beyond the analysis, I helped translate the project into the 97-page Dongfeng Honda KOC Digital Operations Manual and a 15-page Word operating guide. The point was to make the strategy trainable and repeatable after the consulting engagement ended.",
       zh: "除分析外，我还参与把项目沉淀为 97 页东风本田 KOC 数字化运营体系文件和 15 页 Word 操作指南，让策略在咨询项目结束后仍能被培训、复用与持续执行。",
     },
   },
@@ -743,75 +775,11 @@ const INTENTS: ProfileChatIntent[] = [
     },
   },
   {
-    id: "chartcreator",
-    keywords: ["chartcreator", "图表项目", "图表产品", "数据可视化平台", "可视化项目", "ai chart", "visualization product", "flagship project"],
-    answer: {
-      en: "ChartCreator is my AI-powered data-visualization product for non-technical users who need polished, presentation-ready charts. I designed the Upload → AI Recommend → Customize → Export flow and built the MVP from research to deployed interface in four weeks.",
-      zh: "ChartCreator 是我面向非技术用户打造的 AI 数据可视化产品，目标是快速生成可直接用于汇报的精美图表。我设计了“上传 → AI 推荐 → 自定义 → 导出”的完整流程，并在四周内从调研推进到 MVP 上线。",
-    },
-  },
-  {
-    id: "chartcreator-view",
-    keywords: ["怎么看chartcreator", "觉得chartcreator怎么样", "喜欢chartcreator吗", "chartcreator评价", "what do you think of chartcreator", "chartcreator opinion", "how do you feel about chartcreator"],
-    answer: {
-      en: "ChartCreator is the project I feel most personally attached to because it tested the full loop from identifying a real pain point to shipping a usable product. I am proud of the speed and ownership behind the four-week MVP, while also seeing it as an evolving product whose value depends on continued user feedback rather than the first release alone.",
-      zh: "ChartCreator 是我个人投入感最强的项目，因为它完整检验了从发现真实痛点到交付可用产品的全过程。我对四周完成 MVP 的速度与端到端所有权很自豪，但也把它看作一个仍需持续通过用户反馈迭代的产品，而不是首版上线就已经完成。",
-    },
-  },
-  {
-    id: "chartcreator-learning",
-    keywords: ["chartcreator学到了什么", "chartcreator收获", "chartcreator最大挑战", "chartcreator反思", "what did you learn from chartcreator", "chartcreator takeaway", "chartcreator challenge"],
-    answer: {
-      en: "ChartCreator taught me that speed comes from making product decisions explicit, not from skipping them. Defining the user, flow, architecture, and acceptance criteria first made AI-assisted development much more effective, while real feedback kept the build anchored to a user problem.",
-      zh: "ChartCreator 让我认识到，速度来自把产品决策说清楚，而不是跳过这些决策。先明确用户、流程、架构与验收标准，AI 辅助开发才真正高效；真实反馈则确保构建过程始终围绕用户问题，而不是围绕技术本身。",
-    },
-  },
-  {
-    id: "chartcreator-origin",
-    keywords: ["为什么做chartcreator", "chartcreator起源", "chartcreator解决什么问题", "chartcreator有什么用", "解决什么问题", "产品痛点", "why chartcreator", "what problem does chartcreator solve", "problem it solves", "product origin", "user pain point"],
-    answer: {
-      en: "I started ChartCreator after seeing non-technical professionals spend too much time fighting chart formatting instead of interpreting data. The product is designed to reduce that friction and produce polished, presentation-ready output quickly.",
-      zh: "我做 ChartCreator，是因为看到许多非技术用户把大量时间耗在图表样式调整上，而不是数据洞察本身。这个产品希望降低操作摩擦，更快产出可直接用于汇报的精美图表。",
-    },
-  },
-  {
-    id: "chartcreator-process",
-    keywords: ["chartcreator怎么做的", "产品流程", "用户调研", "竞品分析", "figma", "产品设计过程", "how did you build chartcreator", "product process", "user flow"],
-    answer: {
-      en: "I began with competitor analysis of Graphy, Canva, and Graphmaker, then interviewed people in consulting, finance, and sales. I mapped the system in Visio, prototyped in Figma, defined interface logic with the backend, and iterated toward the four-step user flow.",
-      zh: "我先分析 Graphy、Canva、Graphmaker 等竞品，再访谈咨询、金融和销售从业者；随后用 Visio 梳理系统逻辑、用 Figma 制作原型，与后端明确接口，再围绕四步用户流程持续迭代。",
-    },
-  },
-  {
-    id: "chartcreator-audience",
-    keywords: ["chartcreator给谁用", "目标用户", "谁需要chartcreator", "咨询金融销售", "非技术用户", "target users", "who is chartcreator for", "consulting finance sales", "nontechnical users"],
-    answer: {
-      en: "ChartCreator is designed for non-technical professionals — especially people in consulting, finance, and sales — who need polished, presentation-ready charts without spending hours on formatting. User interviews highlighted inconsistent formatting, complex tools, and poor export quality as recurring pain points.",
-      zh: "ChartCreator 面向需要高质量汇报图表的非技术用户，尤其是咨询、金融与销售从业者。访谈中反复出现的痛点包括格式不一致、工具操作复杂，以及导出质量不理想。",
-    },
-  },
-  {
-    id: "chartcreator-stack",
-    keywords: ["chartcreator技术栈", "chartcreator用了什么", "nextjs tailwind", "产品架构", "前后端接口", "chartcreator tech stack", "how is chartcreator built", "next.js tailwind", "product architecture"],
-    answer: {
-      en: "I built the ChartCreator frontend with Next.js and Tailwind CSS, designed prototypes in Figma, mapped system interactions in Visio, and used Claude Code and Codex as the primary development tools. I also defined interface logic and API standards with the backend side of the product.",
-      zh: "ChartCreator 前端采用 Next.js 与 Tailwind CSS，原型使用 Figma，系统交互通过 Visio 梳理，并以 Claude Code 与 Codex 作为主要开发工具。我也参与定义了与后端协作所需的接口逻辑和 API 标准。",
-    },
-  },
-  {
-    id: "chartcreator-ownership",
-    keywords: ["一个人做的吗", "独立开发", "你的职责", "产品所有权", "从0到1", "四周上线", "did you build it alone", "solo builder", "product ownership", "zero to one", "four week mvp"],
-    answer: {
-      en: "I owned the product from zero to one: user research, competitor analysis, product flow, information architecture, prototyping, interface implementation, and deployment. The MVP reached launch in four weeks, with the frontend produced through a prompt-driven development workflow using Claude Code and Codex.",
-      zh: "我承担了从 0 到 1 的完整产品工作，包括用户研究、竞品分析、产品流程、信息架构、原型、界面实现与部署。MVP 在四周内上线，前端通过 Claude Code 与 Codex 驱动的提示词开发流程完成。",
-    },
-  },
-  {
     id: "vibe-coding",
     keywords: ["vibe coding", "氛围编程", "怎么开发", "claude code", "codex", "prompt engineering", "提示词开发", "ai编程"],
     answer: {
-      en: "I use a vibe-coding workflow: define the product blueprint and architecture, write structured prompts, review the generated implementation, then iterate against real product behavior. I built ChartCreator with Claude Code and Codex as my core development tools.",
-      zh: "我的 Vibe Coding 流程是先明确产品蓝图与架构，再通过结构化 Prompt 生成实现、审查结果，并围绕真实产品表现持续迭代。ChartCreator 主要使用 Claude Code 与 Codex 完成开发。",
+      en: "I use a vibe-coding workflow: define the product blueprint and architecture, write structured prompts, review the generated implementation, then iterate against real product behavior.",
+      zh: "我的 Vibe Coding 流程是先明确产品蓝图与架构，再通过结构化 Prompt 生成实现、审查结果，并围绕真实产品表现持续迭代。",
     },
   },
   {
@@ -820,30 +788,6 @@ const INTENTS: ProfileChatIntent[] = [
     answer: {
       en: "I use AI as a structured collaborator, not a substitute for judgment. I define the problem, constraints, and acceptance criteria; AI accelerates research, coding, and iteration; then I verify the logic, test the output, and make the final product decisions.",
       zh: "我把 AI 当作结构化协作者，而不是判断力的替代品。我负责定义问题、约束和验收标准，AI 加速研究、编码与迭代；最后由我核验逻辑、测试结果并做产品决策。",
-    },
-  },
-  {
-    id: "code-and-power",
-    keywords: ["code and power", "科技伦理", "隐性偏见", "intersectionality", "implicit bias", "academic project", "学术项目"],
-    answer: {
-      en: "Code and Power is an educational website about implicit bias, intersectionality, and equity in digital systems. I built it with Matt Steines using HTML/CSS, with resources and a Tech Hero profile that encourage more equitable design thinking.",
-      zh: "Code and Power 是一个讨论数字系统中隐性偏见、交叉性与公平议题的教育网站。我与 Matt Steines 使用 HTML/CSS 合作完成，并通过教育资源与人物专题倡导更公平的设计思维。",
-    },
-  },
-  {
-    id: "code-and-power-ml",
-    keywords: ["code and power机器学习", "羊驼和獾", "548张", "teachable machine", "mobilenet", "图像分类", "coded gaze", "image classifier", "alpaca badger", "548 photos", "transfer learning"],
-    answer: {
-      en: "For Code and Power, I trained a four-class image classifier with Google Teachable Machine, TensorFlow.js, and MobileNet transfer learning using more than 548 self-photographed images of two alpacas and two badgers. The model exposed shortcut learning: it relied on size and camera distance instead of robust animal features, connecting directly to the project’s lesson about biased or incomplete training data.",
-      zh: "在 Code and Power 中，我使用 Google Teachable Machine、TensorFlow.js 与 MobileNet 迁移学习训练了一个四分类图像模型，数据来自 548 张以上自拍的两只羊驼和两只獾。模型暴露了“捷径学习”问题：它依赖物体大小与拍摄距离，而非稳定的动物特征，这也直接对应训练数据偏差与遗漏的主题。",
-    },
-  },
-  {
-    id: "code-and-power-learning",
-    keywords: ["code and power学到了什么", "项目收获", "交叉性设计", "技术偏见", "公平设计", "what did you learn from code and power", "project learning", "intersectional design", "technology bias"],
-    answer: {
-      en: "The project taught me that framing is itself a design decision, inclusion is an engineering constraint rather than an afterthought, and simplifying an idea for a general audience is harder than writing for experts. It also made the relationship between training-data omissions and real product failures tangible.",
-      zh: "这个项目让我更明确地认识到：问题框架本身就是设计决策，包容性应当是工程约束而非事后补充，而面向普通读者准确地化繁为简，往往比面向专家写作更难。它也让我直观看到训练数据的遗漏如何转化为真实的产品失效。",
     },
   },
   {
@@ -858,8 +802,8 @@ const INTENTS: ProfileChatIntent[] = [
     id: "measurable-results",
     keywords: ["代表成果", "量化成果", "有什么成绩", "关键数据", "最有影响的结果", "biggest results", "measurable impact", "key achievements", "metrics"],
     answer: {
-      en: "A few measurable outcomes: about $1.265M in monthly GMV opportunity quantified at Alibaba; root-cause drill-down reduced to roughly 30 seconds; R² = 0.86 and a 27% UGC lift in the Roland Berger project; a 100+ page ByteDance report; and a four-week MVP launch for ChartCreator.",
-      zh: "几项可量化成果包括：在阿里测算约 126.5 万美元月度 GMV 增益空间，将异常根因下钻缩短至约 30 秒；罗兰贝格项目模型 R² = 0.86、次月 UGC 提升 27%；参与字节 100+ 页报告；ChartCreator 四周完成 MVP 上线。",
+      en: "A few measurable outcomes: about $1.265M in monthly GMV opportunity quantified at Alibaba; root-cause drill-down reduced to roughly 30 seconds; R² = 0.86 and a 27% UGC lift in the Roland Berger project; and a 100+ page ByteDance report.",
+      zh: "几项可量化成果包括：在阿里测算约 126.5 万美元月度 GMV 增益空间，将异常根因下钻缩短至约 30 秒；罗兰贝格项目模型 R² = 0.86、次月 UGC 提升 27%；参与字节 100+ 页报告。",
     },
   },
   {
@@ -938,8 +882,8 @@ const INTENTS: ProfileChatIntent[] = [
     id: "global-detail",
     keywords: ["去过多少地方", "多少国家", "多少城市", "几个大洲", "去过哪些城市", "纽约东京巴黎", "how many countries", "how many cities", "continents", "cities visited", "where have you traveled"],
     answer: {
-      en: "I’ve traveled across more than 20 countries, 100 cities, and five continents. The portfolio highlights places including New York, Istanbul, Toronto, Lima, Tokyo, Paris, Singapore, London, Seoul, Berlin, and Machu Picchu in Peru.",
-      zh: "我走访过 20 多个国家、100 多座城市，覆盖五大洲。网站中展示或提到的地点包括纽约、伊斯坦布尔、多伦多、利马、东京、巴黎、新加坡、伦敦、首尔、柏林，以及秘鲁马丘比丘。",
+      en: "I’ve traveled across more than 20 countries, 100 cities, and five continents. The portfolio highlights places including New York, Istanbul, Toronto, Lima, Tokyo, Paris, Chicago, Singapore, London, Seoul, Berlin, and Machu Picchu in Peru.",
+      zh: "我走访过 20 多个国家、100 多座城市，覆盖五大洲。网站中展示或提到的地点包括纽约、伊斯坦布尔、多伦多、利马、东京、巴黎、芝加哥、新加坡、伦敦、首尔、柏林，以及秘鲁马丘比丘。",
     },
   },
   {
@@ -986,8 +930,8 @@ const INTENTS: ProfileChatIntent[] = [
     id: "product-fit",
     keywords: ["适合产品经理吗", "为什么适合产品", "ai产品岗位", "产品经理能力", "产品经验", "fit for product management", "why product", "ai product role", "product manager skills"],
     answer: {
-      en: "My product fit comes from combining user research, information architecture, workflow design, technical collaboration, and hands-on implementation. ChartCreator is the clearest example: I identified the pain point, validated it with users, designed the flow and architecture, and moved the MVP to launch in four weeks.",
-      zh: "我的产品能力来自用户研究、信息架构、工作流设计、技术协作与实际实现的结合。ChartCreator 是最清晰的例子：我识别痛点、通过访谈验证需求、设计流程与架构，并在四周内把 MVP 推进上线。",
+      en: "My product fit comes from combining user research, information architecture, workflow design, technical collaboration, and hands-on implementation.",
+      zh: "我的产品能力来自用户研究、信息架构、工作流设计、技术协作与实际实现的结合。",
     },
   },
   {
@@ -1002,15 +946,15 @@ const INTENTS: ProfileChatIntent[] = [
     id: "independent-building",
     keywords: ["独立完成过什么", "自主推动", "主人翁意识", "ownership案例", "从想法到落地", "what did you build independently", "ownership example", "self directed", "idea to launch"],
     answer: {
-      en: "ChartCreator is my strongest ownership example: I carried it from a user pain point through research, product design, architecture, implementation, and deployment. The Alibaba workbench guide and reusable agent workflows are another example of turning individual analysis into capabilities a wider team could operate.",
-      zh: "ChartCreator 是我最完整的所有权案例：从用户痛点出发，推进调研、产品设计、架构、实现与部署。阿里的 AI 应用台指南和可复用 Agent 工作流，则体现了我如何把个人分析沉淀为团队能够持续使用的能力。",
+      en: "The Alibaba workbench guide and reusable agent workflows are an example of turning individual analysis into capabilities a wider team could operate.",
+      zh: "阿里的 AI 应用台指南和可复用 Agent 工作流体现了我如何把个人分析沉淀为团队能够持续使用的能力。",
     },
   },
   {
     id: "contact",
     keywords: ["怎么联系", "联系方式", "联系他", "找他", "contact", "get in touch", "reach him", "reach out"],
     answer: {
-      en: "The easiest ways to reach me are email or LinkedIn. My English-facing email is zhangwuziyang@gmail.com, and my LinkedIn profile is linked in the Contact section at the bottom of the site.",
+      en: "The easiest ways to reach me are email or LinkedIn. My English-facing email is zhangwuziyang@gmail.com (for Chinese-language contact, 3168661545@qq.com), and my LinkedIn profile is linked in the Contact section at the bottom of the site.",
       zh: "最方便的方式是邮件或 LinkedIn。中文联系我可使用 3168661545@qq.com；英文联系可使用 zhangwuziyang@gmail.com，网站底部的联系区也有 LinkedIn 入口。",
     },
   },
@@ -1093,16 +1037,50 @@ function keywordScore(query: string, keyword: string): number {
   if (q === k) return 100;
 
   let score = diceCoefficient(q, k) * 46;
-  if (q.includes(k)) score = Math.max(score, 62 + Math.min(k.length, 18));
+  const queryTokens = tokenize(query);
+  const keywordTokens = tokenize(keyword);
+  const containsKeyword = /[\u3400-\u9fff]/.test(k)
+    ? q.includes(k)
+    : ` ${queryTokens.join(" ")} `.includes(` ${keywordTokens.join(" ")} `);
+  if (containsKeyword) score = Math.max(score, 62 + Math.min(k.length, 18));
   if (q.length >= 2 && k.includes(q)) score = Math.max(score, 42 + Math.min(q.length, 14));
 
-  const queryTokens = new Set(tokenize(query));
-  const keywordTokens = new Set(tokenize(keyword));
-  const tokenOverlap = [...queryTokens].filter((token) => keywordTokens.has(token)).length;
-  const tokenBase = Math.max(queryTokens.size, keywordTokens.size, 1);
+  const uniqueQueryTokens = new Set(queryTokens);
+  const uniqueKeywordTokens = new Set(keywordTokens);
+  const tokenOverlap = [...uniqueQueryTokens].filter((token) => uniqueKeywordTokens.has(token)).length;
+  const tokenBase = Math.max(uniqueQueryTokens.size, uniqueKeywordTokens.size, 1);
   score = Math.max(score, (tokenOverlap / tokenBase) * 38);
 
   return score;
+}
+
+function resolveProjectIntentId(query: string): string | undefined {
+  const normalizedQuery = normalize(query);
+  const exactMatch = PROJECT_INTENTS.find(({ keywords }) =>
+    keywords.some((keyword) => normalize(keyword) === normalizedQuery),
+  );
+  if (exactMatch) return exactMatch.id;
+
+  const topics = PROJECT_TOPICS.filter(({ pattern }) => pattern.test(query));
+  if (topics.length > 1) return "projects-overview";
+
+  const topic = topics[0];
+  if (!topic) return undefined;
+
+  const focus = query.replace(topic.pattern, "");
+  const ranked = PROJECT_INTENTS
+    .filter(({ destination }) => destination === topic.destination)
+    .map(({ id, keywords, facts }) => {
+      const keywordMatch = Math.max(...keywords.map((keyword) =>
+        keywordScore(focus, keyword.replace(topic.pattern, "")),
+      ));
+      // Longer fact text is less reliable than an explicit keyword match.
+      const factMatch = Math.max(...facts.flatMap(({ en, zh }) => [keywordScore(focus, en), keywordScore(focus, zh)]));
+      const scopedMatch = SCOPED_PROJECT_KEYWORDS[id]?.test(focus) ? 46 : 0;
+      return { id, score: Math.max(keywordMatch, factMatch >= 55 ? factMatch * 0.85 : 0, scopedMatch) };
+    })
+    .sort((a, b) => b.score - a.score);
+  return ranked[0].score >= 32 ? ranked[0].id : topic.questions[0].id;
 }
 
 function isExplicitExperienceComparison(query: string): boolean {
@@ -1112,45 +1090,41 @@ function isExplicitExperienceComparison(query: string): boolean {
     /罗兰贝格|roland\s*berger/i,
     /字节|bytedance/i,
     /国元|guoyuan/i,
-    /chart\s*creator/i,
-    /code\s*and\s*power/i,
   ].filter((pattern) => pattern.test(query)).length;
   return comparisonLanguage && mentionedExperiences >= 2;
 }
 
 const EXPERIENCE_SUBJECTS = [
-  { pattern: /阿里|alibaba/i, opinionId: "alibaba-view", reflectionId: "alibaba-learning" },
-  { pattern: /字节|bytedance/i, opinionId: "bytedance-view", reflectionId: "bytedance-learning" },
-  { pattern: /罗兰贝格|roland\s*berger/i, opinionId: "roland-view", reflectionId: "roland-learning" },
-  { pattern: /国元|guoyuan/i, opinionId: "guoyuan-view", reflectionId: "guoyuan-learning" },
-  { pattern: /chart\s*creator/i, opinionId: "chartcreator-view", reflectionId: "chartcreator-learning" },
+  { pattern: /阿里|alibaba/i, id: "alibaba", opinionId: "alibaba-view", reflectionId: "alibaba-learning" },
+  { pattern: /字节|bytedance/i, id: "bytedance", opinionId: "bytedance-view", reflectionId: "bytedance-learning" },
+  { pattern: /罗兰贝格|roland\s*berger/i, id: "roland-berger", opinionId: "roland-view", reflectionId: "roland-learning" },
+  { pattern: /国元|guoyuan/i, id: "guoyuan", opinionId: "guoyuan-view", reflectionId: "guoyuan-learning" },
 ] as const;
 
 const EXPERIENCE_COMPARISON_PROFILES = [
   {
     pattern: /阿里|alibaba/i,
+    destination: "alibaba",
     zh: "阿里经历更偏因果分析、物流商业分析与 AI Agent，重点是把分析接入日常运营",
     en: "Alibaba emphasized causal analytics, logistics business analysis, and AI agents that moved analysis into daily operations",
   },
   {
     pattern: /罗兰贝格|roland\s*berger/i,
+    destination: "rolandBerger",
     zh: "罗兰贝格经历更偏定量战略、用户分群与客户交付，重点是把模型转成可执行的 KOC 运营体系",
     en: "Roland Berger emphasized quantitative strategy, user segmentation, and turning models into a client-ready KOC operating system",
   },
   {
     pattern: /字节|bytedance/i,
+    destination: "bytedance",
     zh: "字节经历更偏平台、竞品与产品战略，重点是在尚未稳定的市场中搭建决策框架",
     en: "ByteDance emphasized platform, competitive, and product strategy in a market that was still taking shape",
   },
   {
     pattern: /国元|guoyuan/i,
+    destination: "guoyuan",
     zh: "国元证券经历更偏金融与行业研究，重点是把财务、渠道与宏观信号收敛成投资观点",
     en: "Guoyuan Securities emphasized financial and industry research that turned company, channel, and macro signals into an investment thesis",
-  },
-  {
-    pattern: /chart\s*creator/i,
-    zh: "ChartCreator 更偏端到端产品所有权，重点是从用户研究一路推进到可部署的 MVP",
-    en: "ChartCreator emphasized end-to-end product ownership from user research through a deployed MVP",
   },
 ] as const;
 
@@ -1163,9 +1137,9 @@ function buildExperienceComparisonAnswer(query: string, lang: Lang): string | un
   if (compared.length < 2) return undefined;
 
   if (lang === "zh") {
-    return `${compared.map(({ zh }) => zh).join("；")}。共同点是都用数据支持真实决策，核心差异在于它们分别落在业务运营、客户交付、平台判断、投资研究或产品构建的不同环节。`;
+    return `${compared.map(({ zh }) => zh).join("；")}。共同点是都用数据支持真实决策，核心差异在于它们分别落在业务运营、客户交付、平台判断或投资研究的不同环节。`;
   }
-  return `${compared.map(({ en }) => en).join("; ")}. They all used evidence to support real decisions, but each placed me at a different point between operating workflows, client delivery, platform judgment, investment research, and product building.`;
+  return `${compared.map(({ en }) => en).join("; ")}. They all used evidence to support real decisions, but each placed me at a different point across operating workflows, client delivery, platform judgment, and investment research.`;
 }
 
 function findExperienceSubject(value: string) {
@@ -1174,6 +1148,18 @@ function findExperienceSubject(value: string) {
 
 function resolveExplicitIntentId(query: string): string | undefined {
   const rules: Array<{ id: string; pattern: RegExp }> = [
+    {
+      id: "quick-summary",
+      pattern: /一句话介绍|简短介绍|\bone sentence\b|\bquick intro\b|\belevator pitch\b/i,
+    },
+    {
+      id: "resume",
+      pattern: /简历|\b(?:resume|résumé|cv)\b/i,
+    },
+    {
+      id: "experience-timeline",
+      pattern: /实习时间|哪年实习|when (?:was|were|did).*\binternships?\b|\binternship dates\b/i,
+    },
     {
       id: "projects-overview",
       pattern: /(?:你的|他的|梓洋的)(?:代表)?项目|做过哪些项目|有哪些项目|项目概览|项目经历|your projects|what projects have you built|project overview/i,
@@ -1261,12 +1247,16 @@ function resolveFocusedIntentId(
   if (mode === "comparison" && isExplicitExperienceComparison(query)) {
     return "experience-compare";
   }
-  if (mode !== "opinion" && mode !== "reflection") return undefined;
-
   const subject = findExperienceSubject(query)
     ?? (allowRecentContext ? findExperienceSubject(recentUserContext) : undefined);
   if (!subject) return undefined;
-  return mode === "opinion" ? subject.opinionId : subject.reflectionId;
+  if (mode === "opinion") return subject.opinionId;
+  if (mode === "reflection") return subject.reflectionId;
+  if (mode === "fact" && /^(?:what did you do(?: at)?|what about|tell me (?:more )?about)\b|做了什么|做过什么/i.test(query.trim())) {
+    const mentions = EXPERIENCE_SUBJECTS.filter(({ pattern }) => pattern.test(query)).length;
+    if (mentions <= 1) return subject.id;
+  }
+  return undefined;
 }
 
 export function findProfileResponse(
@@ -1275,7 +1265,7 @@ export function findProfileResponse(
   recentUserContext = "",
 ): ProfileChatResponse {
   const mode = detectAnswerMode(query, recentUserContext);
-  const explicitIntentId = resolveExplicitIntentId(query);
+  const explicitIntentId = resolveProjectIntentId(query) ?? resolveExplicitIntentId(query);
   const hasExplicitExperience = Boolean(findExperienceSubject(query));
   const useConversationContext = !explicitIntentId
     && !hasExplicitExperience
@@ -1294,30 +1284,53 @@ export function findProfileResponse(
     return { intent, directScore, score: Math.max(directScore, contextScore, focusedScore) };
   }).sort((a, b) => b.score - a.score);
 
-  const bestMatch = rankedIntents[0];
+  const [bestMatch] = rankedIntents;
+  const bestDestination = DESTINATION_BY_INTENT[bestMatch.intent.id];
+  // Answers about the same page often share phrases. Compare against competing topics.
+  const secondMatch = rankedIntents.find(({ intent }) =>
+    intent.id !== bestMatch.intent.id
+    && (!bestDestination || DESTINATION_BY_INTENT[intent.id] !== bestDestination),
+  );
   const genericIntroductionDrift = Boolean(
     bestMatch
     && ["intro", "education", "majors"].includes(bestMatch.intent.id)
     && /介绍(?:一下)?|tell me about|introduce/i.test(query)
     && !explicitIntentId,
   );
-  if (!bestMatch || bestMatch.score < 24 || genericIntroductionDrift) {
+  const ambiguous = bestMatch && secondMatch && !focusedIntentId
+    && bestMatch.score < 100 && bestMatch.score - secondMatch.score < 6;
+  const minimumScore = 30;
+  if (!bestMatch || bestMatch.score < minimumScore || genericIntroductionDrift || ambiguous) {
+    const clarification = lang === "zh"
+      ? "你想了解哪段经历、哪个项目，或哪项能力？"
+      : "Which experience, project, or skill would you like to know about?";
+    const answer = ambiguous && bestMatch.score >= minimumScore && !genericIntroductionDrift
+      ? clarification
+      : `${PROFILE_CHAT_COPY.fallback[lang]} ${clarification}`;
     return {
-      answer: PROFILE_CHAT_COPY.fallback[lang],
-      context: PROFILE_CHAT_COPY.fallback[lang],
+      answer,
+      context: answer,
       mode,
       useConversationContext,
     };
   }
 
   const bestIntent = bestMatch.intent;
-  const destinationKey = DESTINATION_BY_INTENT[bestIntent.id];
-  const destination = destinationKey ? DESTINATIONS[destinationKey] : undefined;
+  const destinationKey = bestDestination;
+  const comparedDestinations = bestIntent.id === "experience-compare"
+    ? EXPERIENCE_COMPARISON_PROFILES.filter(({ pattern }) => pattern.test(query)).map(({ destination }) => destination)
+    : [];
+  const destinations = comparedDestinations.length >= 2
+    ? comparedDestinations
+    : bestIntent.id === "projects-overview"
+      ? PROJECT_TOPICS.map(({ destination }) => destination)
+      : [destinationKey ?? "about"];
   const resolvedAnswer = bestIntent.id === "experience-compare"
     ? buildExperienceComparisonAnswer(query, lang) ?? bestIntent.answer[lang]
     : bestIntent.answer[lang];
   const supportingAnswers = [
     resolvedAnswer,
+    ...(bestIntent.facts ?? []).map((fact) => fact[lang]),
     ...rankedIntents
       .filter(({ intent, directScore }) => (
         intent.id !== bestIntent.id
@@ -1333,9 +1346,11 @@ export function findProfileResponse(
     context: supportingAnswers.join("\n\n"),
     mode,
     intentId: bestIntent.id,
+    verbatim: bestIntent.verbatim,
     useConversationContext,
-    action: destination
-      ? { href: destination.href, label: destination.label[lang] }
-      : undefined,
+    actions: destinations.map((key) => ({
+      href: DESTINATIONS[key].href,
+      label: DESTINATIONS[key].label[lang],
+    })),
   };
 }

@@ -1,11 +1,11 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 import { LangProvider } from "@/context/LangContext";
-import ProfileChat from "@/components/ProfileChat";
+import { OG_IMAGE, SITE_URL, siteOpenGraph } from "@/lib/siteMetadata";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wuziyang.com";
-const OG_IMAGE = "/images/background.jpg";
-
+// The only root layout. Both sites live under it so switching between / and /cindy stays a
+// client-side navigation (LangProvider state and view transitions survive). Backgrounds,
+// theme colors and site styles belong to app/(main)/layout.tsx and app/(cindy)/cindy/layout.tsx.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -13,11 +13,10 @@ export const metadata: Metadata = {
     template: "%s · Wuziyang Zhang",
   },
   description:
-    "Personal portfolio of Wuziyang Zhang (张吴梓洋) — a globally minded builder at the intersection of business strategy, AI products, data analysis, and creative thinking. UW–Madison, Economics & Information Science.",
+    "Personal portfolio of Wuziyang Zhang (张吴梓洋), an Economics & Information Science student at UW–Madison working across business strategy, data analysis, and AI products.",
   keywords: [
     "Wuziyang Zhang",
     "张吴梓洋",
-    "吴梓洋",
     "UW-Madison",
     "Economics",
     "Information Science",
@@ -26,30 +25,20 @@ export const metadata: Metadata = {
     "Data Analysis",
   ],
   authors: [{ name: "Wuziyang Zhang" }],
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: "Wuziyang Zhang — Think in systems. Build with taste.",
-    description:
-      "Business strategy, AI products, market research, and global perspective — designed into one path.",
-    type: "website",
-    url: SITE_URL,
-    siteName: "Wuziyang Zhang",
-    images: [{ url: OG_IMAGE, width: 1600, height: 900, alt: "Wuziyang Zhang" }],
-  },
   twitter: {
     card: "summary_large_image",
-    title: "Wuziyang Zhang — Think in systems. Build with taste.",
+    title: siteOpenGraph.title,
     description:
-      "Business strategy, AI products, market research, and global perspective.",
+      "Business strategy, data analysis, AI products, and field-tested global perspective.",
     images: [OG_IMAGE],
   },
   robots: { index: true, follow: true },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#000000",
-  colorScheme: "dark",
-};
+// Runs before first paint: applies the saved language to <html> and, for Chinese visitors,
+// holds the page invisible until LangProvider has rendered Chinese (it clears
+// data-lang-pending). The timeout is a safety net if hydration never happens.
+const LANG_BOOT = `(function(){try{var d=document.documentElement,z=localStorage.getItem("wz-lang")==="zh";d.lang=z?"zh-CN":"en";d.setAttribute("data-lang",z?"zh":"en");if(z){d.setAttribute("data-lang-pending","");setTimeout(function(){d.removeAttribute("data-lang-pending")},3000)}}catch(e){}})()`;
 
 export default function RootLayout({
   children,
@@ -57,12 +46,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-black antialiased">
-        <LangProvider>
-          {children}
-          <ProfileChat />
-        </LangProvider>
+    <html lang="en" data-lang="en" suppressHydrationWarning>
+      <head>
+        <script id="lang-boot" dangerouslySetInnerHTML={{ __html: LANG_BOOT }} />
+      </head>
+      <body className="antialiased">
+        <LangProvider>{children}</LangProvider>
       </body>
     </html>
   );
