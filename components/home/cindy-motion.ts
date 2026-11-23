@@ -6,9 +6,18 @@ import { CINDY_BITMAP, paintCindy, type PixelOffset } from "./cindy-sprite";
 
 const IDLE_MS = 20_000;
 const SCROLL_SETTLE_MS = 120;
-const ENTER_IDLE_MS = 200;
+const ENTER_IDLE_MS = 120;
 const NOTE_FADE_MS = 200;
+// The bubble opens empty with a quiet typing cue, then the first word lands this much later.
+const FIRST_TOKEN_MS = 120;
 const TYPE_MS = 30;
+// Only a burst of scroll events (two or more wheel notches, or a continuous swipe) counts as fast.
+const BURST_WINDOW_MS = 100;
+const BURST_DISTANCE = 180;
+const BURST_SPEED = 1.5;
+const BURST_MIN_SPAN_MS = 24;
+// The first-visit opening (see HomeStory) lets the bubble pop once Cindy and the hint have settled.
+const INTRO_NOTE_MS = 950;
 const MOUTH_MS = 105;
 const BLINK_CYCLE = 6_200;
 const BLINK_MS = 120;
@@ -95,6 +104,16 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
   let measuredLine = "";
   let noteBlockSize = 0;
   let arrivals = 0;
+  const burst: { time: number; distance: number }[] = [];
+  const root = document.documentElement;
+  const introAt = root.dataset.intro === "play" ? Number(root.dataset.introAt) || 0 : -1;
+  const introUntil = introAt >= 0 && !reduced.matches ? introAt + INTRO_NOTE_MS : 0;
+  let introTimer = 0;
+  if (introAt >= 0) {
+    // Drop the opening hook once it has played so a client-side return never replays it.
+    introTimer = window.setTimeout(() => { delete root.dataset.intro; delete root.dataset.introAt; },
+      Math.max(0, introAt + 1_400 - performance.now()));
+  }
 
   function scrollPosition() {
     return route.reader?.scrollTop ?? window.scrollY;
@@ -254,9 +273,11 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const chapterChanged = dialogue !== undefined && dialogue.chapter !== station.chapter;
     let hiddenThisFrame = false;
     if (noteAnchor) {
-      const leaving = traveling || dialogue?.line !== line;
-      // A jump can bypass the departure entirely. Clear the note before moving the dock.
-      if (chapterChanged || (parked && !captionReady) || (traveling && noteOverlapsCopy(noteAnchor, scroll))
+      // A jump to another chapter leaves the same way as a walk: the old line fades in its own lane.
+      const leaving = traveling || chapterChanged || dialogue?.line !== line;
+      // On desktop a fading line may never sit on the copy that has moved under it (sides alternate
+      // between chapters), so that case still clears at once; elsewhere the old line fades.
+      if ((parked && !captionReady) || ((traveling || leaving || fadeUntil) && noteOverlapsCopy(noteAnchor, scroll))
         || (fadeUntil && (isReduced || time >= fadeUntil))
         || (isReduced && leaving)) {
         hideNote();
@@ -269,7 +290,9 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
         note.setAttribute("aria-hidden", "true");
       }
     }
-    if (chapterChanged || (!noteAnchor && dialogue?.line !== line)) dialogue = undefined;
+    // A fading line keeps its dialogue until the fade really ends, so a second jump mid-fade
+    // only keeps fading the same bubble instead of stacking a new one on top.
+    if (!noteAnchor && (chapterChanged || dialogue?.line !== line)) dialogue = undefined;
     const gaze = isReduced || asleep ? { x: 0, y: 0 } : preview ? { x: 2, y: -1 } : {
       x: pointer ? Math.round(clamp((pointer.x - x) / 85, -1, 1)) * facing : 0,
       y: pointer ? Math.round(clamp((pointer.y - y) / 85, -1, 1)) : 0,
@@ -310,40 +333,47 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
         measuredLine = key;
       }
     }
-    const enterAt = lastScroll + ENTER_IDLE_MS;
+    const enterAt = Math.max(lastScroll + ENTER_IDLE_MS, introUntil);
     const speaking = noteReady && noteFits && (Boolean(noteAnchor) || (!suppressed && time >= enterAt));
     if (speaking) dialogue ??= { chapter: station.chapter, line, elapsed: 0, lastTick: null };
     else if (noteAnchor && !fadeUntil) hideNote();
 
     const tokens = tokensFor(line, lang);
-    const paused = scrolling || suppressed || settleBlink;
+    // The settle blink is only in her eyes, so the empty bubble's typing cue keeps counting through it.
+    const waiting = Boolean(dialogue) && !isReduced && !spoken.has(station.chapter) && (dialogue?.elapsed ?? 0) < FIRST_TOKEN_MS;
+    const paused = scrolling || suppressed || (settleBlink && !waiting);
     let shown = 0;
     let elapsed = 0;
     if (dialogue) {
       // Only count time spent typing on screen, so the first frame after a pause never catches up.
       if (speaking && !paused && dialogue.lastTick !== null) dialogue.elapsed += time - dialogue.lastTick;
       elapsed = dialogue.elapsed;
-      shown = isReduced || spoken.has(station.chapter) ? tokens.length : Math.min(1 + Math.floor(elapsed / TYPE_MS), tokens.length);
+      if (isReduced || spoken.has(station.chapter)) shown = tokens.length;
+      else if (elapsed >= FIRST_TOKEN_MS) shown = Math.min(1 + Math.floor((elapsed - FIRST_TOKEN_MS) / TYPE_MS), tokens.length);
       dialogue.lastTick = speaking && !paused && shown < tokens.length ? time : null;
     }
     const typing = speaking && shown < tokens.length && !paused;
+    // Before the first word the bubble is open but empty; the cue dots stand in and her mouth stays shut.
+    const pending = speaking && shown === 0;
+    const talking = typing && shown > 0;
     if (speaking) {
       noteAnchor = { x: caption.x - noteWidth / 2, y: y + noteY, width: noteWidth, height: noteBlockSize };
       const text = shown < tokens.length ? tokens.slice(0, shown).join("") : line;
       if (noteText.textContent !== text) noteText.textContent = text;
       if (shown === tokens.length) spoken.add(station.chapter);
     }
-    const mouthBeat = Math.floor(elapsed / MOUTH_MS);
-    const mouth = typing && mouthBeat % 2 === 0;
+    const mouthBeat = Math.floor(Math.max(0, elapsed - FIRST_TOKEN_MS) / MOUTH_MS);
+    const mouth = talking && mouthBeat % 2 === 0;
     const blinkPhase = time % BLINK_CYCLE;
-    const canBlink = !isReduced && parked && !asleep && !scrolling && !settleBlink && !typing;
+    const canBlink = !isReduced && parked && !asleep && !scrolling && !settleBlink && !talking;
     const blink = settleBlink || (canBlink && blinkPhase >= BLINK_START);
     const wagPhase = (time + 2_900) % WAG_CYCLE;
     const canWag = canBlink && !compact && !preview;
     const tail = canWag && wagPhase >= WAG_START ? WAG_FRAMES[Math.floor((wagPhase - WAG_START) / WAG_BEAT)] ?? 0 : 0;
     dock.toggleAttribute("data-speaking", speaking);
     dock.toggleAttribute("data-scroll-dim", speaking && suppressed);
-    dock.toggleAttribute("data-typing", typing && !isReduced);
+    dock.toggleAttribute("data-typing", talking && !isReduced);
+    dock.toggleAttribute("data-note-pending", pending && !isReduced);
     dock.toggleAttribute("data-idle", canBlink && !preview);
     note.setAttribute("aria-hidden", String(!speaking));
     if (parked) {
@@ -390,8 +420,8 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
       spriteKey = nextKey;
       button.dataset.sprite = "ready";
     }
-    const nextToken = typing ? time + shown * TYPE_MS - elapsed : Infinity;
-    const nextMouth = typing ? time + (mouthBeat + 1) * MOUTH_MS - elapsed : Infinity;
+    const nextToken = typing ? time + FIRST_TOKEN_MS + shown * TYPE_MS - elapsed : Infinity;
+    const nextMouth = talking ? time + FIRST_TOKEN_MS + (mouthBeat + 1) * MOUTH_MS - elapsed : Infinity;
     const nextBlink = canBlink ? time + (blink ? BLINK_CYCLE : BLINK_START) - blinkPhase : Infinity;
     const nextWag = !canWag ? Infinity : wagPhase >= WAG_START
       ? time + WAG_BEAT - (wagPhase - WAG_START) % WAG_BEAT
@@ -416,10 +446,17 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
     const delta = position - previousScroll;
     if (delta) {
       const now = performance.now();
-      // A large first jump after a pause can also be fast.
-      const interval = Math.min(now - lastScroll, 32);
+      // A single wheel notch still counts as scrolling (mouth shut, typing paused) but never dims
+      // the bubble. Only two or more events inside a short window that cover a long distance or
+      // move quickly count as fast; a trackpad swipe sends a stream of events and qualifies.
+      burst.push({ time: now, distance: Math.abs(delta) });
+      while (burst.length && burst[0].time < now - BURST_WINDOW_MS) burst.shift();
+      const distance = burst.reduce((sum, event) => sum + event.distance, 0);
+      const span = now - burst[0].time;
+      const fast = burst.length >= 2
+        && (distance >= BURST_DISTANCE || (span >= BURST_MIN_SPAN_MS && distance / span > BURST_SPEED));
       // Keep a fast burst suppressed through its last few, slower wheel or touch events.
-      if (now < fastUntil || Math.abs(delta) > Math.max(8, interval * 1.2)) fastUntil = now + SCROLL_SETTLE_MS;
+      if (now < fastUntil || fast) fastUntil = now + SCROLL_SETTLE_MS;
       previousScroll = position;
       scrollDirection = Math.sign(delta);
       lastActivity = lastScroll = now;
@@ -476,6 +513,8 @@ export function mountCindy({ dock, button, sprite, note, noteMeasure, noteText }
       element.style.removeProperty("--cindy-intro");
     }
     window.clearTimeout(timer);
+    window.clearTimeout(introTimer);
+    if (introAt >= 0) { delete root.dataset.intro; delete root.dataset.introAt; }
     cancelAnimationFrame(frame);
   };
 }

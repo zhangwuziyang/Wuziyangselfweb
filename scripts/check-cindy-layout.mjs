@@ -276,13 +276,35 @@ try {
       paintCindy(expected, CINDY_SCENES.hero.pose, expression, { x: 0, y: 0 }, 0, mobile, { blink, mouth: false, tail: 0 });
       return expected.painted;
     };
+    // The bubble opens empty (the measure already holds the full line) with a typing cue, then types.
+    assert.ok(speaking());
+    assert.equal(noteText.textContent, reduce ? hero : "");
+    assert.equal(dock.hasAttribute("data-note-pending"), !reduce, "an empty bubble shows the typing cue first");
+    assert.equal(noteMeasure.textContent, hero, "the empty bubble is already sized for the whole line");
+    if (!reduce) {
+      assert.ok(!dock.hasAttribute("data-typing"), "her mouth stays shut until the first word");
+      render(119);
+      assert.equal(noteText.textContent, "");
+      render(1);
+      assert.ok(!dock.hasAttribute("data-note-pending"));
+    }
     assert.equal(noteText.textContent, reduce ? hero : prefix(1));
     render(30);
     assert.equal(noteText.textContent, reduce ? hero : prefix(2));
     const pausedText = noteText.textContent;
     const hintY = value("hint-y");
-    jump(12, 8);
-    jump(24, 8);
+    // One wheel notch: scrolling (mouth shut, typing paused) but no dimming.
+    jump(96, 16);
+    assert.ok(speaking() && !dimmed(), "a single wheel notch never dims the bubble");
+    assert.ok(!dock.hasAttribute("data-typing"), "typing pauses during a single notch");
+    assert.equal(noteText.textContent, pausedText);
+    render(150);
+    assert.ok(speaking() && !dimmed());
+    jump(0, 16);
+    render(150);
+    // Two notches inside the burst window: fast, so the bubble dims.
+    jump(96, 8);
+    jump(192, 8);
     assert.ok(speaking() && dimmed(), "fast scrolling within a chapter keeps its bubble and dims it");
     assert.ok(!dock.hasAttribute("data-typing"), "typing pauses during the scroll");
     assert.deepEqual(bitmap.getContext().painted, heroFrame("neutral", false), "scrolling holds a neutral face with the mouth closed");
@@ -303,6 +325,7 @@ try {
       assert.equal(noteText.textContent, prefix(2));
       render(1);
       assert.equal(noteText.textContent, prefix(3), "typing resumes at the next token");
+      assert.equal(dock.attrs.get("data-scene"), "hero", "the burst stayed inside the opening chapter");
       render(heroTokens.length * 30);
     }
     assert.equal(noteText.textContent, hero);
@@ -331,24 +354,38 @@ try {
     assert.equal(note.attrs.get("aria-hidden"), "true");
 
     jump(chapterTops[1]);
-    render(183);
-    assert.ok(!speaking(), "a new bubble needs more idle time than the 120ms scroll-settle window");
+    render(103);
+    assert.ok(!speaking(), "a new bubble waits for the 120ms scroll-settle window");
     render(1);
-    assert.ok(speaking(), "a new bubble opens at 200ms without another scroll event");
+    assert.ok(speaking(), "a new bubble opens at 120ms without another scroll event");
     const about = lineFor("about");
+    assert.equal(noteText.textContent, reduce ? about : "", "the new bubble opens empty before typing");
+    if (!reduce) render(120);
     assert.equal(noteText.textContent, reduce ? about : tokensFor(about)[0]);
     if (mobile && !reduce) assert.ok(dock.dataset.arrive, "the mobile note appears after the arrival hop starts");
     const aboutText = noteText.textContent;
+    const aboutX = check().x + value("note-x");
     for (const top of chapterTops.slice(2, 4)) {
       jump(top);
-      assert.ok(!speaking() && !fading(), "a jump hides the old line immediately at the new station");
+      // A jump fades the old line in its own lane (reduced motion hides it at once); a second jump
+      // mid-fade keeps fading the same bubble rather than stacking another.
+      assert.ok(!speaking(), "a jump never shows a second bubble at the new station");
+      // On desktop the old lane can land on the next chapter's copy (check() enforces no overlap),
+      // so there the line may clear at once; the single-column stage always has room to fade.
+      if (mobile || reduce) assert.equal(fading(), !reduce, "a chapter jump fades the old line unless motion is reduced");
+      if (fading()) assert.ok(Math.abs(check().x + value("note-x") - aboutX) < .01, "the fading line stays in its old lane");
       assert.equal(note.attrs.get("aria-hidden"), "true");
       assert.equal(noteText.textContent, aboutText, "a hidden station never types a queued line");
       render(54);
       assert.ok(!speaking(), "fast scrolling through a brief park suppresses the bubble");
     }
+    if (fading()) {
+      let waited = 0;
+      while (fading() && waited < 210) { assert.ok(!speaking(), "no new bubble while the old line fades"); render(1); waited++; }
+      assert.ok(!fading() && !speaking(), "the fade ends before any new bubble");
+    }
     jump(0);
-    render(183);
+    render(103);
     assert.ok(!speaking());
     render(1);
     assert.ok(speaking());
@@ -357,8 +394,10 @@ try {
       jump(firstDeparture);
       assert.ok(fading());
       jump(chapterTops[1]);
-      assert.ok(!speaking() && !fading(), "a fast skip cancels a fade already in progress");
-      assert.equal(noteText.textContent, hero, "the hidden bubble still holds the old line");
+      assert.ok(!speaking() && (fading() || !mobile), "a fast skip keeps the fade already in progress instead of stacking a bubble");
+      assert.equal(noteText.textContent, hero, "the fading bubble still holds the old line");
+      render(200);
+      assert.ok(!fading());
       jump(0);
       render(184);
     }
@@ -390,8 +429,11 @@ try {
       jump(Math.min(top, end));
       assert.equal(dock.attrs.get("data-scene"), CHAPTERS[index]);
       assert.ok(dock.hasAttribute("data-hint"), `hint is visible at the ${CHAPTERS[index]} anchor (${width}×${height})`);
-      render(184);
-      assert.ok(speaking(), "bubble appears when the entrance idle window closes without another scroll event");
+      // The previous chapter's line may still be fading (single column), so wait frame by frame.
+      let waited = 16;
+      while (!speaking() && waited < 420) { render(1); waited++; }
+      assert.ok(speaking(), `bubble appears once the old line has gone and the entrance idle window closes (${waited}ms)`);
+      if (index) assert.ok(waited >= 120, "the new bubble still waits for the 120ms entrance idle window");
       if (!mobile) {
         const parkedFrame = check();
         assert.equal(parkedFrame.x > width / 2, index % 2 === 1, "desktop chapters alternate sides");
@@ -400,9 +442,16 @@ try {
       const line = lineFor(CHAPTERS[index]);
       if (noteText.textContent !== line && !reduce) {
         const tokens = tokensFor(line);
+        assert.equal(noteText.textContent, "", "an unfinished chapter opens an empty bubble first");
+        assert.ok(dock.hasAttribute("data-note-pending"));
+        let beat = 0;
+        while (!noteText.textContent && beat < 200) { render(1); beat++; }
+        assert.ok(beat <= 121, `the first word follows the empty bubble within 120ms (${beat}ms)`);
         assert.equal(noteText.textContent, tokens[0], "an unfinished chapter starts from its first token after a chapter change");
-        render(120);
-        for (let shown = 1; shown < tokens.length; shown++) {
+        // The settle blink may hold the second token briefly; after that the cadence is strict.
+        let hold = 0;
+        while (noteText.textContent === tokens[0] && tokens.length > 1 && hold < 200) { render(1); hold++; }
+        for (let shown = 2; shown < tokens.length; shown++) {
           render(29);
           check();
           assert.equal(noteText.textContent, tokens.slice(0, shown).join(""));

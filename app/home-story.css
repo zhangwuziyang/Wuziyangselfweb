@@ -14,6 +14,8 @@
   --story-button-ink: #fffaf1;
   --story-motif-ink: #705443;
   --story-wing: clamp(.625rem, 3vw, 1.125rem);
+  /* Set by next/font in HomeStory.tsx; scoped to the homepage. */
+  --font-story-display: var(--font-story-latin, "Source Serif 4"), var(--font-story-han, "Noto Serif SC"), "Songti SC", serif;
   --cindy-pixels: 3;
   position: relative;
   isolation: isolate;
@@ -260,10 +262,11 @@
 
 .story-title {
   color: var(--story-ink);
-  font-size: clamp(1.96rem, 5.4vw, 5rem);
-  line-height: 1.04;
-  font-weight: 600;
-  letter-spacing: -.055em;
+  font-family: var(--font-story-display);
+  font-size: clamp(1.9rem, 4.8vw, 4.25rem);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -.02em;
   overflow-wrap: break-word;
 }
 
@@ -311,13 +314,14 @@
 }
 
 .story-hero__name {
-  font-size: clamp(2rem, 6vw, 6.35rem);
+  font-family: var(--font-story-display);
+  font-size: clamp(2rem, 6vw, 6rem);
   display: block;
   inline-size: max-content;
   max-inline-size: 100%;
-  font-weight: 600;
-  line-height: .89;
-  letter-spacing: -.078em;
+  font-weight: 500;
+  line-height: .98;
+  letter-spacing: -.025em;
   overflow-wrap: anywhere;
 }
 
@@ -350,6 +354,62 @@
   background: transparent;
   border-color: transparent;
 }
+
+/* Desktop chapter links: one row from 768px up, tightened until there is room. */
+.story-nav__links {
+  /* display comes from the hidden md:flex utilities */
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(.7rem, 1.6vw, 1.75rem);
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+
+.story-nav__link {
+  position: relative;
+  padding-block: .875rem;
+  color: var(--story-muted);
+  font-size: .78rem;
+  letter-spacing: 0;
+  transition: color 160ms ease-out;
+}
+
+.story-nav__link:hover,
+.story-nav__link[aria-current] { color: var(--story-ink); }
+
+.story-nav__link:focus-visible {
+  outline: 2px solid var(--story-tint);
+  outline-offset: 2px;
+  border-radius: .25rem;
+}
+
+/* A single hairline that slides to the current chapter. */
+.story-nav__marker {
+  position: absolute;
+  inset: auto auto .5rem 0;
+  block-size: 1.5px;
+  inline-size: 1px;
+  border-radius: 1px;
+  background: var(--story-tint);
+  transform-origin: 0 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.story-nav__marker[data-active] { opacity: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .story-nav__marker[data-ready] {
+    transition: transform 280ms cubic-bezier(.2, .7, .2, 1), opacity 180ms ease-out;
+  }
+}
+
+@media (min-width: 64rem) {
+  .story-nav__link { font-size: .8125rem; }
+}
+
+.mobile-nav a[aria-current] { color: var(--story-tint); }
 
 /* Geometry (size, padding, radii, screen ratio) is set inline in
    components/home/ProjectPreview.tsx; this only paints the titanium shell. */
@@ -600,12 +660,12 @@
     column-gap: clamp(1.25rem, 3vw, 2.75rem);
   }
 
-  .story-hero__name { font-size: clamp(3.75rem, 5.2vw, 5.8rem); }
+  .story-hero__name { font-size: clamp(3.75rem, 5vw, 5.5rem); }
 }
 
 @media (max-width: 34rem) {
   .story-hero__track { min-block-size: 92svh; gap: 1.65rem; }
-  .story-hero__name { line-height: .94; }
+  .story-hero__name { line-height: 1; }
   .story-content h3 { overflow-wrap: anywhere; }
   .story-project__media { padding-inline: .65rem; }
   #global .story-photo-label { max-inline-size: calc(100% - 1rem); }
@@ -622,4 +682,35 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* First-visit opening: name, subtitle, Cindy, then the hint, all inside ~1s. The hook is set by
+   the inline script in HomeStory.tsx; no hash, a repeat visit or reduced motion skips it. Only text
+   and Cindy move: the portrait loads and paints untouched, and Cindy never scales. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-intro="play"] .story-hero__copy > * {
+    animation: story-intro-rise 380ms cubic-bezier(.2, .7, .2, 1) backwards;
+  }
+
+  html[data-intro="play"] .story-hero__copy > :nth-child(2) { animation-delay: 60ms; }
+  html[data-intro="play"] .story-hero__copy > :nth-child(3) { animation-delay: 180ms; }
+  html[data-intro="play"] .story-hero__copy > :nth-child(4) { animation-delay: 260ms; }
+
+  /* filter: opacity() and translate leave the JS-driven opacity and transform alone. */
+  html[data-intro="play"] .cindy-sprite,
+  html[data-intro="play"] .cindy-shadow {
+    animation: story-intro-arrive 360ms cubic-bezier(.2, .7, .2, 1) 380ms backwards;
+  }
+
+  html[data-intro="play"] .cindy-hint {
+    animation: story-intro-arrive 300ms cubic-bezier(.2, .7, .2, 1) 640ms backwards;
+  }
+}
+
+@keyframes story-intro-rise {
+  from { opacity: 0; translate: 0 12px; }
+}
+
+@keyframes story-intro-arrive {
+  from { filter: opacity(0); translate: 0 8px; }
 }

@@ -46,10 +46,26 @@ async function checkDialogue(page, mobile, reduced) {
     let pops = 0;
     const onPop = event => { if (event.animationName === "cindy-note-in") pops++; };
     note.addEventListener("animationstart", onPop);
-    move(position() + 64);
+    // A single wheel-notch-sized step pauses typing but never dims the bubble.
+    move(position() + 48);
+    const single = { dimmed: false, minOpacity: 1, text: text.textContent };
+    for (let index = 0; index < 8; index++) {
+      await frame();
+      single.dimmed ||= dock.hasAttribute("data-scroll-dim");
+      single.minOpacity = Math.min(single.minOpacity, opacity());
+    }
+    await until("Typing never resumed after a single step", () => text.textContent.length > single.text.length || reduced
+      || text.textContent === full);
+    // Two or more steps inside the burst window count as fast scrolling and dim it.
+    const burstPrefix = text.textContent;
+    move(position() + 80);
+    await frame();
+    move(position() + 80);
+    await frame();
+    move(position() + 80);
     await until("The same-section bubble never dimmed", () => speaking("experience")
       && dock.hasAttribute("data-scroll-dim") && Math.abs(opacity() - .4) < .03);
-    const dim = { text: text.textContent, hintY: hint.getBoundingClientRect().top,
+    const dim = { text: text.textContent, burstPrefix, hintY: hint.getBoundingClientRect().top,
       ariaHidden: note.getAttribute("aria-hidden") };
     await until("The bubble never returned to full opacity", () => opacity() === 1);
     await until("Typing never resumed", () => text.textContent.length > prefix.length || reduced);
@@ -59,9 +75,19 @@ async function checkDialogue(page, mobile, reduced) {
 
     visit("projects");
     await until("Cindy never switched stations", () => dock.dataset.scene === "projects");
-    const jumped = { opacity: opacity(), text: text.textContent, ariaHidden: note.getAttribute("aria-hidden") };
+    const jumped = { speaking: dock.hasAttribute("data-speaking"), leaving: dock.hasAttribute("data-note-leaving"),
+      opacity: opacity(), text: text.textContent, ariaHidden: note.getAttribute("aria-hidden") };
+    // Skip again while the first fade may still run: the same bubble keeps fading, nothing stacks.
     visit("global");
+    await frame();
+    const stacked = { speaking: dock.hasAttribute("data-speaking"), text: text.textContent };
+    if (dock.hasAttribute("data-note-leaving")) {
+      await until("The fade never finished", () => !dock.hasAttribute("data-note-leaving"));
+    }
+    const faded = opacity();
     await until("The final chapter never got a note", () => speaking("global"));
+    const opened = { text: text.textContent, pending: dock.hasAttribute("data-note-pending") };
+    await until("The final chapter never started typing", () => text.textContent.length > 0);
     const landed = text.textContent;
     visit("experience");
     await until("The revisited chapter never got a note", () => speaking("experience"));
@@ -82,17 +108,27 @@ async function checkDialogue(page, mobile, reduced) {
     await until("The press feedback did not clear", () => !next.classList.contains("is-pressed"));
     visit("hero");
     await until("Cindy never returned to the start", () => speaking("hero") && opacity() === 1);
-    return { prefix, full, hintY, dim, resumed, pops, jumped, landed, revisit, press };
+    return { prefix, full, hintY, single, dim, resumed, pops, jumped, stacked, faded, opened, landed, revisit, press };
   }, { mobile, reduced });
 
-  assert.equal(result.dim.text, result.prefix, "Same-section scrolling preserves the visible prefix");
+  assert.equal(result.single.dimmed, false, "A single wheel-notch step never dims the bubble");
+  assert.equal(result.single.minOpacity, 1, "A single step keeps the bubble at full opacity");
+  assert.equal(result.single.text, result.prefix, "A single step preserves the visible prefix");
+  assert.equal(result.dim.text, result.dim.burstPrefix, "Same-section scrolling preserves the visible prefix");
   assert.equal(result.dim.ariaHidden, "false");
   assert.ok(Math.abs(result.dim.hintY - result.hintY) < .5, "The hint stays in place as the bubble dims");
   assert.equal(result.pops, 0, "Dimming and recovering opacity never replay the pop");
   if (!reduced) assert.ok(result.resumed.startsWith(result.prefix) && result.resumed.length > result.prefix.length);
-  assert.deepEqual(result.jumped, { opacity: 0, text: result.full, ariaHidden: "true" },
-    "The first frame in the new station has a fully hidden note with the old text");
+  assert.deepEqual({ speaking: result.jumped.speaking, text: result.jumped.text, ariaHidden: result.jumped.ariaHidden },
+    { speaking: false, text: result.full, ariaHidden: "true" },
+    "The first frame in the new station never speaks; the old text is leaving and hidden from assistive tech");
+  // The single column always fades the old line; desktop may clear it at once when its lane would sit on new copy.
+  if (mobile && !reduced) assert.ok(result.jumped.leaving, "A chapter jump fades the old line instead of dropping it");
+  if (reduced) assert.equal(result.jumped.opacity, 0, "Reduced motion hides the old line at once");
+  assert.deepEqual(result.stacked, { speaking: false, text: result.full }, "A second skip mid-fade never stacks a bubble");
+  assert.equal(result.faded, 0, "The fade ends fully hidden before the next note");
   assert.ok(result.landed && !result.full.startsWith(result.landed), "The skip lands on the final chapter's line");
+  if (!reduced) assert.deepEqual(result.opened, { text: "", pending: true }, "A new bubble opens empty with the typing cue");
   assert.equal(result.revisit, result.full, "A spoken chapter immediately revisits with the full line");
   assert.ok(result.press.changed, "The preview advances on press");
   assert.deepEqual(result.press.after, result.press.before, "Press feedback leaves the device and screenshot geometry in place");
@@ -105,7 +141,9 @@ async function checkWheelEntrance(page, client, width, height) {
     return dock.dataset.scene === chapter && dock.hasAttribute("data-speaking");
   };
   const wheelDelta = 100;
-  const wheelInterval = 130;
+  // Just under the 120ms entrance idle window, and longer than the 100ms burst window, so each
+  // notch is a single slow step: no dimming, but no bubble either until the wheel stops.
+  const wheelInterval = 110;
   await page.evaluate(() => window.scrollTo({
     top: window.scrollY + document.getElementById("about").getBoundingClientRect().top, behavior: "instant",
   }));
@@ -148,8 +186,8 @@ async function checkWheelEntrance(page, client, width, height) {
     assert.ok(parked.includes(chapter), `The wheel crossed a parked ${chapter} station`);
   }
   assert.deepEqual(entrances.map(([chapter]) => chapter), ["global"],
-    "100px wheel steps every 130ms never open a bubble at an intermediate station");
-  assert.ok(entrances[0][1] >= 198, `The final station waited for 200ms of scroll idle (${entrances[0][1]}ms)`);
+    "100px wheel steps every 110ms never open a bubble at an intermediate station");
+  assert.ok(entrances[0][1] >= 118, `The final station waited for 120ms of scroll idle (${entrances[0][1]}ms)`);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForFunction(arriving, {}, "hero");
 }
