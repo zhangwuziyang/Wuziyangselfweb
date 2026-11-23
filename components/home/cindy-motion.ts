@@ -6,7 +6,10 @@ import { CINDY_BITMAP, paintCindy, type PixelOffset } from "./cindy-sprite";
 
 const IDLE_MS = 20_000;
 const SCROLL_SETTLE_MS = 120;
-const ENTER_IDLE_MS = 120;
+// A new station only speaks once the scroll has been quiet this long. It must clearly exceed a
+// slow wheel's notch interval (~110ms, more on a loaded CPU), or a station passed mid-wheel opens
+// a bubble; quick scrolls, chapter jumps and the fade between sections are unaffected.
+const ENTER_IDLE_MS = 200;
 const NOTE_FADE_MS = 200;
 // The bubble opens empty with a quiet typing cue, then the first word lands this much later.
 const FIRST_TOKEN_MS = 120;

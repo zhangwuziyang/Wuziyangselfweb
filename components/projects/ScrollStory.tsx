@@ -793,7 +793,8 @@ function GalleryLightbox({ item, device, lang, onClose }: GalleryLightboxProps) 
   );
 }
 
-export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
+/** basePath "" for the standard site, "/cindy" for the Cindy tour copy of the page. */
+export default function ScrollStory({ story, basePath = "" }: { story: ProjectStoryConfig; basePath?: "" | "/cindy" }) {
   const { lang } = useLang();
   const zh = lang === "zh";
   const reducedMotion = Boolean(useReducedMotion());
@@ -863,6 +864,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
 
       {/* Adaptive floating top navigation */}
       <ProjectNav
+        homeHref={`${basePath || "/"}#projects`}
         title={story.title}
         progress={clampedProgress}
         darkTransition={story.darkTransition}
@@ -1107,7 +1109,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
             {/* Quiet Footer Navigation */}
             <footer className="flex flex-col justify-between gap-6 border-t border-white/[0.08] pt-10 sm:flex-row sm:items-center">
               <Link
-                href="/#projects"
+                href={`${basePath || "/"}#projects`}
                 className="group inline-flex items-center gap-2 text-sm font-medium text-[#9da1af] transition-colors hover:text-white"
               >
                 <span
@@ -1120,7 +1122,7 @@ export default function ScrollStory({ story }: { story: ProjectStoryConfig }) {
               </Link>
 
               <Link
-                href={story.sibling.href}
+                href={`${basePath}${story.sibling.href}`}
                 className="group inline-flex items-center gap-3 text-sm font-medium text-[#d8dbe6] transition-colors hover:text-white"
               >
                 <span className="text-xs tracking-[0.08em] text-[#848897] uppercase">

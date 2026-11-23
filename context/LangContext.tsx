@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
+import { createContext, useContext, useLayoutEffect, useSyncExternalStore } from "react";
 import type { Lang } from "@/lib/i18n";
 
 const LS_KEY = "wz-lang";
@@ -51,8 +51,13 @@ const LangContext = createContext<LangContextValue>({
 export function LangProvider({ children }: { children: React.ReactNode }) {
   const lang = useSyncExternalStore(subscribe, readLang, getServerSnapshot);
 
-  useEffect(() => {
-    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  // Layout effect: runs before paint. The hydration pass renders the server snapshot ("en");
+  // only once the rendered language matches the saved one is the first-paint gate lifted.
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.lang = lang === "zh" ? "zh-CN" : "en";
+    root.dataset.lang = lang;
+    if (lang === readLang()) root.removeAttribute("data-lang-pending");
   }, [lang]);
 
   const toggle = () => writeLang(lang === "en" ? "zh" : "en");

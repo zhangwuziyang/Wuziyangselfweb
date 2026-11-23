@@ -7,6 +7,7 @@ import { useLang } from "@/context/LangContext";
 import type { LocalizedText } from "@/lib/projectData/storyTypes";
 
 interface ProjectNavProps {
+  homeHref?: string;
   title: LocalizedText;
   progress: MotionValue<number>;
   darkTransition: [number, number];
@@ -15,6 +16,7 @@ interface ProjectNavProps {
 }
 
 export function ProjectNav({
+  homeHref = "/#projects",
   title,
   progress,
   darkTransition,
@@ -64,7 +66,7 @@ export function ProjectNav({
         }`}
       >
         <Link
-          href="/#projects"
+          href={homeHref}
           className={`inline-flex w-fit items-center gap-2 text-[13px] font-medium transition-opacity duration-200 hover:opacity-100 ${
             isDark ? "text-white/80" : "text-black/70"
           }`}

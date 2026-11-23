@@ -1,11 +1,11 @@
-import type { Metadata, Viewport } from "next";
-import { Suspense } from "react";
+import type { Metadata } from "next";
 import "./globals.css";
 import { LangProvider } from "@/context/LangContext";
-import ProfileChatLauncher from "@/components/ProfileChatLauncher";
-import ScrollEffects from "@/components/ui/ScrollEffects";
 import { OG_IMAGE, SITE_URL, siteOpenGraph } from "@/lib/siteMetadata";
 
+// The only root layout. Both sites live under it so switching between / and /cindy stays a
+// client-side navigation (LangProvider state and view transitions survive). Backgrounds,
+// theme colors and site styles belong to app/(main)/layout.tsx and app/(cindy)/cindy/layout.tsx.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   keywords: [
     "Wuziyang Zhang",
     "张吴梓洋",
-    "吴梓洋",
     "UW-Madison",
     "Economics",
     "Information Science",
@@ -36,10 +35,10 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#000000",
-  colorScheme: "dark",
-};
+// Runs before first paint: applies the saved language to <html> and, for Chinese visitors,
+// holds the page invisible until LangProvider has rendered Chinese (it clears
+// data-lang-pending). The timeout is a safety net if hydration never happens.
+const LANG_BOOT = `(function(){try{var d=document.documentElement,z=localStorage.getItem("wz-lang")==="zh";d.lang=z?"zh-CN":"en";d.setAttribute("data-lang",z?"zh":"en");if(z){d.setAttribute("data-lang-pending","");setTimeout(function(){d.removeAttribute("data-lang-pending")},3000)}}catch(e){}})()`;
 
 export default function RootLayout({
   children,
@@ -47,14 +46,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-black antialiased">
-        <LangProvider>
-          <ProfileChatLauncher>{children}</ProfileChatLauncher>
-          <Suspense fallback={null}>
-            <ScrollEffects />
-          </Suspense>
-        </LangProvider>
+    <html lang="en" data-lang="en" suppressHydrationWarning>
+      <head>
+        <script id="lang-boot" dangerouslySetInnerHTML={{ __html: LANG_BOOT }} />
+      </head>
+      <body className="antialiased">
+        <LangProvider>{children}</LangProvider>
       </body>
     </html>
   );

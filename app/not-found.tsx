@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: "#000", color: "#f5f5f7" }}>
+    <main data-site="main" className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: "#000", color: "#f5f5f7" }}>
       <p className="text-[11px] font-semibold tracking-[0.22em] uppercase mb-6" style={{ color: "#0071e3" }}>
         404
       </p>

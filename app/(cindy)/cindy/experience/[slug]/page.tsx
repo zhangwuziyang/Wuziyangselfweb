@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { EXPERIENCE_DATA } from "@/lib/experienceData";
 import { siteOpenGraph } from "@/lib/siteMetadata";
+import { cindySubpageViewport } from "@/lib/cindyRoutes";
+
+export const viewport = cindySubpageViewport;
 import ExperienceDetailClient from "./ExperienceDetailClient";
 
 export const unstable_instant = { prefetch: "static", unstable_disableValidation: true };

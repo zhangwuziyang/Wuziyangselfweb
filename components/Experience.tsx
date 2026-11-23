@@ -45,7 +45,7 @@ export default function Experience() {
                     <Localized {...exp.location} />
                   </p>
 
-                  <Link href={`/experience/${exp.slug}`}>
+                  <Link href={`/cindy/experience/${exp.slug}`}>
                     <article
                       className="story-panel group relative overflow-hidden rounded-2xl story-interactive p-3.5 sm:p-7"
                     >

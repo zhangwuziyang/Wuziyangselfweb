@@ -29,11 +29,42 @@
 /* ─── Base ──────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
+}
+
+/* No background on body: each site sets the canvas through <html>, so overscroll and
+   rubber-band areas show the right color. Unmatched routes (404) render the standard site.
+   After a client navigation Next keeps the previous route mounted but hidden (React Activity
+   sets an inline "display: none !important"), so only the visible site may decide. */
+html:has([data-site="main"]:not([style*="display: none"])) {
+  background: #000;
+  color-scheme: dark;
+}
+
+html:has([data-site="cindy"]:not([style*="display: none"])) {
+  background: #f9f4eb;
+  color-scheme: light;
   scroll-padding-top: 4rem;
 }
 
+/* Cindy subpages keep their 9343abf dark chrome; only the Cindy homepage is cream. */
+html:has([data-site="cindy"]:not([style*="display: none"])):not(:has(.home-story:not([style*="display: none"]))) {
+  background: #000;
+  color-scheme: dark;
+}
+
+/* Saved Chinese: hidden until LangProvider renders zh (see LANG_BOOT in app/layout.tsx). */
+html[data-lang-pending] body {
+  visibility: hidden;
+}
+
+/* Switching between / and /cindy: a plain ~300ms cross-fade, no movement. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
 body {
-  background: var(--c-black);
   color: var(--c-white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

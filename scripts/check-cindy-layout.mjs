@@ -65,9 +65,9 @@ try {
   const { measureRoute, sampleBackdrop, sampleGuide, TRAVEL_START } = (await import(pathToFileURL(join(directory, "cindy-route.js")))).default;
   const { CHAPTERS, CINDY_SCENES } = (await import(pathToFileURL(join(directory, "cindy-scenes.js")))).default;
   const { paintCindy } = (await import(pathToFileURL(join(directory, "cindy-sprite.js")))).default;
-  const html = htmlParser.parse(await readFile(new URL("../.next/server/app/index.html", import.meta.url), "utf8"));
+  const html = htmlParser.parse(await readFile(new URL("../.next/server/app/cindy.html", import.meta.url), "utf8"));
   const guideCSS = await readFile(new URL("../components/home/cindy-guide.css", import.meta.url), "utf8");
-  const storyCSS = await readFile(new URL("../app/home-story.css", import.meta.url), "utf8");
+  const storyCSS = await readFile(new URL("../app/(cindy)/cindy/home-story.css", import.meta.url), "utf8");
   assert.match(guideCSS, /\.cindy-hint\s*\{[^}]*transform:\s*translate\(-50%,/);
   assert.match(storyCSS, /@media \(width < 48rem\)\s*\{[\s\S]*?\.story-content\s*\{[^}]*overflow:\s*auto;/);
   assert.match(storyCSS, /section:nth-child\(even\) > \.cindy-station\s*\{ grid-area: 1 \/ 2;/);
@@ -354,10 +354,10 @@ try {
     assert.equal(note.attrs.get("aria-hidden"), "true");
 
     jump(chapterTops[1]);
-    render(103);
-    assert.ok(!speaking(), "a new bubble waits for the 120ms scroll-settle window");
+    render(183);
+    assert.ok(!speaking(), "a new bubble waits for the 200ms entrance idle window");
     render(1);
-    assert.ok(speaking(), "a new bubble opens at 120ms without another scroll event");
+    assert.ok(speaking(), "a new bubble opens at 200ms without another scroll event");
     const about = lineFor("about");
     assert.equal(noteText.textContent, reduce ? about : "", "the new bubble opens empty before typing");
     if (!reduce) render(120);
@@ -385,7 +385,7 @@ try {
       assert.ok(!fading() && !speaking(), "the fade ends before any new bubble");
     }
     jump(0);
-    render(103);
+    render(183);
     assert.ok(!speaking());
     render(1);
     assert.ok(speaking());
@@ -433,7 +433,7 @@ try {
       let waited = 16;
       while (!speaking() && waited < 420) { render(1); waited++; }
       assert.ok(speaking(), `bubble appears once the old line has gone and the entrance idle window closes (${waited}ms)`);
-      if (index) assert.ok(waited >= 120, "the new bubble still waits for the 120ms entrance idle window");
+      if (index) assert.ok(waited >= 200, "the new bubble still waits for the 200ms entrance idle window");
       if (!mobile) {
         const parkedFrame = check();
         assert.equal(parkedFrame.x > width / 2, index % 2 === 1, "desktop chapters alternate sides");

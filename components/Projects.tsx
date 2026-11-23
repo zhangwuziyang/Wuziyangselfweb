@@ -70,7 +70,7 @@ export default function Projects() {
                   <div className="mb-5 flex flex-wrap gap-2">
                     <Localized en={renderTechTags(en.techTags)} zh={renderTechTags(zh.techTags)} />
                   </div>
-                  <Link href={`/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:underline">
+                  <Link href={`/cindy/projects/${slug}`} className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[var(--story-tint)] hover:underline">
                     <Localized en={en.cta} zh={zh.cta} />
                     <span className="sr-only"><Localized en={` ${en.title}`} zh={` ${zh.title}`} /></span>
                     <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>

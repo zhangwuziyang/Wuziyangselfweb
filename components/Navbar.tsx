@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLang } from "@/context/LangContext";
+import SiteSwitchLink from "@/components/SiteSwitchLink";
 import type { i18n } from "@/lib/i18n";
 
 const NAV_KEYS = [
@@ -93,6 +94,7 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
   const { lang, toggle } = useLang();
   const [open, setOpen] = useState(false);
   const { active, jump } = useChapterSpy();
+  const standardLabel = lang === "zh" ? "标准版" : "Standard site";
   const links = useRef<HTMLElement>(null);
   const marker = useRef<HTMLSpanElement>(null);
   const shown = useRef(false);
@@ -154,7 +156,7 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
 
           {/* Left — logo */}
           <Link
-            href="/"
+            href="/cindy"
             className="nav-link shrink-0 text-sm font-semibold tracking-[0.2em] uppercase transition-colors duration-200 w-fit"
           >
             WZ
@@ -183,6 +185,13 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
 
           {/* Right — language + CTA */}
           <div className="ml-auto md:ml-0 flex shrink-0 items-center justify-end gap-3">
+            {/* Way back to the standard site; remembers the choice in wz-tour. */}
+            <SiteSwitchLink
+              to="main"
+              className="hidden md:inline-flex nav-link text-[13px] font-light underline-offset-4 hover:underline"
+            >
+              {standardLabel}
+            </SiteSwitchLink>
             <button
               onClick={toggle}
               className="hidden md:block nav-link text-[13px] font-light transition-colors duration-200 px-3 py-1.5 rounded-full border border-current/20 hover:border-current/40"
@@ -235,6 +244,12 @@ export default function Navbar({ copy }: { copy: typeof i18n.nav }) {
               {copy[key][lang]}
             </a>
           ))}
+          <SiteSwitchLink
+            to="main"
+            className="text-[var(--story-muted)] text-[15px] underline-offset-4 hover:underline"
+          >
+            {standardLabel}
+          </SiteSwitchLink>
           <div className="flex items-center gap-4 mt-4">
             <button
               onClick={toggle}

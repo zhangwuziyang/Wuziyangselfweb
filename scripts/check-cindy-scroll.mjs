@@ -5,7 +5,12 @@ import { setTimeout as delay } from "node:timers/promises";
 
 const { default: puppeteer } = await import(process.env.CINDY_PUPPETEER || "puppeteer-core");
 
-const URL = process.env.CINDY_SCROLL_URL || "http://localhost:3000";
+// The Cindy tour lives at /cindy; CINDY_SCROLL_URL is the server origin (a full /cindy URL also works).
+const ORIGIN = process.env.CINDY_SCROLL_URL || "http://localhost:3000";
+const URL = /\/cindy\/?$/.test(ORIGIN) ? ORIGIN : `${ORIGIN.replace(/\/$/, "")}/cindy`;
+// Stress options for the wheel-entrance check: CDP CPU throttling rate and ± wheel interval jitter (ms).
+const CPU_THROTTLE = Number(process.env.CINDY_CPU_THROTTLE || 0);
+const WHEEL_JITTER = Number(process.env.CINDY_WHEEL_JITTER || 0);
 const DELTA = 12;
 const STEP_MS = 16;
 const CHAPTERS = ["hero", "about", "experience", "projects", "global", "music", "skills", "philosophy", "contact"];
@@ -141,7 +146,7 @@ async function checkWheelEntrance(page, client, width, height) {
     return dock.dataset.scene === chapter && dock.hasAttribute("data-speaking");
   };
   const wheelDelta = 100;
-  // Just under the 120ms entrance idle window, and longer than the 100ms burst window, so each
+  // Well under the 200ms entrance idle window, and longer than the 100ms burst window, so each
   // notch is a single slow step: no dimming, but no bubble either until the wheel stops.
   const wheelInterval = 110;
   await page.evaluate(() => window.scrollTo({
@@ -174,7 +179,8 @@ async function checkWheelEntrance(page, client, width, height) {
   }, wheelDelta);
   const started = performance.now();
   for (let index = 0; index < steps; index++) {
-    if (index > 0) await delay(Math.max(0, started + index * wheelInterval - performance.now()));
+    const jitter = WHEEL_JITTER ? Math.round((Math.random() * 2 - 1) * WHEEL_JITTER) : 0;
+    if (index > 0) await delay(Math.max(0, started + index * wheelInterval + jitter - performance.now()));
     await client.send("Input.dispatchMouseEvent", {
       type: "mouseWheel", x: width * .65, y: height / 2, deltaX: 0, deltaY: wheelDelta,
     });
@@ -187,7 +193,7 @@ async function checkWheelEntrance(page, client, width, height) {
   }
   assert.deepEqual(entrances.map(([chapter]) => chapter), ["global"],
     "100px wheel steps every 110ms never open a bubble at an intermediate station");
-  assert.ok(entrances[0][1] >= 118, `The final station waited for 120ms of scroll idle (${entrances[0][1]}ms)`);
+  assert.ok(entrances[0][1] >= 198, `The final station waited for 200ms of scroll idle (${entrances[0][1]}ms)`);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForFunction(arriving, {}, "hero");
 }
@@ -205,7 +211,12 @@ async function check(browser, width, height, { mobile = false, reduced = false, 
     await page.evaluate(() => document.fonts.ready);
     await checkDialogue(page, mobile, reduced);
     const client = await page.createCDPSession();
-    if (!mobile) await checkWheelEntrance(page, client, width, height);
+    if (!mobile) {
+      if (CPU_THROTTLE > 1) await client.send("Emulation.setCPUThrottlingRate", { rate: CPU_THROTTLE });
+      await checkWheelEntrance(page, client, width, height);
+      if (CPU_THROTTLE > 1) await client.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+      console.log(`${width}×${height}: wheel entrance ok (cpu ×${CPU_THROTTLE || 1}, jitter ±${WHEEL_JITTER}ms)`);
+    }
     const maxScroll = await page.evaluate(async mobile => {
       // Let the first rendered pose reach the screen before the opening sample.
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));

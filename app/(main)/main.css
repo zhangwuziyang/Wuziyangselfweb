@@ -1,0 +1,15 @@
+/* Standard-site-only styles restored from main (df2f82a) app/globals.css. */
+
+/* ─── Scroll indicator ──────────────────────────────────────── */
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50%       { opacity: 1;   transform: scaleY(1.3); }
+}
+.scroll-indicator { animation: scroll-pulse 2.2s ease-in-out infinite; }
+
+/* ─── Apple-style page transition ──────────────────────────── */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: page-in 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; }

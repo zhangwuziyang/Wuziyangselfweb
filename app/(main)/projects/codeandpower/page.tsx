@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import CodeAndPowerClient from "./CodeAndPowerClient";
 import { siteOpenGraph } from "@/lib/siteMetadata";
+import CodeAndPowerClient from "./CodeAndPowerClient";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/projects/codeandpower" },

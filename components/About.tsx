@@ -94,7 +94,7 @@ export default function About() {
             {/* University card — links to /university */}
             <div className="mt-6">
               <Link
-                href="/university"
+                href="/cindy/university"
                 className="story-panel group flex flex-wrap items-center justify-between gap-4 rounded-2xl px-4 py-3 story-interactive"
               >
                 <div className="flex items-center gap-3 min-w-0">

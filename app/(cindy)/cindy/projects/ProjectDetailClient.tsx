@@ -34,7 +34,7 @@ export default function ProjectDetailClient({ copy, video }: ProjectDetailProps)
   return (
     <div className="min-h-screen bg-black text-[#f5f5f7]">
       <nav className="fixed inset-x-0 top-0 z-50 flex h-12 items-center justify-between border-b border-white/[0.06] bg-black/[0.82] px-5 backdrop-blur-[24px]">
-        <Link href="/#projects" className="inline-flex items-center gap-2 text-sm font-medium text-[#a1a1a6] transition-colors hover:text-white">
+        <Link href="/cindy#projects" className="inline-flex items-center gap-2 text-sm font-medium text-[#a1a1a6] transition-colors hover:text-white">
           <span aria-hidden="true" className="text-lg">←</span>
           {zh ? "项目" : "Projects"}
         </Link>
@@ -134,7 +134,7 @@ export default function ProjectDetailClient({ copy, video }: ProjectDetailProps)
 
       <div className="px-5 pb-20">
         <div className="mx-auto max-w-[900px] border-t border-white/[0.06] pt-12">
-          <Link href="/#projects" className="inline-flex items-center gap-2 text-sm font-medium text-[#a1a1a6] transition-colors hover:text-white">
+          <Link href="/cindy#projects" className="inline-flex items-center gap-2 text-sm font-medium text-[#a1a1a6] transition-colors hover:text-white">
             <span aria-hidden="true">←</span>
             {zh ? "返回全部项目" : "Back to all projects"}
           </Link>

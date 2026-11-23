@@ -16,9 +16,13 @@ import { i18n } from "@/lib/i18n";
 import { siteOpenGraph } from "@/lib/siteMetadata";
 import "./home-story.css";
 
+const title = "Cindy 导览版 · Wuziyang Zhang";
+
+// Same content as the standard homepage, so the canonical points back to "/".
 export const metadata: Metadata = {
+  title: { absolute: title },
   alternates: { canonical: "/" },
-  openGraph: { ...siteOpenGraph, url: "/" },
+  openGraph: { ...siteOpenGraph, title, url: "/cindy" },
 };
 
 export default function Home() {

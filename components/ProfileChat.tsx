@@ -4,6 +4,7 @@ import { type FormEvent, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CindyAvatar from "@/components/home/CindyAvatar";
 import { useLang } from "@/context/LangContext";
+import { cindyHref } from "@/lib/cindyRoutes";
 import type { LocalAI } from "@/lib/profileChatAI";
 import { collapsedChatFrame, type ChatOrigin } from "./profile-chat-motion";
 import {
@@ -383,7 +384,7 @@ export default function ProfileChat({ open, readOrigin, onClose }: {
                   {!message.typing && message.actions?.map((action) => (
                     <Link
                       key={action.href}
-                      href={action.href}
+                      href={cindyHref(action.href)}
                       onNavigate={() => closeChat(false)}
                       className="profile-chat-message__link"
                     >
