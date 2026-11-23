@@ -159,12 +159,18 @@ async function checkWheelEntrance(page, client, width, height) {
     const entrances = new Map();
     const events = new AbortController();
     let lastScroll = -Infinity;
-    window.addEventListener("scroll", () => { lastScroll = performance.now(); }, { passive: true, signal: events.signal });
+    // Diagnostics only: when each scroll event reached the page, to tell a real pause in the
+    // input stream apart from a bubble that opened too early.
+    const scrolls = [];
+    window.addEventListener("scroll", () => {
+      lastScroll = performance.now();
+      scrolls.push([Math.round(lastScroll), Math.round(window.scrollY)]);
+    }, { passive: true, signal: events.signal });
     const observer = new MutationObserver(() => {
       const chapter = dock.dataset.scene;
       if (dock.hasAttribute("data-parked")) parked.add(chapter);
       if (chapter !== "about" && dock.hasAttribute("data-speaking") && !entrances.has(chapter)) {
-        entrances.set(chapter, performance.now() - lastScroll);
+        entrances.set(chapter, Math.round(performance.now() - lastScroll));
       }
     });
     observer.observe(dock, { attributes: true, attributeFilter: ["data-scene", "data-parked", "data-speaking"] });
@@ -172,27 +178,36 @@ async function checkWheelEntrance(page, client, width, height) {
       observer.disconnect();
       events.abort();
       delete window.finishCindyWheelEntrance;
-      return { parked: [...parked], entrances: [...entrances] };
+      let maxGap = 0;
+      for (let i = 1; i < scrolls.length; i++) maxGap = Math.max(maxGap, scrolls[i][0] - scrolls[i - 1][0]);
+      return { parked: [...parked], entrances: [...entrances], scrollEvents: scrolls.length, maxGap, scrolls };
     };
     const steps = Math.ceil(document.getElementById("global").getBoundingClientRect().top / wheelDelta);
     return { steps, end: window.scrollY + steps * wheelDelta };
   }, wheelDelta);
   const started = performance.now();
+  let slowestDispatch = 0;
   for (let index = 0; index < steps; index++) {
     const jitter = WHEEL_JITTER ? Math.round((Math.random() * 2 - 1) * WHEEL_JITTER) : 0;
     if (index > 0) await delay(Math.max(0, started + index * wheelInterval + jitter - performance.now()));
+    const sent = performance.now();
     await client.send("Input.dispatchMouseEvent", {
       type: "mouseWheel", x: width * .65, y: height / 2, deltaX: 0, deltaY: wheelDelta,
     });
+    slowestDispatch = Math.max(slowestDispatch, performance.now() - sent);
   }
   await page.waitForFunction(end => window.scrollY >= end - 1, {}, end);
   await page.waitForFunction(arriving, {}, "global");
-  const { parked, entrances } = await page.evaluate(() => window.finishCindyWheelEntrance());
+  const { parked, entrances, scrollEvents, maxGap, scrolls } = await page.evaluate(() => window.finishCindyWheelEntrance());
+  const diagnosis = `${steps} wheel notches → ${scrollEvents} scroll events, longest gap between scroll events ${maxGap}ms, `
+    + `slowest wheel dispatch ${Math.round(slowestDispatch)}ms, entrances ${JSON.stringify(entrances)} (ms after the last scroll event)`;
+  console.log(`${width}×${height}: wheel entrance diagnostics: ${diagnosis}`);
+  if (entrances.length !== 1) console.log(`  scroll events [t, scrollY]: ${JSON.stringify(scrolls)}`);
   for (const chapter of ["experience", "projects", "global"]) {
     assert.ok(parked.includes(chapter), `The wheel crossed a parked ${chapter} station`);
   }
   assert.deepEqual(entrances.map(([chapter]) => chapter), ["global"],
-    "100px wheel steps every 110ms never open a bubble at an intermediate station");
+    `100px wheel steps every 110ms never open a bubble at an intermediate station (${diagnosis})`);
   assert.ok(entrances[0][1] >= 198, `The final station waited for 200ms of scroll idle (${entrances[0][1]}ms)`);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForFunction(arriving, {}, "hero");
