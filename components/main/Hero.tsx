@@ -111,31 +111,9 @@ export default function Hero() {
             : "经济学与信息科学 · AI 商业分析与 AI 产品"}
         </motion.p>
 
-        <motion.div
-          {...fade(0.72)}
-          className="flex flex-col sm:flex-row gap-3 mt-9 justify-center items-stretch sm:items-center"
-        >
-          <button
-            onClick={() =>
-              document.querySelector("#experience")?.scrollIntoView({ behavior: "smooth" })
-            }
-            className="group flex items-center justify-center gap-2 text-sm font-medium rounded-full transition-[background,transform] duration-300 hover:scale-[1.03] active:scale-[0.97] px-[30px] py-[11px] text-[#1a1a1a] bg-white/90 hover:bg-white"
-          >
-            {tx(h.cta1, lang)}
-            <span className="inline-block group-hover:translate-x-0.5 transition-transform duration-200">
-              ↗
-            </span>
-          </button>
-          <button
-            onClick={() =>
-              document.querySelector("#about")?.scrollIntoView({ behavior: "smooth" })
-            }
-            className="text-sm font-medium rounded-full transition-[background,transform] duration-300 hover:scale-[1.03] active:scale-[0.97] px-[30px] py-[11px] text-[#f5ede0] bg-transparent hover:bg-white/10"
-            style={{ border: "1.5px solid rgba(255,255,255,0.7)" }}
-          >
-            {tx(h.cta2, lang)}
-          </button>
-          {/* Third-tier entry to the Cindy tour; variants and states live in app/(main)/main.css. */}
+        {/* The hero's only call to action: the entry to the Cindy tour (variants in app/(main)/main.css).
+            Content-width on every screen, centred under the subtitle. */}
+        <motion.div {...fade(0.72)} className="flex justify-center mt-10 md:mt-12">
           <HeroSwitch label={tx(h.switchTour, lang)} />
         </motion.div>
       </div>

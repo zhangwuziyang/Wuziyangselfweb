@@ -15,20 +15,22 @@
 .page-enter { animation: page-in 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; }
 
 /* ─── Hero: entry to the Cindy tour (components/main/HeroSwitch.tsx) ───
-   Third tier after "View Experience" and "About Me". No looping animation of any kind;
+   The hero's only call to action, centred under the subtitle and sized to its content on
+   every screen (never a full-width bar on phones). No looping animation of any kind;
    hover / keyboard focus brighten it a little and lift it 1.5px (150–200ms, ease-out). */
 .hero-switch {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  min-height: 44px;
-  padding: 10px 20px 10px 14px;
+  gap: 0.7rem;
+  min-height: 52px;
+  padding: 13px 26px 13px 17px;
   border-radius: 9999px;
   border: 1px solid transparent;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 500;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   transition:
     transform 180ms ease-out,
@@ -86,14 +88,14 @@
   color: #f5ede0;
   background-color: rgba(14, 11, 8, 0.8);
   border-color: rgba(245, 237, 224, 0.4);
-  padding-right: 16px;
+  padding-right: 20px;
 }
 .hero-switch[data-variant="b"] .hero-switch__sep {
   display: block;
   flex: none;
   width: 1px;
-  height: 14px;
-  margin-left: 0.2rem;
+  height: 16px;
+  margin-left: 0.15rem;
   background: rgba(245, 237, 224, 0.3);
 }
 .hero-switch[data-variant="b"]:hover,
@@ -101,6 +103,15 @@
   color: #fffaf2;
   background-color: rgba(30, 24, 18, 0.86);
   border-color: rgba(245, 237, 224, 0.68);
+}
+
+@media (min-width: 768px) {
+  .hero-switch {
+    min-height: 56px;
+    padding: 15px 30px 15px 19px;
+    font-size: 1rem;
+  }
+  .hero-switch[data-variant="b"] { padding-right: 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

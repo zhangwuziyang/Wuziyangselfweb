@@ -17,8 +17,6 @@ export const i18n = {
     headline2:  { en: "Build with taste.",          zh: "以品味构建。" },
     sub1:       { en: "Economics & Information Science · AI Business Analytics & AI Products", zh: "经济学与信息科学 · AI 商业分析与 AI 产品" },
     sub2:       { en: "at the University of Wisconsin–Madison.", zh: "威斯康星大学麦迪逊分校。" },
-    cta1:       { en: "View Experience", zh: "查看经历" },
-    cta2:       { en: "About Me",        zh: "关于我"   },
     switchTour: { en: "Switch to Cindy tour", zh: "切换至 Cindy 导览版" },
     scroll:     { en: "Scroll",          zh: "向下"     },
   },
